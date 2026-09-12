@@ -25,7 +25,7 @@ interface SlackMessage {
   content: string;
   isBot?: boolean;
   botFor?: string;
-  citations?: { source: string; snippet: string }[];
+  citations?: { source: string; snippet: string; url?: string }[];
 }
 
 const CHANNELS = [
@@ -318,9 +318,18 @@ export function SlackSimulatorView() {
               {CHANNELS.find((c) => c.id === activeChannel)?.desc}
             </span>
           </div>
-          <div className="flex items-center gap-2 text-xs bg-[#222529] px-2.5 py-1 rounded-full text-[#c4b5a0] border border-[#383a40]">
-            <Sparkles size={12} />
-            Theme: Agent in the Workplace
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 text-xs bg-[#1a2e3b] px-2.5 py-1 rounded-full text-[#36c5f0] border border-[#2b5974]">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#36c5f0] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#36c5f0]"></span>
+              </span>
+              Exa AI Neural Grounding
+            </div>
+            <div className="flex items-center gap-2 text-xs bg-[#222529] px-2.5 py-1 rounded-full text-[#c4b5a0] border border-[#383a40]">
+              <Sparkles size={12} />
+              OpenAI gpt-4o-mini
+            </div>
           </div>
         </div>
 
@@ -361,15 +370,29 @@ export function SlackSimulatorView() {
                 {msg.citations && msg.citations.length > 0 && (
                   <div className="mt-2.5 rounded-md border border-[#3f4148] bg-[#19171d] p-2 text-xs space-y-1">
                     <span className="text-[10px] font-semibold uppercase tracking-wider text-[#9a9b9e] flex items-center gap-1">
-                      <CheckCircle size={10} className="text-[#2eb67d]" /> Verified Citations:
+                      <CheckCircle size={10} className="text-[#2eb67d]" /> Verified Grounded Citations:
                     </span>
-                    {msg.citations.map((cit, idx) => (
-                      <div key={idx} className="flex items-center gap-1.5 text-[11px] text-[#4a9eff]">
-                        <ExternalLink size={10} />
-                        <span className="font-semibold text-[#c4b5a0]">{cit.source}:</span>
-                        <span className="text-[#bcabbc] truncate">{cit.snippet}</span>
-                      </div>
-                    ))}
+                    {msg.citations.map((cit, idx) =>
+                      cit.url ? (
+                        <a
+                          key={idx}
+                          href={cit.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1.5 text-[11px] text-[#36c5f0] hover:underline cursor-pointer group"
+                        >
+                          <ExternalLink size={10} className="group-hover:translate-x-0.5 transition-transform" />
+                          <span className="font-semibold text-[#36c5f0]">{cit.source}:</span>
+                          <span className="text-[#a0c8e0] underline truncate">{cit.snippet}</span>
+                        </a>
+                      ) : (
+                        <div key={idx} className="flex items-center gap-1.5 text-[11px] text-[#4a9eff]">
+                          <ExternalLink size={10} />
+                          <span className="font-semibold text-[#c4b5a0]">{cit.source}:</span>
+                          <span className="text-[#bcabbc] truncate">{cit.snippet}</span>
+                        </div>
+                      )
+                    )}
                   </div>
                 )}
               </div>

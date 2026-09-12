@@ -38,7 +38,11 @@ When key engineers, PMs, or sales leads are asleep, in back-to-back meetings, or
 - A CEO can ask a single high-level question (e.g., *"Are we on track for our enterprise v3 release?"*).
 - GhostWorker polls the **Engineering Lead twin, Sales VP twin, and Product VP twin** simultaneously, aggregating agreement levels, risk areas, and cross-team themes.
 
-### 4. 🎙️ Natural Voice Interaction
+### 4. 🌐 Real-Time Neural Grounding via Exa AI ($1,000 Bounty Track)
+- GhostWorker blends internal company memory with live web intelligence via **Exa AI's Neural Search API**.
+- When teammates ask about external dependencies, latest framework releases (e.g. Next.js 16), or competitor benchmarks, the agent livecrawls and highlights verified web sources with clickable URLs.
+
+### 5. 🎙️ Natural Voice Interaction
 - Conversational audio powered by OpenAI Whisper (STT) and OpenAI TTS.
 
 ---
@@ -95,6 +99,9 @@ OPENAI_API_KEY=sk-or-v1-xxxxxxxxxxxxxxxxxxxx
 OPENAI_BASE_URL=https://openrouter.ai/api/v1
 OPENAI_MODEL=openai/gpt-4o-mini
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Exa AI Search Key (For Live Web Grounding)
+EXA_API_KEY=772e5dd2-xxxxxxxxxxxxxxxxxxxx
 ```
 
 ### 4. Run Development Server

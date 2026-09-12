@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/core/supabase/server";
 import { generateEmbedding } from "@/lib/agents/openai";
-import { learnFromConversation } from "@backend/memory";
 import OpenAI from "openai";
+import { searchExa } from "@/lib/services/exa";
 
 /**
  * POST /api/edamame/chat
@@ -220,6 +220,35 @@ Let me know if you need me to drill deeper into the architecture diffs or specif
       ? facts.map((f) => `- ${f.content} (source: ${f.source}, confidence: ${((f.confidence ?? 0.5) * 100).toFixed(0)}%)`).join("\n")
       : "";
 
+    // Live External Grounding via Exa AI Neural Search
+    let exaCitations: { source: string; snippet: string; date: string; url?: string }[] = [];
+    let exaContextStr = "";
+
+    if (process.env.EXA_API_KEY) {
+      try {
+        const exaRes = await searchExa(question, { numResults: 2, searchType: "auto" });
+        if (exaRes.results && exaRes.results.length > 0) {
+          exaContextStr = exaRes.results
+            .map(
+              (r, i) =>
+                `[Exa Live Web Source ${i + 1}: ${r.title} (${r.url})]\n${
+                  r.highlights && r.highlights.length > 0 ? r.highlights.join("\n") : "Relevant live web intelligence."
+                }`
+            )
+            .join("\n\n---\n\n");
+
+          exaCitations = exaRes.results.map((r) => ({
+            source: "Exa AI (Live Web)",
+            snippet: r.title || r.url,
+            date: "Live Grounded",
+            url: r.url,
+          }));
+        }
+      } catch (err) {
+        console.warn("[Exa Search] Non-fatal Exa search warning:", err);
+      }
+    }
+
     // System prompt
     const systemPrompt = `You are the AI Digital Twin of ${cloneName}. You embody their knowledge, communication style, and expertise.
 
@@ -230,14 +259,15 @@ Let me know if you need me to drill deeper into the architecture diffs or specif
 - Expertise: ${expertise.join(", ") || "General organizational knowledge"}
 
 ## Your Knowledge Base (retrieved from organizational data)
-${contextStr || "(No relevant documents found in the knowledge base yet.)"}
+${contextStr || "(No relevant internal documents found in the knowledge base yet.)"}
 ${factsStr ? `\n### Key Facts\n${factsStr}\n` : ""}
+${exaContextStr ? `\n## Live External Knowledge (Grounding via Exa AI Neural Search)\n${exaContextStr}\n` : ""}
 ## Instructions
-1. Answer questions using the knowledge base context above as your primary source.
+1. Answer questions using the internal knowledge base context and any Exa AI live web sources above.
 2. Speak as ${cloneName}'s twin — use first person.
-3. Be concise and conversational. Reference specific documents, emails, or messages when relevant.
-4. If the context doesn't contain an answer, say so honestly and suggest what might help.
-5. When citing information, mention the source type (email, Drive doc, Slack message, etc.).
+3. Be concise and conversational. Reference specific documents, RFCs, or Exa live web findings when relevant.
+4. If neither context contains an answer, say so honestly and suggest what might help.
+5. When citing information, mention the source type (RFC, Slack message, or Exa Live Web).
 6. Keep responses focused and actionable.`;
 
     // Build messages
@@ -267,15 +297,18 @@ ${factsStr ? `\n### Key Facts\n${factsStr}\n` : ""}
       temperature: 0.7,
     });
 
-    // Build citations from the chunks used
-    const citations = chunks
+    // Build citations from the chunks used + Exa live web findings
+    const internalCitations = chunks
       .slice(0, 3)
       .map((c) => ({
         source: (c.metadata?.source as string) || "document",
         snippet: (c.metadata?.document_title as string) || c.content.slice(0, 80) + "…",
         date: (c.metadata?.gmail_date as string) || "",
+        url: "",
       }))
       .filter((c) => c.snippet);
+
+    const citations = [...internalCitations, ...exaCitations];
 
     // Stream as SSE
     const encoder = new TextEncoder();

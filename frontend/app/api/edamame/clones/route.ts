@@ -27,7 +27,7 @@ export async function GET() {
     if (!supabaseUrl || !supabaseKey) {
       const { mockClones } = await import("@/lib/memory/mock-data");
       const profiles = mockClones.map((clone) => {
-        const personality = clone.personality as Record<string, unknown> | null;
+        const personality = clone.personality as unknown as Record<string, unknown> | null;
         const tone = (personality?.tone as string) || "";
         const bio = (personality?.bio as string) || "";
         const expertiseAreas = (personality?.expertise_areas as string[]) || [];
@@ -75,7 +75,7 @@ export async function GET() {
     }
 
     const profiles = clones.map((clone) => {
-      const personality = clone.personality as Record<string, unknown> | null;
+      const personality = clone.personality as unknown as Record<string, unknown> | null;
       const tone = (personality?.tone as string) || "";
       const bio = (personality?.bio as string) || "";
       const expertiseAreas = (personality?.expertise_areas as string[]) || [];

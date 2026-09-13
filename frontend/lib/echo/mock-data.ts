@@ -10,7 +10,7 @@ import type {
   Stance,
   CloneProfile,
   Citation,
-} from "./types";
+} from "@/lib/edamame/types";
 
 // ============================================
 // EMPLOYEES

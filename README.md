@@ -3,6 +3,14 @@
 > **Autonomous Workplace Digital Twins Living in Slack, GitHub & Team Memory.**  
 > *Built for the **AI Tinkerers & OpenAI Hackathon: "Agents Everywhere"**.*
 
+🔗 **Live Deployment:** [https://ghostworker-nczhglfa1-syed-mohammad-alis-projects-3ffcf36b.vercel.app](https://ghostworker-nczhglfa1-syed-mohammad-alis-projects-3ffcf36b.vercel.app)  
+🐙 **GitHub Repository:** [https://github.com/mohammadali-2000/ghostworker-ai](https://github.com/mohammadali-2000/ghostworker-ai)
+
+### 👥 Team GhostWorker
+- **Sm Ali (Mohammad Ali)** — Lead Full Stack & AI Architect
+- **Maneesh Nand** — Backend & Infrastructure Lead
+- **Md Towfik Omer** — Frontend & Product Lead
+
 ---
 
 ## 🎯 The Core Concept: "Leaving the Chatbox"

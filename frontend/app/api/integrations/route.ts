@@ -53,10 +53,29 @@ function maskConfig(config: Record<string, unknown>): Record<string, unknown> {
   return masked;
 }
 
+// In-memory store when Supabase is not configured
+export const localIntegrationsMap = new Map<IntegrationProvider, { config: Record<string, unknown>; updated_at: string }>();
+
 export async function GET() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    const integrations = VALID_PROVIDERS.map((provider) => {
+      const entry = localIntegrationsMap.get(provider);
+      return {
+        provider,
+        updated_at: entry?.updated_at || new Date().toISOString(),
+        has_config: Boolean(entry && Object.keys(entry.config).length > 0),
+        config_preview: entry ? maskConfig(entry.config) : {},
+      };
+    });
+    return NextResponse.json({ integrations });
+  }
+
   const supabase = createServerSupabaseClient();
   const result = await supabase
-      .from("integrations")
+    .from("integrations")
     .select("provider, config, updated_at")
     .order("provider");
 
@@ -94,25 +113,40 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const supabase = createServerSupabaseClient();
-  const result = await supabase
-      .from("integrations")
-    .upsert(
-      {
-        provider: body.provider,
-        config: body.config,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "provider" }
-    )
-    .select("provider, updated_at")
-    .single();
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (result.error || !result.data) {
-    return NextResponse.json(
-      { error: `Failed to save integration: ${result.error?.message}` },
-      { status: 500 }
-    );
+  let providerName = body.provider;
+  let updatedAt = new Date().toISOString();
+
+  if (!supabaseUrl || !supabaseKey) {
+    localIntegrationsMap.set(body.provider, {
+      config: body.config,
+      updated_at: updatedAt,
+    });
+  } else {
+    const supabase = createServerSupabaseClient();
+    const result = await supabase
+      .from("integrations")
+      .upsert(
+        {
+          provider: body.provider,
+          config: body.config,
+          updated_at: updatedAt,
+        },
+        { onConflict: "provider" }
+      )
+      .select("provider, updated_at")
+      .single();
+
+    if (result.error || !result.data) {
+      return NextResponse.json(
+        { error: `Failed to save integration: ${result.error?.message}` },
+        { status: 500 }
+      );
+    }
+    providerName = result.data.provider;
+    updatedAt = result.data.updated_at;
   }
 
   // Auto-trigger sync after saving credentials
@@ -135,7 +169,7 @@ export async function POST(request: NextRequest) {
         typeof body.config.username === "string"
           ? body.config.username.trim()
           : null;
-      if (username && body.config.token) {
+      if (username) {
         syncResult = await syncGitHubContextToSupabase({
           cloneId,
           username,
@@ -176,8 +210,8 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({
     success: true,
-    provider: result.data.provider,
-    updated_at: result.data.updated_at,
+    provider: providerName,
+    updated_at: updatedAt,
     sync: syncResult
       ? { success: true, result: syncResult }
       : syncError

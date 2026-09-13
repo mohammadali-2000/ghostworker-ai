@@ -19,12 +19,20 @@ export async function getIntegrationConfig(
       .eq("provider", provider)
       .single();
 
-    if (result.error || !result.data) return null;
+    if (result.error || !result.data) {
+      const { localIntegrationsMap } = await import("@/app/api/integrations/route");
+      return localIntegrationsMap.get(provider)?.config ?? null;
+    }
     const config = result.data.config as Record<string, unknown> | null;
     if (!config || Object.keys(config).length === 0) return null;
     return config;
   } catch {
-    return null;
+    try {
+      const { localIntegrationsMap } = await import("@/app/api/integrations/route");
+      return localIntegrationsMap.get(provider)?.config ?? null;
+    } catch {
+      return null;
+    }
   }
 }
 
@@ -182,6 +190,13 @@ export async function getSlackBotToken(): Promise<string> {
 }
 
 export async function getActiveCloneId(): Promise<string> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return "clone_self";
+  }
+
   const supabase = createServerSupabaseClient();
 
   // Try active clones first

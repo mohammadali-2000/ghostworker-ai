@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
       const name = c.name.replace(/\s*\(Clone\)$/i, "");
       const cRole = c.owner_role || "Team Member";
       const expertise = c.expertise_tags?.slice(0, 3).join(", ") || "";
-      const personality = c.personality as Record<string, unknown> | null;
+      const personality = c.personality as unknown as Record<string, unknown> | null;
       const bio = (personality?.bio as string) || "";
       const tone = (personality?.tone as string) || "";
 

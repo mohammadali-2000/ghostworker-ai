@@ -550,7 +550,7 @@ export async function getKnowledgeContext(
     .limit(6);
 
   // Always fetch episodic memories (keyword fallback if vector didn't find any)
-  let keywordEpisodesPromise: ReturnType<typeof supabase.from> | null = null;
+  let keywordEpisodesPromise: any = null;
   if (!vectorEpisodes || vectorEpisodes.length === 0) {
     let episodeQuery = supabase
       .from("memories")
@@ -567,8 +567,8 @@ export async function getKnowledgeContext(
   }
 
   // If vector search didn't work, fetch items/chunks via keyword
-  let keywordItemsPromise: ReturnType<typeof supabase.from> | null = null;
-  let keywordChunksPromise: ReturnType<typeof supabase.from> | null = null;
+  let keywordItemsPromise: any = null;
+  let keywordChunksPromise: any = null;
 
   if (!hasVectorResults) {
     let itemQuery = supabase
@@ -596,7 +596,7 @@ export async function getKnowledgeContext(
   }
 
   // Execute all queries in parallel
-  const promises: Promise<{ data: unknown }>[] = [categoryQuery, resourceQuery];
+  const promises: any[] = [categoryQuery, resourceQuery];
   if (keywordEpisodesPromise) promises.push(keywordEpisodesPromise);
   if (keywordItemsPromise) promises.push(keywordItemsPromise);
   if (keywordChunksPromise) promises.push(keywordChunksPromise);

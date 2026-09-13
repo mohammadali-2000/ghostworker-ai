@@ -16,6 +16,7 @@ export type IntegrationSource = "slack" | "notion" | "github" | "jira" | "gdrive
 
 export interface Clone {
   id: string;
+  org_id?: string;
   name: string;
   avatar_url?: string;
   personality: ClonePersonality;
@@ -42,13 +43,15 @@ export interface ClonePersonality {
 export interface Memory {
   id: string;
   clone_id: string;
-  type: MemoryType;
-  source: MemorySource;
-  content: string;
+  type?: MemoryType;
+  source?: MemorySource;
+  content?: string;
+  fact?: string;
   confidence: number;
-  metadata: Record<string, unknown>;
-  occurred_at: string;
+  metadata?: Record<string, unknown>;
+  occurred_at?: string;
   created_at: string;
+  [key: string]: unknown;
 }
 
 export interface MemoryInput extends Omit<Memory, "id" | "created_at"> {}
@@ -69,13 +72,13 @@ export interface EpisodicMetadata {
 
 // Convenience accessors for metadata fields used across the codebase
 export function memoryFact(m: Memory): string {
-  return m.content;
+  return m.content || m.fact || "";
 }
 export function memoryTitle(m: Memory): string | undefined {
-  return m.metadata.title as string | undefined;
+  return (m.metadata?.title as string) || undefined;
 }
 export function memoryDocType(m: Memory): string | undefined {
-  return m.metadata.doc_type as string | undefined;
+  return (m.metadata?.doc_type as string) || undefined;
 }
 
 // Flat message row
@@ -133,6 +136,15 @@ export interface Chunk {
   created_at: string;
   score?: number;
   document_id?: string;
+}
+
+export interface Document {
+  id: string;
+  clone_id: string;
+  title: string;
+  content: string;
+  doc_type?: string;
+  created_at: string;
 }
 
 // Input type for synthetic resource generation (used by ingest pipeline)

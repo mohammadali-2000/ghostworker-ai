@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
             messages.push(assistantMessage);
 
             for (const toolCall of assistantMessage.tool_calls) {
-              if (toolCall.function.name !== "consult_clone") {
+              if (toolCall.type !== "function" || toolCall.function.name !== "consult_clone") {
                 messages.push({
                   role: "tool",
                   tool_call_id: toolCall.id,

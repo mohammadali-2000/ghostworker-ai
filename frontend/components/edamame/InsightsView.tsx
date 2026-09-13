@@ -739,7 +739,7 @@ export function InsightsView({ demoTrigger }: InsightsViewProps) {
         ) : (
           <div className="mx-auto max-w-3xl">
             {/* Agent Network Visualization */}
-            {(isRunning || (stage !== "idle" && stage !== "complete")) && (
+            {(isRunning || stage !== "complete") && (
               <div className="animate-fade-in mb-6">
                 <AgentNetworkView trigger={networkTrigger} />
               </div>

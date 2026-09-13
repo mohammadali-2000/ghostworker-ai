@@ -28,6 +28,42 @@ interface SlackMessage {
   citations?: { source: string; snippet: string; url?: string }[];
 }
 
+interface TeammateAvatarInfo {
+  initials: string;
+  gradient: string;
+  ring: string;
+}
+
+export function getTeammateAvatarInfo(sender: string, botFor?: string): TeammateAvatarInfo {
+  const name = (botFor || sender).toLowerCase();
+  if (name.includes("ali")) {
+    return {
+      initials: "SA",
+      gradient: "from-emerald-600 to-teal-800 text-white",
+      ring: "ring-emerald-500/40",
+    };
+  }
+  if (name.includes("maneesh")) {
+    return {
+      initials: "MN",
+      gradient: "from-indigo-600 to-violet-800 text-white",
+      ring: "ring-indigo-500/40",
+    };
+  }
+  if (name.includes("towfik")) {
+    return {
+      initials: "MT",
+      gradient: "from-cyan-600 to-blue-800 text-white",
+      ring: "ring-cyan-500/40",
+    };
+  }
+  return {
+    initials: "YOU",
+    gradient: "from-zinc-700 to-slate-900 text-zinc-200",
+    ring: "ring-zinc-500/40",
+  };
+}
+
 const CHANNELS = [
   { id: "eng-architecture", name: "eng-architecture", desc: "System design & v3 platform" },
   { id: "sales-pipeline", name: "sales-pipeline", desc: "Deals, enterprise security reviews" },
@@ -38,70 +74,70 @@ const INITIAL_MESSAGES: Record<string, SlackMessage[]> = {
   "eng-architecture": [
     {
       id: "msg-1",
-      sender: "David Kim",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",
-      role: "Senior Backend Eng",
+      sender: "Sm Ali (Mohammad Ali)",
+      avatar: "SA",
+      role: "Lead Full Stack & AI Architect",
       timestamp: "10:14 AM",
-      content: "Hey @Jason Park, are we still targeting March 15 for the v3 release? Need to know if we can start database schema migrations this week.",
+      content: "Hey @Maneesh Nand, are we still targeting March 15 for the v3 release? Need to know if we can start database schema migrations this week.",
     },
     {
       id: "msg-2",
-      sender: "GhostWorker (Jason Park)",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80",
+      sender: "GhostWorker (Maneesh Nand)",
+      avatar: "MN",
       role: "AI Digital Twin",
       timestamp: "10:14 AM",
       isBot: true,
-      botFor: "Jason Park (Offline / In Planning)",
-      content: "Hey David! Jason is currently offline, but here is his verified timeline from the RFC:\n\n• Target date remains March 15 with a phased rollout:\n  - Phase 1 (March 1): Core platform + SSO\n  - Phase 2 (March 15): Audit logs & advanced RBAC\n  - Phase 3 (April 1): Migration tooling\n\nSchema migrations should begin in Phase 1 once SSO is finalized (currently 80% complete and passing tests).",
+      botFor: "Maneesh Nand (Offline / In Deep Focus)",
+      content: "Hey Ali! Maneesh is currently offline, but here is his verified timeline from the RFC:\n\n• Target date remains March 15 with a phased rollout:\n  - Phase 1 (March 1): Core platform + SSO\n  - Phase 2 (March 15): Audit logs & advanced RBAC\n  - Phase 3 (April 1): Migration tooling\n\nSchema migrations should begin in Phase 1 once SSO is finalized (currently 80% complete and passing tests).",
       citations: [
         { source: "Notion", snippet: "v3 Platform Architecture RFC (Phase 1 Rollout)" },
-        { source: "Slack", snippet: "#eng-platform commit log: SSO test suite passing" },
+        { source: "Slack", snippet: "#new-channel: Maneesh & Ali architecture sync" },
       ],
     },
   ],
   "sales-pipeline": [
     {
       id: "msg-3",
-      sender: "Marcus Vance",
-      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80",
-      role: "Account Executive",
+      sender: "Maneesh Nand",
+      avatar: "MN",
+      role: "Backend & Infrastructure Lead",
       timestamp: "11:20 AM",
-      content: "Hey @Sarah Chen, what is the status of the TechFlow $3.2M security review? Do we have SSO ready for them?",
+      content: "Hey @Md Towfik Omer, what is the status of the enterprise frontend security review? Do we have SSO ready for them?",
     },
     {
       id: "msg-4",
-      sender: "GhostWorker (Sarah Chen)",
-      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80",
+      sender: "GhostWorker (Md Towfik Omer)",
+      avatar: "MT",
       role: "AI Digital Twin",
       timestamp: "11:20 AM",
       isBot: true,
-      botFor: "Sarah Chen (In Executive Review)",
-      content: "Hi Marcus! Sarah is in customer reviews right now. TechFlow requires SSO and audit logging before their security review begins on March 5.\n\nEngineering is finishing SAML support this week, and we're on track. CTO Maria Santos is our primary decision maker.",
+      botFor: "Md Towfik Omer (In Design Review)",
+      content: "Hi Maneesh! Towfik is in design reviews right now. The frontend requires SSO and audit logging before our enterprise review begins on March 5.\n\nFrontend components for SAML support are finishing this week, and we're on track.",
       citations: [
-        { source: "Playbook", snippet: "Q1 Sales Playbook: TechFlow $3.2M ARR compliance specs" },
+        { source: "Playbook", snippet: "Frontend Design System: Enterprise Compliance Specs" },
       ],
     },
   ],
   "product-roadmap": [
     {
       id: "msg-5",
-      sender: "Rachel Green",
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&auto=format&fit=crop&q=80",
-      role: "Product Ops",
+      sender: "Md Towfik Omer",
+      avatar: "MT",
+      role: "Frontend & Product Lead",
       timestamp: "9:05 AM",
-      content: "What are our top 3 enterprise priorities for Q1?",
+      content: "What are our top 3 priorities for the GhostWorker AI launch?",
     },
     {
       id: "msg-6",
-      sender: "GhostWorker (Alex Morgan)",
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&auto=format&fit=crop&q=80",
+      sender: "GhostWorker (Sm Ali)",
+      avatar: "SA",
       role: "AI Digital Twin",
       timestamp: "9:05 AM",
       isBot: true,
-      botFor: "Alex Morgan (VP Product)",
-      content: "Alex's Q1 roadmap priorities:\n\n1. Enterprise Security (SSO + Audit logs to unlock the $8.7M pipeline)\n2. Platform Reliability (99.95% uptime SLA)\n3. Developer Experience (API docs & webhook management)",
+      botFor: "Sm Ali (In Architecture Review)",
+      content: "Morning Towfik! Ali is in architecture review, but here are our top 3 deliverables:\n\n1. In-situ Slack & GitHub digital twins (zero friction)\n2. Real-time neural search grounding via Exa AI\n3. Executive CEO polling across engineering, product, and sales.",
       citations: [
-        { source: "Roadmap", snippet: "Q1 Product Roadmap: Enterprise Tier Requirements" },
+        { source: "Roadmap", snippet: "Q1 GhostWorker Autonomous Agent Roadmap" },
       ],
     },
   ],
@@ -112,6 +148,51 @@ export function SlackSimulatorView() {
   const [messages, setMessages] = useState<Record<string, SlackMessage[]>>(INITIAL_MESSAGES);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [presence, setPresence] = useState<Record<string, "away" | "active">>({
+    maneesh: "away",
+    towfik: "away",
+    ali: "away",
+  });
+  const [autoMode, setAutoMode] = useState(false);
+  const [statusReasons, setStatusReasons] = useState<Record<string, string>>({
+    towfik: "Google Cal: In Product Design Sync",
+    maneesh: "Slack Idle: >15m Inactive",
+    ali: "Active in Slack & GitHub",
+  });
+
+  const togglePresence = (key: string) => {
+    setPresence((prev) => ({
+      ...prev,
+      [key]: prev[key] === "active" ? "away" : "active",
+    }));
+  };
+
+  // Auto-Presence Simulation: Realistic Calendar & Slack Heartbeat
+  useEffect(() => {
+    if (!autoMode) return;
+
+    const interval = setInterval(() => {
+      // Rotate presence dynamically based on simulated events
+      setPresence((prev) => {
+        const nextTowfik = prev.towfik === "active" ? "away" : "active";
+        return {
+          ...prev,
+          towfik: nextTowfik,
+        };
+      });
+
+      setStatusReasons((prev) => ({
+        ...prev,
+        towfik:
+          prev.towfik.includes("Google Cal")
+            ? "Slack: Active at desk"
+            : "Google Cal: In Product Design Sync",
+      }));
+    }, 18000); // changes every 18 seconds in auto demo mode
+
+    return () => clearInterval(interval);
+  }, [autoMode]);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const currentMessages = messages[activeChannel] || [];
@@ -128,7 +209,7 @@ export function SlackSimulatorView() {
     const userMsg: SlackMessage = {
       id: `user-${Date.now()}`,
       sender: "You (Teammate)",
-      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80",
+      avatar: "YOU",
       role: "Teammate",
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       content: text,
@@ -142,15 +223,50 @@ export function SlackSimulatorView() {
     setIsTyping(true);
 
     // Determine which clone to call based on channel or mention
-    let cloneId = "clone_jason";
-    let targetName = "Jason Park";
-    if (activeChannel === "sales-pipeline" || text.toLowerCase().includes("sarah")) {
-      cloneId = "clone_sarah";
-      targetName = "Sarah Chen";
-    } else if (activeChannel === "product-roadmap" || text.toLowerCase().includes("alex")) {
-      cloneId = "clone_self";
-      targetName = "Alex Morgan";
+    let cloneId = "e5c02685-c1e0-4660-84a1-77ea33a593e1";
+    let targetName = "Maneesh Nand";
+    let presenceKey = "maneesh";
+
+    if (
+      activeChannel === "sales-pipeline" ||
+      text.toLowerCase().includes("towfik") ||
+      text.toLowerCase().includes("sarah")
+    ) {
+      cloneId = "a8f7c9e2-3b1d-4e5f-9a8c-1d2e3f4a5b6c";
+      targetName = "Md Towfik Omer";
+      presenceKey = "towfik";
+    } else if (
+      activeChannel === "product-roadmap" ||
+      text.toLowerCase().includes("ali") ||
+      text.toLowerCase().includes("alex")
+    ) {
+      cloneId = "f1d2e3b4-5a6c-7d8e-9f0a-1b2c3d4e5f6a";
+      targetName = "Sm Ali (Mohammad Ali)";
+      presenceKey = "ali";
     }
+
+    const targetInitials = targetName.includes("Maneesh") ? "MN" : targetName.includes("Towfik") ? "MT" : "SA";
+
+    // IF TEAMMATE IS ACTIVE (ONLINE): GhostWorker stays quiet, human replies!
+    if (presence[presenceKey] === "active") {
+      await new Promise((r) => setTimeout(r, 600));
+      const activeHumanMsg: SlackMessage = {
+        id: `human-${Date.now()}`,
+        sender: targetName,
+        avatar: targetInitials,
+        role: "Teammate (Active Online)",
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        content: `Hey! I'm actively online at my desk right now. Got your ping, looking into it! (GhostWorker is on standby).`,
+      };
+      setMessages((prev) => ({
+        ...prev,
+        [activeChannel]: [...(prev[activeChannel] || []), activeHumanMsg],
+      }));
+      setIsTyping(false);
+      return;
+    }
+
+    // OTHERWISE: TEAMMATE IS AWAY/IN MEETING -> GhostWorker AI steps in on their behalf!
 
     try {
       const res = await fetch("/api/edamame/chat", {
@@ -191,11 +307,7 @@ export function SlackSimulatorView() {
       const botMsg: SlackMessage = {
         id: `bot-${Date.now()}`,
         sender: `GhostWorker (${targetName})`,
-        avatar: targetName.includes("Jason")
-          ? "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80"
-          : targetName.includes("Sarah")
-          ? "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80"
-          : "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&auto=format&fit=crop&q=80",
+        avatar: targetInitials,
         role: "AI Digital Twin",
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         isBot: true,
@@ -215,7 +327,7 @@ export function SlackSimulatorView() {
       const fallbackMsg: SlackMessage = {
         id: `bot-${Date.now()}`,
         sender: `GhostWorker (${targetName})`,
-        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80",
+        avatar: targetInitials,
         role: "AI Digital Twin",
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         isBot: true,
@@ -277,31 +389,110 @@ export function SlackSimulatorView() {
             </button>
           ))}
 
-          {/* Active Digital Twins */}
-          <p className="px-2 text-[11px] font-bold text-[#868686] uppercase tracking-wider mt-5 mb-2">
-            Digital Twins Online (3)
+          {/* Active Digital Twins & Presence Simulation */}
+          <div className="mt-5 mb-1 px-2 flex items-center justify-between">
+            <p className="text-[11px] font-bold text-[#868686] uppercase tracking-wider">
+              Teammate Presence
+            </p>
+            <button
+              type="button"
+              onClick={() => setAutoMode(!autoMode)}
+              className={`text-[9px] px-2 py-0.5 rounded border transition-colors flex items-center gap-1 font-semibold ${
+                autoMode
+                  ? "bg-[#2eb67d]/20 text-[#2eb67d] border-[#2eb67d]/50 shadow-sm"
+                  : "text-[#36c5f0] bg-[#36c5f0]/10 border-[#36c5f0]/30 hover:bg-[#36c5f0]/20"
+              }`}
+            >
+              {autoMode ? "⚡ Auto Sync: ON" : "🖐 Click to Toggle"}
+            </button>
+          </div>
+
+          <p className="px-2 text-[10px] text-[#868686] mb-2 leading-tight">
+            {autoMode 
+              ? "⚡ Live Auto: Syncs with Calendar & Slack Idle webhooks" 
+              : "Click any teammate below to test Online vs Away behavior:"}
           </p>
-          <div className="space-y-1.5 px-2 text-xs">
-            <div className="flex items-center justify-between">
-              <span className="text-white flex items-center gap-1.5">
-                <Circle size={8} className="fill-[#2eb67d] text-[#2eb67d]" />
-                Jason's Twin
+          
+          <div className="space-y-2 px-2 text-xs">
+            {/* Towfik */}
+            <div 
+              onClick={() => togglePresence("towfik")}
+              className="flex items-center justify-between p-1.5 rounded bg-[#222529] hover:bg-[#2a2d33] cursor-pointer border border-[#383a40] transition-all group"
+            >
+              <div className="flex flex-col min-w-0 pr-1">
+                <span className="text-white font-medium flex items-center gap-1.5 text-[11px]">
+                  <Circle 
+                    size={8} 
+                    className={presence.towfik === "active" ? "fill-[#2eb67d] text-[#2eb67d]" : "fill-[#e01e5a] text-[#e01e5a]"} 
+                  />
+                  Md Towfik Omer
+                  <span className="px-1 py-0.2 rounded bg-cyan-950/80 text-cyan-400 font-mono text-[9px] font-bold border border-cyan-800/50">MT</span>
+                </span>
+                <span className="text-[9px] text-[#868686] truncate">
+                  {autoMode ? statusReasons.towfik : "Frontend & Product"}
+                </span>
+              </div>
+              <span className={`text-[9px] px-1.5 py-0.5 rounded font-semibold flex-shrink-0 transition-colors ${
+                presence.towfik === "active" 
+                  ? "bg-[#2eb67d]/20 text-[#2eb67d] border border-[#2eb67d]/40" 
+                  : "bg-[#e01e5a]/20 text-[#ff6b8b] border border-[#e01e5a]/40"
+              }`}>
+                {presence.towfik === "active" ? "🟢 Online" : "🔴 Away (Twin On)"}
               </span>
-              <span className="text-[10px] text-[#e01e5a]">Jason Away</span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-white flex items-center gap-1.5">
-                <Circle size={8} className="fill-[#2eb67d] text-[#2eb67d]" />
-                Sarah's Twin
+
+            {/* Maneesh */}
+            <div 
+              onClick={() => togglePresence("maneesh")}
+              className="flex items-center justify-between p-1.5 rounded bg-[#222529] hover:bg-[#2a2d33] cursor-pointer border border-[#383a40] transition-all group"
+            >
+              <div className="flex flex-col min-w-0 pr-1">
+                <span className="text-white font-medium flex items-center gap-1.5 text-[11px]">
+                  <Circle 
+                    size={8} 
+                    className={presence.maneesh === "active" ? "fill-[#2eb67d] text-[#2eb67d]" : "fill-[#e01e5a] text-[#e01e5a]"} 
+                  />
+                  Maneesh Nand
+                  <span className="px-1 py-0.2 rounded bg-indigo-950/80 text-indigo-400 font-mono text-[9px] font-bold border border-indigo-800/50">MN</span>
+                </span>
+                <span className="text-[9px] text-[#868686] truncate">
+                  {autoMode ? statusReasons.maneesh : "Backend & Infra"}
+                </span>
+              </div>
+              <span className={`text-[9px] px-1.5 py-0.5 rounded font-semibold flex-shrink-0 transition-colors ${
+                presence.maneesh === "active" 
+                  ? "bg-[#2eb67d]/20 text-[#2eb67d] border border-[#2eb67d]/40" 
+                  : "bg-[#e01e5a]/20 text-[#ff6b8b] border border-[#e01e5a]/40"
+              }`}>
+                {presence.maneesh === "active" ? "🟢 Online" : "🔴 Away (Twin On)"}
               </span>
-              <span className="text-[10px] text-[#ecb22e]">In Meeting</span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-white flex items-center gap-1.5">
-                <Circle size={8} className="fill-[#2eb67d] text-[#2eb67d]" />
-                Alex's Twin
+
+            {/* Sm Ali */}
+            <div 
+              onClick={() => togglePresence("ali")}
+              className="flex items-center justify-between p-1.5 rounded bg-[#222529] hover:bg-[#2a2d33] cursor-pointer border border-[#383a40] transition-all group"
+            >
+              <div className="flex flex-col min-w-0 pr-1">
+                <span className="text-white font-medium flex items-center gap-1.5 text-[11px]">
+                  <Circle 
+                    size={8} 
+                    className={presence.ali === "active" ? "fill-[#2eb67d] text-[#2eb67d]" : "fill-[#e01e5a] text-[#e01e5a]"} 
+                  />
+                  Sm Ali
+                  <span className="px-1 py-0.2 rounded bg-emerald-950/80 text-emerald-400 font-mono text-[9px] font-bold border border-emerald-800/50">SA</span>
+                </span>
+                <span className="text-[9px] text-[#868686] truncate">
+                  {autoMode ? statusReasons.ali : "Lead AI Architect"}
+                </span>
+              </div>
+              <span className={`text-[9px] px-1.5 py-0.5 rounded font-semibold flex-shrink-0 transition-colors ${
+                presence.ali === "active" 
+                  ? "bg-[#2eb67d]/20 text-[#2eb67d] border border-[#2eb67d]/40" 
+                  : "bg-[#e01e5a]/20 text-[#ff6b8b] border border-[#e01e5a]/40"
+              }`}>
+                {presence.ali === "active" ? "🟢 Online" : "🔴 Away (Twin On)"}
               </span>
-              <span className="text-[10px] text-[#9a9b9e]">Focus Time</span>
             </div>
           </div>
         </div>
@@ -342,11 +533,24 @@ export function SlackSimulatorView() {
                 msg.isBot ? "bg-[#222529]/70 border border-[#383a40]" : "hover:bg-[#222529]/40"
               }`}
             >
-              <img
-                src={msg.avatar}
-                alt={msg.sender}
-                className="h-9 w-9 rounded-md object-cover flex-shrink-0"
-              />
+              {(() => {
+                const av = getTeammateAvatarInfo(msg.sender, msg.botFor);
+                return (
+                  <div
+                    className={`relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br ${av.gradient} text-xs font-bold tracking-wider shadow-sm ring-1 ${av.ring}`}
+                  >
+                    {av.initials}
+                    {msg.isBot && (
+                      <span
+                        className="absolute -bottom-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#611f69] ring-2 ring-[#1a1d21]"
+                        title="GhostWorker AI Digital Twin"
+                      >
+                        <Bot size={8} className="text-white" />
+                      </span>
+                    )}
+                  </div>
+                );
+              })()}
               <div className="flex-1 min-w-0">
                 <div className="flex items-baseline gap-2">
                   <span className="font-bold text-white text-xs">{msg.sender}</span>
@@ -411,6 +615,32 @@ export function SlackSimulatorView() {
 
         {/* Input box */}
         <div className="p-4 border-t border-[#2b2d31]">
+          {/* Quick Test Chips */}
+          <div className="mb-2 flex items-center gap-2 flex-wrap">
+            <span className="text-[10px] text-[#868686] font-medium">Quick Test Prompts:</span>
+            <button
+              type="button"
+              onClick={() => setInputValue("@Md Towfik Omer what is our frontend status and design progress?")}
+              className="text-[10px] bg-[#222529] hover:bg-[#2e3238] text-[#36c5f0] border border-[#383a40] px-2 py-1 rounded transition-colors"
+            >
+              Ask @Towfik (Frontend)
+            </button>
+            <button
+              type="button"
+              onClick={() => setInputValue("@Maneesh Nand did Jira ticket PROJ-104 pass, and what did our latest GitHub commit change?")}
+              className="text-[10px] bg-[#222529] hover:bg-[#2e3238] text-[#ecb22e] border border-[#383a40] px-2 py-1 rounded transition-colors"
+            >
+              Ask @Maneesh (Jira PROJ-104 & GitHub)
+            </button>
+            <button
+              type="button"
+              onClick={() => setInputValue("@Sm Ali what are our top 3 deliverables for the GhostWorker AI hackathon launch?")}
+              className="text-[10px] bg-[#222529] hover:bg-[#2e3238] text-[#2eb67d] border border-[#383a40] px-2 py-1 rounded transition-colors"
+            >
+              Ask @Ali (Architect)
+            </button>
+          </div>
+
           <form
             onSubmit={handleSendMessage}
             className="rounded-lg border border-[#42444a] bg-[#222529] p-2 focus-within:border-[#7c7e86] transition-colors"
@@ -425,7 +655,7 @@ export function SlackSimulatorView() {
                   handleSendMessage(e);
                 }
               }}
-              placeholder={`Message #${activeChannel} (e.g. Ask @Jason about v3 architecture or @Sarah about deals)...`}
+              placeholder={`Message #${activeChannel} (e.g. Ask @Towfik about frontend or @Maneesh about backend)...`}
               className="w-full bg-transparent text-xs text-white placeholder-[#868686] outline-none resize-none"
             />
             <div className="flex items-center justify-between border-t border-[#383a40] pt-2 mt-1">

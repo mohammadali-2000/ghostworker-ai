@@ -3,8 +3,8 @@
 > **Autonomous Workplace Digital Twins Living in Slack, GitHub & Team Memory.**  
 > *Built for the **AI Tinkerers & OpenAI Hackathon: "Agents Everywhere"**.*
 
-🔗 **Live Production URL:** [https://eight-margin-supplier-delicious.trycloudflare.com](https://eight-margin-supplier-delicious.trycloudflare.com)  
-🔗 **Vercel Deployment:** [https://ghostworker-ai.vercel.app](https://ghostworker-ai.vercel.app)  
+🔗 **Live Production URL (Direct Access):** [https://eight-margin-supplier-delicious.trycloudflare.com](https://eight-margin-supplier-delicious.trycloudflare.com)  
+🔗 **Vercel Deployment:** [https://ghostworker-dvwc7jhme-syed-mohammad-alis-projects-3ffcf36b.vercel.app](https://ghostworker-dvwc7jhme-syed-mohammad-alis-projects-3ffcf36b.vercel.app)  
 🐙 **GitHub Repository:** [https://github.com/mohammadali-2000/ghostworker-ai](https://github.com/mohammadali-2000/ghostworker-ai)
 
 ### 👥 Team GhostWorker

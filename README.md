@@ -3,9 +3,11 @@
 > **Autonomous Workplace Digital Twins Living in Slack, GitHub & Team Memory.**  
 > *Built for the **AI Tinkerers & OpenAI Hackathon: "Agents Everywhere"**.*
 
-🔗 **Live Production URL (Direct Access):** [https://eight-margin-supplier-delicious.trycloudflare.com](https://eight-margin-supplier-delicious.trycloudflare.com)  
-🔗 **Vercel Deployment:** [https://ghostworker-dvwc7jhme-syed-mohammad-alis-projects-3ffcf36b.vercel.app](https://ghostworker-dvwc7jhme-syed-mohammad-alis-projects-3ffcf36b.vercel.app)  
-🐙 **GitHub Repository:** [https://github.com/mohammadali-2000/ghostworker-ai](https://github.com/mohammadali-2000/ghostworker-ai)
+🔗 **Live Production URL (Direct Public Access):** [https://carb-rebel-met-topics.trycloudflare.com](https://carb-rebel-met-topics.trycloudflare.com)  
+🔗 **Vercel Deployment:** [https://ghostworker-pe7oq3ntp-syed-mohammad-alis-projects-3ffcf36b.vercel.app](https://ghostworker-pe7oq3ntp-syed-mohammad-alis-projects-3ffcf36b.vercel.app)  
+🐙 **GitHub Repository:** [https://github.com/mohammadali-2000/ghostworker-ai](https://github.com/mohammadali-2000/ghostworker-ai)  
+📑 **Project Overview & Architecture Solution:** [docs/PROJECT_OVERVIEW_AND_SOLUTION.md](docs/PROJECT_OVERVIEW_AND_SOLUTION.md)  
+🎯 **Hackathon Strategy & Sponsor Bounties:** [docs/HACKATHON_GUIDE_AND_STRATEGY.md](docs/HACKATHON_GUIDE_AND_STRATEGY.md)  
 
 ### 👥 Team GhostWorker
 - **Sm Ali (Mohammad Ali)** — Lead Full Stack & AI Architect

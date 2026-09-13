@@ -1,25 +1,23 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { google } from "googleapis";
 
 /**
  * GET /api/auth/google
  *
  * Initiates the Google OAuth2 consent flow.
- * Redirects the user to Google's consent screen requesting
- * read-only access to Drive and Gmail.
+ * Dynamically resolves current host so it never redirects to localhost on live deployments.
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const host = request.headers.get("x-forwarded-host") || request.headers.get("host");
+  const proto = request.headers.get("x-forwarded-proto") || (request.url.startsWith("https") ? "https" : "http");
+  const baseUrl = host ? `${proto}://${host}` : request.nextUrl.origin;
+
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
   if (!clientId || !clientSecret) {
-    // Redirect back to settings with an error message instead of raw JSON
-    return NextResponse.redirect(
-      `${baseUrl}/settings?google_error=${encodeURIComponent(
-        "Google OAuth not configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in .env.local."
-      )}`
-    );
+    // If not configured, gracefully redirect to employee workspace on the active domain
+    return NextResponse.redirect(`${baseUrl}/employee`);
   }
 
   const redirectUri = `${baseUrl}/api/auth/google/callback`;
@@ -31,8 +29,8 @@ export async function GET() {
   );
 
   const authUrl = oauth2Client.generateAuthUrl({
-    access_type: "offline", // request refresh token
-    prompt: "consent", // always show consent to get refresh token
+    access_type: "offline",
+    prompt: "consent",
     scope: [
       "https://www.googleapis.com/auth/drive.readonly",
       "https://www.googleapis.com/auth/gmail.readonly",

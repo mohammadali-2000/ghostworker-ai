@@ -1,16 +1,27 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Sparkles, Loader2, UserCheck, Shield } from "lucide-react";
 
-const CEO_EMAIL = "ceo@gmail.com";
+const CEO_EMAIL = "ceo@ghostworker.ai";
 
 const EMAIL_TO_CLONE: Record<string, string> = {
+  "smali@ghostworker.ai": "Sm Ali",
+  "maneesh@ghostworker.ai": "Maneesh Nand",
+  "towfik@ghostworker.ai": "Md Towfik Omer",
+  "ceo@ghostworker.ai": "Angelina Quan",
   "ella2happy@gmail.com": "Ella Lan",
   "mvideet@gmail.com": "Videet Mehta",
   "angelinaquan2024@gmail.com": "Angelina Quan",
   "jamesliu535b@gmail.com": "James Liu",
 };
+
+const DEMO_PERSONAS = [
+  { name: "Sm Ali", role: "Lead AI Architect", email: "smali@ghostworker.ai", isCeo: false, initials: "SA", color: "from-emerald-500 to-teal-600" },
+  { name: "Maneesh Nand", role: "Backend & Infra", email: "maneesh@ghostworker.ai", isCeo: false, initials: "MN", color: "from-indigo-500 to-violet-600" },
+  { name: "Md Towfik Omer", role: "Frontend & Product", email: "towfik@ghostworker.ai", isCeo: false, initials: "MT", color: "from-cyan-500 to-blue-600" },
+  { name: "Angelina Quan", role: "CEO Strategic Polling", email: "ceo@ghostworker.ai", isCeo: true, initials: "AQ", color: "from-amber-500 to-orange-600" },
+];
 
 function GoogleIcon() {
   return (
@@ -28,6 +39,19 @@ export default function LandingPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const loginWithEmail = (targetEmail: string, cloneName?: string, isCeo?: boolean) => {
+    const trimmed = targetEmail.trim().toLowerCase();
+    setLoading(true);
+    sessionStorage.setItem("ghostworker_email", trimmed);
+    sessionStorage.setItem("edamame_email", trimmed);
+    const resolvedName = cloneName || EMAIL_TO_CLONE[trimmed] || "Sm Ali";
+    sessionStorage.setItem("ghostworker_clone_name", resolvedName);
+    sessionStorage.setItem("edamame_clone_name", resolvedName);
+    
+    // Always navigate using relative paths on current origin -- NEVER localhost
+    window.location.href = isCeo || trimmed === CEO_EMAIL ? "/ceo" : "/employee";
+  };
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const trimmed = email.trim().toLowerCase();
@@ -36,38 +60,64 @@ export default function LandingPage() {
       return;
     }
     setError("");
-    setLoading(true);
-    sessionStorage.setItem("ghostworker_email", trimmed);
-    sessionStorage.setItem("edamame_email", trimmed);
-    sessionStorage.setItem("ghostworker_clone_name", EMAIL_TO_CLONE[trimmed] || "");
-    sessionStorage.setItem("edamame_clone_name", EMAIL_TO_CLONE[trimmed] || "");
-    window.location.href = trimmed === CEO_EMAIL ? "/ceo" : "/employee";
+    loginWithEmail(trimmed);
   };
 
   const handleGoogleAuth = () => {
     setLoading(true);
-    window.location.href = "/api/auth/google";
+    // Directly log into verified demo workspace as Sm Ali on the active domain
+    loginWithEmail("smali@ghostworker.ai", "Sm Ali", false);
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#111113]">
-      <div className="w-full max-w-[420px] px-4">
+    <div className="flex min-h-screen items-center justify-center bg-[#111113] p-4">
+      <div className="w-full max-w-[460px]">
         {/* Card */}
-        <div className="rounded-2xl border border-[#2a2a2e] bg-[#19191d] px-8 pb-8 pt-10">
+        <div className="rounded-2xl border border-[#2a2a2e] bg-[#19191d] p-6 sm:p-8 shadow-2xl">
           {/* Logo icon */}
-          <div className="mb-6 flex justify-center">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white">
-              <Sparkles size={20} />
+          <div className="mb-4 flex justify-center">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-lg shadow-emerald-900/30">
+              <Sparkles size={22} />
             </div>
           </div>
 
           {/* Title */}
-          <h1 className="mb-1.5 text-center text-[20px] font-semibold text-white">
+          <h1 className="mb-1 text-center text-[22px] font-bold text-white tracking-tight">
             Sign in to GhostWorker
           </h1>
-          <p className="mb-7 text-center text-[14px] text-[#888]">
-            Autonomous Workplace Digital Twins
+          <p className="mb-6 text-center text-[13.5px] text-[#8e8e93]">
+            Autonomous Workplace Digital Twins Living in Slack & Docs
           </p>
+
+          {/* Quick 1-Click Demo Login */}
+          <div className="mb-6 rounded-xl border border-[#2a2a2e] bg-[#141416] p-3.5">
+            <div className="mb-2.5 flex items-center justify-between">
+              <span className="text-[11.5px] font-semibold uppercase tracking-wider text-[#a1a1aa] flex items-center gap-1.5">
+                <UserCheck size={13} className="text-emerald-400" />
+                1-Click Instant Demo Login
+              </span>
+              <span className="text-[10.5px] text-[#71717a] font-mono">Live Session</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {DEMO_PERSONAS.map((p) => (
+                <button
+                  key={p.email}
+                  type="button"
+                  onClick={() => loginWithEmail(p.email, p.name, p.isCeo)}
+                  disabled={loading}
+                  className="flex items-center gap-2.5 rounded-lg border border-[#27272a] bg-[#1c1c20] p-2 text-left transition-all hover:border-[#3f3f46] hover:bg-[#25252b] active:scale-[0.98]"
+                >
+                  <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-gradient-to-br ${p.color} text-[11px] font-bold text-white shadow-sm`}>
+                    {p.initials}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[12px] font-medium text-white">{p.name}</div>
+                    <div className="truncate text-[10px] text-[#a1a1aa]">{p.role}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
 
           {/* Email input */}
           <form onSubmit={handleSubmit} className="mb-4">
@@ -78,9 +128,8 @@ export default function LandingPage() {
                 setEmail(e.target.value);
                 setError("");
               }}
-              placeholder="Business email*"
-              autoFocus
-              className="mb-3 w-full rounded-lg border border-[#2a2a2e] bg-[#111113] px-4 py-3 text-[14px] text-white placeholder:text-[#555] focus:border-[#444] focus:outline-none"
+              placeholder="Enter your business email*"
+              className="mb-3 w-full rounded-lg border border-[#2a2a2e] bg-[#111113] px-4 py-3 text-[14px] text-white placeholder:text-[#555] focus:border-emerald-500 focus:outline-none transition-colors"
             />
             {error && (
               <p className="mb-2 text-[12px] text-red-400">{error}</p>
@@ -88,12 +137,12 @@ export default function LandingPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-white px-4 py-3 text-[14px] font-semibold text-black transition-colors hover:bg-[#e8e8e8] disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-white px-4 py-3 text-[14px] font-semibold text-black transition-all hover:bg-[#e8e8e8] active:scale-[0.99] disabled:opacity-50"
             >
               {loading ? (
                 <Loader2 size={16} className="animate-spin" />
               ) : (
-                "Continue"
+                "Continue to Workspace"
               )}
             </button>
           </form>
@@ -101,18 +150,19 @@ export default function LandingPage() {
           {/* Divider */}
           <div className="mb-4 flex items-center gap-3">
             <div className="h-px flex-1 bg-[#2a2a2e]" />
-            <span className="text-[12px] font-medium text-[#555]">OR</span>
+            <span className="text-[11px] font-medium uppercase text-[#555]">OR</span>
             <div className="h-px flex-1 bg-[#2a2a2e]" />
           </div>
 
           {/* Google auth */}
           <button
+            type="button"
             onClick={handleGoogleAuth}
             disabled={loading}
-            className="flex w-full items-center justify-center gap-3 rounded-lg border border-[#2a2a2e] bg-transparent px-4 py-3 text-[14px] font-medium text-[#ccc] transition-colors hover:border-[#444] hover:text-white disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-3 rounded-lg border border-[#2a2a2e] bg-[#141416] px-4 py-3 text-[13.5px] font-medium text-[#ccc] transition-all hover:border-[#3f3f46] hover:bg-[#1c1c20] hover:text-white active:scale-[0.99] disabled:opacity-50"
           >
             <GoogleIcon />
-            Continue with Google
+            Continue with Google (Demo Sign In)
           </button>
         </div>
       </div>

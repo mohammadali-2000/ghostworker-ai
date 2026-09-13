@@ -13,7 +13,10 @@ import { createServerSupabaseClient } from "@/lib/core/supabase/server";
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get("code");
   const error = request.nextUrl.searchParams.get("error");
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  
+  const host = request.headers.get("x-forwarded-host") || request.headers.get("host");
+  const proto = request.headers.get("x-forwarded-proto") || (request.url.startsWith("https") ? "https" : "http");
+  const baseUrl = host ? `${proto}://${host}` : request.nextUrl.origin;
   const settingsUrl = `${baseUrl}/settings`;
 
   if (error) {

@@ -1,60 +1,56 @@
-# 👻 GhostWorker AI
+# 🟣 TwinOps Enterprise
 
-> **Autonomous Workplace Digital Twins Living in Slack, GitHub & Team Memory.**  
-> *Built for the **AI Tinkerers & OpenAI Hackathon: "Agents Everywhere"**.*
+> **Autonomous Workplace Digital Twins for Enterprise Delivery Pods.**  
+> *Seamlessly integrated into Microsoft Teams, Slack, GitHub, Jira, and Episodic Team Memory.*
 
-🔗 **Live Production URL (Direct Public Access):** [https://carb-rebel-met-topics.trycloudflare.com](https://carb-rebel-met-topics.trycloudflare.com)  
-🔗 **Vercel Deployment:** [https://ghostworker-pe7oq3ntp-syed-mohammad-alis-projects-3ffcf36b.vercel.app](https://ghostworker-pe7oq3ntp-syed-mohammad-alis-projects-3ffcf36b.vercel.app)  
-🐙 **GitHub Repository:** [https://github.com/mohammadali-2000/ghostworker-ai](https://github.com/mohammadali-2000/ghostworker-ai)  
-📑 **Project Overview & Architecture Solution:** [docs/PROJECT_OVERVIEW_AND_SOLUTION.md](docs/PROJECT_OVERVIEW_AND_SOLUTION.md)  
-🎯 **Hackathon Strategy & Sponsor Bounties:** [docs/HACKATHON_GUIDE_AND_STRATEGY.md](docs/HACKATHON_GUIDE_AND_STRATEGY.md)  
-
-### 👥 Team GhostWorker
-- **Sm Ali (Mohammad Ali)** — Lead Full Stack & AI Architect
-- **Maneesh Nand** — Backend & Infrastructure Lead
-- **Md Towfik Omer** — Frontend & Product Lead
+[![TwinOps Enterprise CI](https://github.com/mohammadali-2000/ghostworker-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/mohammadali-2000/ghostworker-ai/actions/workflows/ci.yml)
+![Next.js](https://img.shields.io/badge/Next.js-16.1.6-black?style=flat&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat&logo=typescript)
+![Microsoft Teams](https://img.shields.io/badge/Microsoft%20Teams-Adaptive%20Cards%20v1.4-5B5FC7?style=flat&logo=microsoft-teams)
+![Enterprise Security](https://img.shields.io/badge/Security-Zero%20Data%20Leakage-10B981?style=flat)
 
 ---
 
-## 🎯 The Core Concept: "Leaving the Chatbox"
+## 🎯 The Enterprise Problem
 
-Most workplace AI tools make a fundamental mistake: **they trap the agent inside an external chatbox**. To get help, you have to leave your work, open a new browser tab, and spend 10 minutes typing context into a blank prompt.
+In high-velocity enterprise consulting and engineering pods (e.g., Accenture, Microsoft, AWS delivery partners), **delivery bottlenecks are rarely about writing code—they are about blocked communication**:
 
-**GhostWorker flips this paradigm.** 
+1. **Lead Architects in 4-Hour Client Meetings:** When a Senior Tech Lead is tied up in client governance calls or on leave, junior developers and external contractors are blocked on architecture, API contracts, and schema designs.
+2. **Context Scattered Across Silos:** Decisions are buried across Jira tickets, closed GitHub PR reviews, Teams threads, and internal RFCs.
+3. **The "Generic Chatbot" Failure:** Generic AI chatbots (like standard ChatGPT) know nothing about private corporate codebases, sprint user stories, or client compliance requirements.
 
-Instead of forcing users to visit an AI, **the AI lives where the work is already happening**:
-- Inside your **Slack channels** (`#eng-architecture`, `#sales-pipeline`, `#product-roadmap`)
-- Inside your **GitHub PR discussions** and RFCs
-- Inside your **Workspace Documentation** and meeting decisions
-
-When key engineers, PMs, or sales leads are asleep, in back-to-back meetings, or on vacation, **their GhostWorker digital twin monitors team threads ambiently and answers technical questions on their behalf—backed by verified citations from real internal code and docs.**
+**TwinOps solves this by creating ambient, verified Digital Twins of your delivery leads.**
 
 ---
 
-## ⚡ Key Capabilities
+## ⚡ Core Capabilities
 
-### 1. 💬 In-Situ Slack Channel Interception
-- Teammates ask natural questions in team channels (e.g., *"@Jason Park when does our auth token expire in v3?"*).
-- If the engineer is away, their **GhostWorker Twin** steps in seamlessly:
-  - Ingests the thread context
-  - Searches internal RFCs, PR diffs, and Slack discussions
-  - Posts a verified answer on their behalf with clickable citations back to the exact document.
+### 1. 🟣 Microsoft Teams & Slack In-Situ Interception
+- Teammates ask natural questions in delivery channels (e.g., `"#hls-backend-delivery"`: *"@Sm Ali is patient auth token verification using in-memory or Redis caching?"*).
+- When the architect is **Away** or **In Meeting**, their **TwinOps Twin** responds in 2 seconds directly in the thread:
+  - Formatted as a rich **Microsoft Teams Adaptive Card** (via modern Power Automate Workflows).
+  - Backed by **verifiable source citations** with clickable links to Jira User Stories (e.g., `HLS-402`) and GitHub PRs (`#142`).
 
-### 2. 🧠 Continual Episodic Learning
-- GhostWorker does not require rigid manual retraining.
-- As teammates chat and resolve issues, the agent automatically extracts facts, calculates confidence scores, and reinforces memory.
+### 2. 🎛️ Human-in-the-Loop Governance & Presence Cockpit
+- **Presence Modes:**
+  - 🔴 **At Desk (Online):** Twin stays silent; human answers natively.
+  - 🟡 **Shadow Mode:** Twin drafts responses to the employee's private dashboard for 1-click review without auto-sending.
+  - 🟢 **Autonomous (In Meeting / On Leave):** Twin answers high-confidence architectural inquiries automatically.
+- **Risk Approval Gate:** High-impact operations (prod deployments, client commitments) require explicit human sign-off.
 
-### 3. 👔 CEO Multi-Clone Strategic Polling
-- Executives don't have to schedule 4 different status meetings to understand sprint health.
-- A CEO can ask a single high-level question (e.g., *"Are we on track for our enterprise v3 release?"*).
-- GhostWorker polls the **Engineering Lead twin, Sales VP twin, and Product VP twin** simultaneously, aggregating agreement levels, risk areas, and cross-team themes.
+### 3. 🧠 Continual Episodic Memory & Vector RAG
+- Automatically ingests Confluence docs, GitHub commits, Jira tickets, and meeting summaries into an encrypted vector store (`pgvector`).
+- Extracts architectural facts, tracks confidence scores, and reinforces memory dynamically without manual fine-tuning.
 
-### 4. 🌐 Real-Time Neural Grounding via Exa AI ($1,000 Bounty Track)
-- GhostWorker blends internal company memory with live web intelligence via **Exa AI's Neural Search API**.
-- When teammates ask about external dependencies, latest framework releases (e.g. Next.js 16), or competitor benchmarks, the agent livecrawls and highlights verified web sources with clickable URLs.
+### 4. 👔 Executive Multi-Twin Pod Polling
+- Project Directors and Delivery Managers can poll multiple lead twins simultaneously:
+  - *"Are we on track for the Friday v3 healthcare compliance release?"*
+  - The **Tech Lead Twin**, **Product Compliance Twin**, and **QA Lead Twin** respond in parallel, generating instant consensus percentages and flagging unmerged blockers.
 
-### 5. 🎙️ Natural Voice Interaction
-- Conversational audio powered by OpenAI Whisper (STT) and OpenAI TTS.
+### 5. 🔒 Enterprise Security & Compliance
+- **Zero Client Data Leakage:** No training on client intellectual property. Deterministic RAG bounded by tenant ID.
+- **DLP & PII Redaction:** Automated sanitization of secrets, tokens, and patient/customer data.
+- **Azure OpenAI Service Alignment:** Built to connect with corporate Azure OpenAI instances inside private enterprise VPCs.
 
 ---
 
@@ -64,25 +60,26 @@ When key engineers, PMs, or sales leads are asleep, in back-to-back meetings, or
 ┌────────────────────────────────────────────────────────────────────────┐
 │                        WHERE WORK ALREADY HAPPENS                      │
 │                                                                        │
-│   💬 Slack Channels    │   🐙 GitHub Commits/PRs   │   📋 Notion RFCs  │
+│   🟣 MS Teams (Workflows) │  💬 Slack Webhooks  │  🐙 GitHub / Jira    │
 └───────────────────────────────────┬────────────────────────────────────┘
-                                    │ (Ambient Thread Ingestion)
+                                    │ (Inbound Webhooks / Event Triggers)
                                     ▼
 ┌────────────────────────────────────────────────────────────────────────┐
-│                      GHOSTWORKER MEMORY ENGINE                         │
+│                        TWINOPS MEMORY COCKPIT                          │
 │                                                                        │
 │  • Persona Alignment: Tone, communication style, domain boundaries     │
-│  • Semantic Chunking & Retrieval: Hybrid RAG across internal docs      │
-│  • Continual Fact Extractor: Dynamic knowledge reinforcement           │
+│  • Hybrid RAG: Semantic pgvector search + keyword BM25 retrieval      │
+│  • Episodic Fact Extraction: Dynamic confidence reinforcement          │
+│  • DLP Guardrails: Regex & semantic stripping of API keys and PII      │
 └───────────────────────────────────┬────────────────────────────────────┘
                                     │
                                     ▼
 ┌────────────────────────────────────────────────────────────────────────┐
-│                 LLM REASONING & IN-SITU EXECUTION                      │
+│                      ENTERPRISE LLM INFERENCE                          │
 │                                                                        │
-│  • Model: OpenAI GPT-4o-mini via OpenRouter API                        │
-│  • In-Thread Slack Responses with source citations                     │
-│  • Multi-Agent Executive Theme Synthesis                               │
+│  • Engine: Azure OpenAI (GPT-4o) / Anthropic Claude                    │
+│  • Output: Microsoft Teams Adaptive Card v1.4 Payload                  │
+│  • Governance: Human-in-the-Loop Approval Queue & Audit Logs           │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -91,57 +88,70 @@ When key engineers, PMs, or sales leads are asleep, in back-to-back meetings, or
 ## 🚀 Quickstart & Local Setup
 
 ### 1. Prerequisites
-- Node.js 18+
+- Node.js 20+
 - npm or pnpm
 
 ### 2. Clone & Install
 ```bash
-git clone <repo-url>
-cd ghostworker/frontend
+git clone https://github.com/mohammadali-2000/ghostworker-ai.git twinops
+cd twinops
 npm install
 ```
 
-### 3. Configure Environment Variables
-Create a `.env.local` file in `frontend/`:
+### 3. Environment Configuration
+Copy the template to create your local config:
+```bash
+cp .env.example .env.local
+```
+Fill in the minimal required parameters:
 ```env
-# OpenRouter / OpenAI Key
-OPENROUTER_API_KEY=sk-or-v1-xxxxxxxxxxxxxxxxxxxx
-OPENAI_API_KEY=sk-or-v1-xxxxxxxxxxxxxxxxxxxx
-OPENAI_BASE_URL=https://openrouter.ai/api/v1
-OPENAI_MODEL=openai/gpt-4o-mini
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+# LLM Inference
+OPENAI_API_KEY=your_openai_or_azure_api_key_here
+OPENAI_MODEL=gpt-4o
 
-# Exa AI Search Key (For Live Web Grounding)
-EXA_API_KEY=772e5dd2-xxxxxxxxxxxxxxxxxxxx
+# Vector Store
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key_here
+
+# Microsoft Teams Webhook (Optional for live delivery)
+TEAMS_WEBHOOK_URL=https://prod-xx.eastus.logic.azure.com:443/workflows/...
 ```
 
 ### 4. Run Development Server
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000) to access the TwinOps Command Center.
 
 ---
 
-## 🎬 How to Demo to Judges (2-Minute Script)
+## 🌿 Enterprise Git Workflow & Branching Strategy
 
-1. **The Problem (20s)**:
-   *"Today, when a senior tech lead goes on leave, the whole team gets blocked on architectural questions. Generic chatbots can't fix this because they don't know your internal code and nobody wants to copy-paste context."*
-2. **The In-Situ Solution (40s)**:
-   - Navigate to `/employee`.
-   - Show the **Live Slack Channels** tab (`#eng-architecture`).
-   - Type a question asking `@Jason Park` about the v3 platform rollout or auth tokens.
-   - Watch the GhostWorker bot reply in real-time on Jason's behalf with verified RFC citations.
-3. **Continual Learning (30s)**:
-   - Click **My Twin Clone** to show how every message extracts facts with confidence scores.
-4. **The Executive Multi-Agent View (30s)**:
-   - Open `/ceo` and run *"Are we on track for the v3 release?"*.
-   - Show the multi-agent cascade polling Eng, Sales, and Product in parallel to synthesize risks.
+This project follows enterprise trunk-based development with feature branch protection:
+
+| Branch | Purpose |
+| :--- | :--- |
+| `main` | Production-ready stable release. Protected by CI automation. |
+| `feature/teams-adaptive-cards` | Microsoft Teams Power Automate webhook integration & Adaptive Card v1.4 engine. |
+| `feature/omnichannel-simulator` | In-app dark mode simulator with real-time toggle between Microsoft Teams & Slack. |
+| `feature/episodic-rag-memory` | Vector memory, fact extraction, and citation engine. |
+| `feature/enterprise-security` | Zero client data leakage, AES-256 token validation, PII redaction, HIPAA guardrails. |
+
+Every pull request runs automated GitHub Actions for:
+1. **Secret & DLP Scanning** (checks for hardcoded API keys or client tokens).
+2. **TypeScript 5 Typechecking** (`tsc --noEmit`).
+3. **Next.js Production Build Validation** (`npm run build`).
 
 ---
 
-## 🏆 Hackathon Alignment ("Agents Everywhere")
+## 👥 Core Team
+- **Sm Ali (Mohammad Ali)** — Lead Full Stack & AI Architect
+- **Maneesh Nand** — Backend & Infrastructure Lead
+- **Md Towfik Omer** — Frontend & Product Lead
 
-- **Theme**: Agents living directly where people communicate (Slack, GitHub, Team Docs).
-- **Zero Hallucination Guarantee**: Every claim links to verified internal sources.
-- **Resilient Offline Architecture**: Graceful fallback ensures zero demo crashes on slow venue networks.
+---
+
+## 📄 Documentation Links
+- [Master Plan & 5-Minute Demo Script](TWINOPS_ACCENTURE_MASTER_PLAN.md)
+- [Project Overview & Solution](docs/PROJECT_OVERVIEW_AND_SOLUTION.md)

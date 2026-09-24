@@ -64,11 +64,91 @@ export function getTeammateAvatarInfo(sender: string, botFor?: string): Teammate
   };
 }
 
-const CHANNELS = [
+const SLACK_CHANNELS = [
   { id: "eng-architecture", name: "eng-architecture", desc: "System design & v3 platform" },
   { id: "sales-pipeline", name: "sales-pipeline", desc: "Deals, enterprise security reviews" },
   { id: "product-roadmap", name: "product-roadmap", desc: "Q1 roadmap, features, priorities" },
 ];
+
+const TEAMS_CHANNELS = [
+  { id: "hls-backend-delivery", name: "hls-backend-delivery", desc: "Healthcare & Life Sciences Pod" },
+  { id: "architecture-governance", name: "architecture-governance", desc: "Spring Boot, Microservices & Redis" },
+  { id: "sprint-release-sync", name: "sprint-release-sync", desc: "Jira Sprint HLS-402 & Gate Checks" },
+];
+
+const TEAMS_INITIAL_MESSAGES: Record<string, SlackMessage[]> = {
+  "hls-backend-delivery": [
+    {
+      id: "teams-msg-1",
+      sender: "Rohan Mehta (Junior Dev)",
+      avatar: "RM",
+      role: "Backend Engineer",
+      timestamp: "10:14 AM",
+      content: "Hey @Sm Ali, is our patient auth token verification middleware using in-memory or Redis caching? Need to know for the HLS-402 user story.",
+    },
+    {
+      id: "teams-msg-2",
+      sender: "TwinOps (Sm Ali)",
+      avatar: "SA",
+      role: "AI Digital Twin",
+      timestamp: "10:14 AM",
+      isBot: true,
+      botFor: "Sm Ali (In 4-Hour Client Architecture Meeting)",
+      content: "Hi Rohan! Ali is in a client architecture meeting right now. From his verified Jira decision on HLS-402:\n\n• In v3, we use a distributed Redis cluster with a 15-minute TTL for patient session tokens to prevent 180ms DB latency during peak hospital hours.\n• All tokens are validated in AuthMiddleware.java using our AES-256 decryption key before hitting the controller tier.",
+      citations: [
+        { source: "Jira", snippet: "HLS-402: Patient Session Token Caching Architecture" },
+        { source: "GitHub PR", snippet: "PR #142: feat(auth): add Redis cluster token cache" },
+      ],
+    },
+  ],
+  "architecture-governance": [
+    {
+      id: "teams-msg-3",
+      sender: "Priya Sharma (QA Lead)",
+      avatar: "PS",
+      role: "Lead Quality Architect",
+      timestamp: "11:20 AM",
+      content: "What is our fallback strategy if the primary healthcare database connection pool exhausts under peak hospital traffic?",
+    },
+    {
+      id: "teams-msg-4",
+      sender: "TwinOps (Maneesh Nand)",
+      avatar: "MN",
+      role: "AI Digital Twin",
+      timestamp: "11:20 AM",
+      isBot: true,
+      botFor: "Maneesh Nand (On Sick Leave)",
+      content: "Hello Priya! Maneesh is out on sick leave today, but here is his verified fallback design from the architectural review:\n\n• The resilience circuit breaker trips when HikariCP connection pool latency exceeds 2000ms.\n• Read-only requests are automatically routed to the secondary replica pool with a 503 retry-after header to preserve patient data integrity.",
+      citations: [
+        { source: "Confluence", snippet: "High Availability & Failover Protocol v3.2" },
+      ],
+    },
+  ],
+  "sprint-release-sync": [
+    {
+      id: "teams-msg-5",
+      sender: "Delivery Manager",
+      avatar: "DM",
+      role: "Delivery Lead",
+      timestamp: "9:05 AM",
+      content: "Are all HIPAA audit log compliance checks completed for Friday's enterprise deployment?",
+    },
+    {
+      id: "teams-msg-6",
+      sender: "TwinOps (Md Towfik Omer)",
+      avatar: "MT",
+      role: "AI Digital Twin",
+      timestamp: "9:05 AM",
+      isBot: true,
+      botFor: "Md Towfik Omer (In Sprint Planning)",
+      content: "Good morning! Towfik is in sprint planning, but here is the verified status from GitHub Actions:\n\n1. HIPAA audit log interceptors are 100% merged into branch main.\n2. Automated security compliance pipeline passed with zero critical vulnerabilities.\n3. Final end-to-end integration tests are green.",
+      citations: [
+        { source: "Jira", snippet: "HLS-389: HIPAA Audit Log Event Ingestion" },
+        { source: "GitHub Actions", snippet: "Workflow #882: Security & Compliance Scan Passed" },
+      ],
+    },
+  ],
+};
 
 const INITIAL_MESSAGES: Record<string, SlackMessage[]> = {
   "eng-architecture": [
@@ -82,7 +162,7 @@ const INITIAL_MESSAGES: Record<string, SlackMessage[]> = {
     },
     {
       id: "msg-2",
-      sender: "GhostWorker (Maneesh Nand)",
+      sender: "TwinOps (Maneesh Nand)",
       avatar: "MN",
       role: "AI Digital Twin",
       timestamp: "10:14 AM",
@@ -106,7 +186,7 @@ const INITIAL_MESSAGES: Record<string, SlackMessage[]> = {
     },
     {
       id: "msg-4",
-      sender: "GhostWorker (Md Towfik Omer)",
+      sender: "TwinOps (Md Towfik Omer)",
       avatar: "MT",
       role: "AI Digital Twin",
       timestamp: "11:20 AM",
@@ -129,7 +209,7 @@ const INITIAL_MESSAGES: Record<string, SlackMessage[]> = {
     },
     {
       id: "msg-6",
-      sender: "GhostWorker (Sm Ali)",
+      sender: "TwinOps (Sm Ali)",
       avatar: "SA",
       role: "AI Digital Twin",
       timestamp: "9:05 AM",
@@ -144,8 +224,12 @@ const INITIAL_MESSAGES: Record<string, SlackMessage[]> = {
 };
 
 export function SlackSimulatorView() {
-  const [activeChannel, setActiveChannel] = useState("eng-architecture");
-  const [messages, setMessages] = useState<Record<string, SlackMessage[]>>(INITIAL_MESSAGES);
+  const [platform, setPlatform] = useState<"teams" | "slack">("teams");
+  const [activeChannel, setActiveChannel] = useState("hls-backend-delivery");
+  const [messages, setMessages] = useState<Record<string, SlackMessage[]>>({
+    ...INITIAL_MESSAGES,
+    ...TEAMS_INITIAL_MESSAGES,
+  });
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [presence, setPresence] = useState<Record<string, "away" | "active">>({
@@ -155,10 +239,17 @@ export function SlackSimulatorView() {
   });
   const [autoMode, setAutoMode] = useState(false);
   const [statusReasons, setStatusReasons] = useState<Record<string, string>>({
-    towfik: "Google Cal: In Product Design Sync",
-    maneesh: "Slack Idle: >15m Inactive",
-    ali: "Active in Slack & GitHub",
+    towfik: "Teams: In Sprint Planning Sync",
+    maneesh: "Out of Office: On Sick Leave",
+    ali: "In 4-Hour Client Architecture Meeting",
   });
+
+  const channels = platform === "teams" ? TEAMS_CHANNELS : SLACK_CHANNELS;
+
+  const handlePlatformChange = (p: "teams" | "slack") => {
+    setPlatform(p);
+    setActiveChannel(p === "teams" ? "hls-backend-delivery" : "eng-architecture");
+  };
 
   const togglePresence = (key: string) => {
     setPresence((prev) => ({
@@ -350,37 +441,74 @@ export function SlackSimulatorView() {
         {/* Workspace header */}
         <div className="flex items-center justify-between border-b border-[#2b2d31] pb-3 mb-3 px-2">
           <div className="flex items-center gap-2">
-            <div className="h-6 w-6 rounded bg-[#611f69] flex items-center justify-center text-white font-bold text-xs">
-              GW
+            <div className={`h-6 w-6 rounded flex items-center justify-center text-white font-bold text-xs ${
+              platform === "teams" ? "bg-[#5B5FC7]" : "bg-[#611f69]"
+            }`}>
+              {platform === "teams" ? "T" : "S"}
             </div>
-            <span className="font-bold text-white text-sm">GhostWorker Org</span>
+            <div className="flex flex-col">
+              <span className="font-bold text-white text-xs leading-none">
+                {platform === "teams" ? "Accenture Teams" : "Accenture Slack"}
+              </span>
+              <span className="text-[9px] text-[#9a9b9e] leading-tight">
+                {platform === "teams" ? "HLS Delivery Pod" : "Innovation Workspace"}
+              </span>
+            </div>
           </div>
           <ChevronDown size={16} className="text-[#9a9b9e]" />
+        </div>
+
+        {/* Platform Switcher */}
+        <div className="flex gap-1 p-1 bg-[#222529] rounded-lg mb-3 border border-[#383a40]">
+          <button
+            type="button"
+            onClick={() => handlePlatformChange("teams")}
+            className={`flex-1 py-1 px-1.5 rounded text-[10px] font-semibold flex items-center justify-center gap-1 transition-all ${
+              platform === "teams"
+                ? "bg-[#5B5FC7] text-white shadow-sm"
+                : "text-zinc-400 hover:text-white"
+            }`}
+          >
+            <span>🟣</span> Teams
+          </button>
+          <button
+            type="button"
+            onClick={() => handlePlatformChange("slack")}
+            className={`flex-1 py-1 px-1.5 rounded text-[10px] font-semibold flex items-center justify-center gap-1 transition-all ${
+              platform === "slack"
+                ? "bg-[#1164a3] text-white shadow-sm"
+                : "text-zinc-400 hover:text-white"
+            }`}
+          >
+            <span>💬</span> Slack
+          </button>
         </div>
 
         {/* Ambient Bot Status banner */}
         <div className="mb-4 rounded-lg bg-[#222529] p-2.5 border border-[#383a40]">
           <div className="flex items-center gap-2 text-xs font-semibold text-[#2eb67d]">
             <span className="h-2 w-2 rounded-full bg-[#2eb67d] animate-pulse" />
-            GhostWorker Active
+            TwinOps Ambient Active
           </div>
           <p className="text-[11px] text-[#9a9b9e] mt-1 leading-snug">
-            Monitoring 3 channels. Auto-answering for teammates who are away.
+            Monitoring {channels.length} delivery channels. Auto-answering for teammates in meetings or on leave.
           </p>
         </div>
 
         {/* Channels */}
         <div className="flex-1 space-y-1">
           <p className="px-2 text-[11px] font-bold text-[#868686] uppercase tracking-wider mb-1">
-            Channels
+            {platform === "teams" ? "Teams Channels" : "Slack Channels"}
           </p>
-          {CHANNELS.map((ch) => (
+          {channels.map((ch) => (
             <button
               key={ch.id}
               onClick={() => setActiveChannel(ch.id)}
               className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium transition-colors ${
                 activeChannel === ch.id
-                  ? "bg-[#1164a3] text-white"
+                  ? platform === "teams"
+                    ? "bg-[#5B5FC7] text-white"
+                    : "bg-[#1164a3] text-white"
                   : "text-[#bcabbc] hover:bg-[#27242c] hover:text-white"
               }`}
             >
@@ -498,7 +626,7 @@ export function SlackSimulatorView() {
         </div>
       </div>
 
-      {/* Slack Main Chat Area */}
+      {/* Main Chat Area */}
       <div className="flex flex-1 flex-col h-full bg-[#1a1d21]">
         {/* Channel header */}
         <div className="flex items-center justify-between border-b border-[#2b2d31] px-5 py-3">
@@ -506,7 +634,7 @@ export function SlackSimulatorView() {
             <Hash size={18} className="text-[#ababad]" />
             <span className="font-bold text-white text-sm">{activeChannel}</span>
             <span className="text-xs text-[#868686] ml-2">
-              {CHANNELS.find((c) => c.id === activeChannel)?.desc}
+              {channels.find((c) => c.id === activeChannel)?.desc}
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -515,11 +643,15 @@ export function SlackSimulatorView() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#36c5f0] opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#36c5f0]"></span>
               </span>
-              Exa AI Neural Grounding
+              Neural Citations
             </div>
-            <div className="flex items-center gap-2 text-xs bg-[#222529] px-2.5 py-1 rounded-full text-[#c4b5a0] border border-[#383a40]">
+            <div className={`flex items-center gap-2 text-xs px-2.5 py-1 rounded-full border ${
+              platform === "teams"
+                ? "bg-[#5B5FC7]/20 text-[#a5a7f5] border-[#5B5FC7]/40"
+                : "bg-[#222529] text-[#c4b5a0] border-[#383a40]"
+            }`}>
               <Sparkles size={12} />
-              OpenAI gpt-4o-mini
+              {platform === "teams" ? "TwinOps Teams Runtime" : "TwinOps Slack Runtime"}
             </div>
           </div>
         </div>
@@ -530,7 +662,11 @@ export function SlackSimulatorView() {
             <div
               key={msg.id}
               className={`flex gap-3 p-2 rounded-lg transition-colors ${
-                msg.isBot ? "bg-[#222529]/70 border border-[#383a40]" : "hover:bg-[#222529]/40"
+                msg.isBot 
+                  ? platform === "teams" 
+                    ? "bg-[#202028] border border-[#5B5FC7]/30 shadow-sm" 
+                    : "bg-[#222529]/70 border border-[#383a40]" 
+                  : "hover:bg-[#222529]/40"
               }`}
             >
               {(() => {
@@ -542,8 +678,10 @@ export function SlackSimulatorView() {
                     {av.initials}
                     {msg.isBot && (
                       <span
-                        className="absolute -bottom-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#611f69] ring-2 ring-[#1a1d21]"
-                        title="GhostWorker AI Digital Twin"
+                        className={`absolute -bottom-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full ${
+                          platform === "teams" ? "bg-[#5B5FC7]" : "bg-[#611f69]"
+                        } ring-2 ring-[#1a1d21]`}
+                        title="TwinOps AI Digital Twin"
                       >
                         <Bot size={8} className="text-white" />
                       </span>
@@ -555,8 +693,10 @@ export function SlackSimulatorView() {
                 <div className="flex items-baseline gap-2">
                   <span className="font-bold text-white text-xs">{msg.sender}</span>
                   {msg.isBot && (
-                    <span className="rounded bg-[#611f69] px-1.5 py-0.2 text-[9px] font-bold text-white uppercase tracking-wider">
-                      APP
+                    <span className={`rounded ${
+                      platform === "teams" ? "bg-[#5B5FC7]" : "bg-[#611f69]"
+                    } px-1.5 py-0.2 text-[9px] font-bold text-white uppercase tracking-wider`}>
+                      {platform === "teams" ? "TEAMS BOT" : "APP"}
                     </span>
                   )}
                   {msg.botFor && (

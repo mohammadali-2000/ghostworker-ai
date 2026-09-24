@@ -8,6 +8,7 @@ import { syncSlackContextToSupabase } from "@/lib/integrations/slack";
 
 type IntegrationProvider =
   | "slack"
+  | "teams"
   | "github"
   | "notion"
   | "google_drive"
@@ -16,6 +17,7 @@ type IntegrationProvider =
 
 const VALID_PROVIDERS: IntegrationProvider[] = [
   "slack",
+  "teams",
   "github",
   "notion",
   "google_drive",

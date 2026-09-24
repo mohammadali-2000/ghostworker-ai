@@ -2,6 +2,7 @@ import { createServerSupabaseClient } from "@/lib/core/supabase/server";
 
 type IntegrationProvider =
   | "slack"
+  | "teams"
   | "github"
   | "notion"
   | "google_drive"
@@ -187,6 +188,20 @@ export async function getSlackBotToken(): Promise<string> {
   throw new Error(
     "No Slack bot token found. Add it in Settings or set SLACK_BOT_TOKEN in .env.local."
   );
+}
+
+export async function getTeamsWebhookUrl(): Promise<string | null> {
+  const config = await getIntegrationConfig("teams");
+  if (
+    config?.webhook_url &&
+    typeof config.webhook_url === "string" &&
+    config.webhook_url.trim()
+  ) {
+    return config.webhook_url.trim();
+  }
+  const envUrl = process.env.TEAMS_WEBHOOK_URL;
+  if (envUrl && envUrl.trim()) return envUrl.trim();
+  return null;
 }
 
 export async function getActiveCloneId(): Promise<string> {

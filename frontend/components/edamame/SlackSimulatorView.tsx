@@ -205,7 +205,7 @@ const INITIAL_MESSAGES: Record<string, SlackMessage[]> = {
       avatar: "MT",
       role: "Frontend & Product Lead",
       timestamp: "9:05 AM",
-      content: "What are our top 3 priorities for the GhostWorker AI launch?",
+      content: "What are our top 3 priorities for the TwinOps enterprise launch?",
     },
     {
       id: "msg-6",
@@ -215,9 +215,9 @@ const INITIAL_MESSAGES: Record<string, SlackMessage[]> = {
       timestamp: "9:05 AM",
       isBot: true,
       botFor: "Sm Ali (In Architecture Review)",
-      content: "Morning Towfik! Ali is in architecture review, but here are our top 3 deliverables:\n\n1. In-situ Slack & GitHub digital twins (zero friction)\n2. Real-time neural search grounding via Exa AI\n3. Executive CEO polling across engineering, product, and sales.",
+      content: "Morning Towfik! Ali is in architecture review, but here are our top 3 deliverables:\n\n1. In-situ Teams, Slack & GitHub digital twins (zero friction)\n2. Real-time neural search grounding via Exa AI\n3. Executive CEO polling across engineering, product, and sales.",
       citations: [
-        { source: "Roadmap", snippet: "Q1 GhostWorker Autonomous Agent Roadmap" },
+        { source: "Roadmap", snippet: "Q1 TwinOps Autonomous Agent Roadmap" },
       ],
     },
   ],
@@ -338,7 +338,7 @@ export function SlackSimulatorView() {
 
     const targetInitials = targetName.includes("Maneesh") ? "MN" : targetName.includes("Towfik") ? "MT" : "SA";
 
-    // IF TEAMMATE IS ACTIVE (ONLINE): GhostWorker stays quiet, human replies!
+    // IF TEAMMATE IS ACTIVE (ONLINE): TwinOps stays quiet, human replies!
     if (presence[presenceKey] === "active") {
       await new Promise((r) => setTimeout(r, 600));
       const activeHumanMsg: SlackMessage = {
@@ -347,7 +347,7 @@ export function SlackSimulatorView() {
         avatar: targetInitials,
         role: "Teammate (Active Online)",
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        content: `Hey! I'm actively online at my desk right now. Got your ping, looking into it! (GhostWorker is on standby).`,
+        content: `Hey! I'm actively online at my desk right now. Got your ping, looking into it! (TwinOps is on standby).`,
       };
       setMessages((prev) => ({
         ...prev,
@@ -357,7 +357,7 @@ export function SlackSimulatorView() {
       return;
     }
 
-    // OTHERWISE: TEAMMATE IS AWAY/IN MEETING -> GhostWorker AI steps in on their behalf!
+    // OTHERWISE: TEAMMATE IS AWAY/IN MEETING -> TwinOps AI steps in on their behalf!
 
     try {
       const res = await fetch("/api/edamame/chat", {
@@ -397,7 +397,7 @@ export function SlackSimulatorView() {
 
       const botMsg: SlackMessage = {
         id: `bot-${Date.now()}`,
-        sender: `GhostWorker (${targetName})`,
+        sender: `TwinOps (${targetName})`,
         avatar: targetInitials,
         role: "AI Digital Twin",
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
@@ -417,7 +417,7 @@ export function SlackSimulatorView() {
       // Fallback message
       const fallbackMsg: SlackMessage = {
         id: `bot-${Date.now()}`,
-        sender: `GhostWorker (${targetName})`,
+        sender: `TwinOps (${targetName})`,
         avatar: targetInitials,
         role: "AI Digital Twin",
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
@@ -747,7 +747,7 @@ export function SlackSimulatorView() {
           {isTyping && (
             <div className="flex items-center gap-2 text-xs text-[#9a9b9e] italic pl-2">
               <Sparkles size={13} className="animate-spin text-[#c4b5a0]" />
-              GhostWorker is reading internal RFCs & drafting response in Slack…
+              TwinOps is reading internal RFCs & drafting response in {platform === "teams" ? "Microsoft Teams" : "Slack"}…
             </div>
           )}
           <div ref={messagesEndRef} />
@@ -774,7 +774,7 @@ export function SlackSimulatorView() {
             </button>
             <button
               type="button"
-              onClick={() => setInputValue("@Sm Ali what are our top 3 deliverables for the GhostWorker AI hackathon launch?")}
+              onClick={() => setInputValue("@Sm Ali what are our top 3 deliverables for the TwinOps enterprise launch?")}
               className="text-[10px] bg-[#222529] hover:bg-[#2e3238] text-[#2eb67d] border border-[#383a40] px-2 py-1 rounded transition-colors"
             >
               Ask @Ali (Architect)

@@ -24,9 +24,15 @@ TwinOps ambiently indexes project documentation, Jira tickets, and GitHub PR dis
 * **Core Accenture Standard:** Over 90% of global Accenture enterprise delivery runs on **Microsoft Teams**, Outlook, Azure DevOps, and GitHub Enterprise.
 
 ### How TwinOps connects to Microsoft Teams:
-1. **The Native Protocol:** In production, Microsoft Teams bots connect via the **Microsoft Bot Framework / Azure Bot Service** through an outgoing/incoming webhook endpoint (`/api/teams/events`).
-2. **The Teams App Manifest:** An internal Teams application package (`manifest.json` + icons) that can be sideloaded into any Accenture Teams channel.
-3. **The Built-in Teams Simulator:** For internal presentations and pilot testing, TwinOps features a native **Microsoft Teams Dark Mode Simulator** directly in the UI. You can show an authentic Microsoft Teams channel experience without waiting for corporate IT tenant admin approval.
+1. **Modern Power Automate / Workflows Webhooks (Zero-Admin Required):**  
+   - Microsoft retired legacy Office 365 incoming webhooks. In modern Teams, channels use the **Workflows App (Power Automate)**.
+   - Any team member can click `(...)` on any Teams channel ➔ `Workflows` ➔ `Post to a channel when a webhook request is received`.
+   - Microsoft gives an instant HTTPS webhook URL (`https://prod-xx.azure.com/.../workflows/...`).
+   - TwinOps dispatches enterprise **Adaptive Cards (v1.4 / v1.5 standard)** directly to that URL via `POST /api/teams/send`. This requires **zero corporate tenant admin permissions**!
+2. **Inbound Webhooks & Bot Events:**  
+   - Incoming queries from Teams trigger `POST /api/teams/events`, which queries the TwinOps episodic memory and replies back to the channel.
+3. **The Built-in Omnichannel Simulator:**  
+   - For internal presentations, demos, and instant offline testing, TwinOps features a native **Microsoft Teams Dark Mode Simulator** directly in the web UI. You can show an authentic Teams channel experience with instant presence toggling and citations.
 
 ---
 

@@ -37,17 +37,14 @@ function nextMsgId() {
 }
 
 const AVATAR_COLORS = [
-  "bg-[#1e1e22] text-[#818cf8]",
-  "bg-[#1e1e22] text-[#34d399]",
-  "bg-[#1e1e22] text-[#fbbf24]",
-  "bg-[#1e1e22] text-[#fb7185]",
-  "bg-[#1e1e22] text-[#a78bfa]",
-  "bg-[#1e1e22] text-[#38bdf8]",
-  "bg-[#1e1e22] text-[#fb923c]",
-  "bg-[#1e1e22] text-[#2dd4bf]",
-  "bg-[#1e1e22] text-[#f472b6]",
-  "bg-[#1e1e22] text-[#a3e635]",
-  "bg-[#1e1e22] text-[#22d3ee]",
+  "bg-indigo-50 text-indigo-700 border-indigo-200",
+  "bg-emerald-50 text-emerald-700 border-emerald-200",
+  "bg-amber-50 text-amber-700 border-amber-200",
+  "bg-rose-50 text-rose-700 border-rose-200",
+  "bg-purple-50 text-purple-700 border-purple-200",
+  "bg-sky-50 text-sky-700 border-sky-200",
+  "bg-orange-50 text-orange-700 border-orange-200",
+  "bg-teal-50 text-teal-700 border-teal-200",
 ];
 
 function getAvatarColor(index: number) {
@@ -72,31 +69,31 @@ function EmployeeListItem({
   return (
     <button
       onClick={onClick}
-      className={`flex w-full items-center gap-3 px-4 py-3 text-left transition-colors ${
+      className={`flex w-full items-center gap-3 px-3.5 py-3 text-left transition-all rounded-xl my-1 ${
         active
-          ? "bg-[#19191d] border-r-2 border-[#c4b5a0]"
-          : "hover:bg-[#131316]"
+          ? "bg-[#e2eaf3] shadow-[inset_2px_2px_4px_#cfd8e5,inset_-2px_-2px_4px_#ffffff] text-slate-900 border-l-4 border-indigo-600"
+          : "hover:bg-[#f1f5fa] text-slate-700 shadow-[2px_2px_5px_#cfd8e5,-2px_-2px_5px_#ffffff] bg-[#f1f5fa]"
       }`}
     >
       <div
-        className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-[12px] font-semibold ${getAvatarColor(colorIndex)}`}
+        className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl text-[12px] font-bold border shadow-[2px_2px_4px_#cfd8e5] ${getAvatarColor(colorIndex)}`}
       >
         {profile.employee.initials}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between">
           <span
-            className={`truncate text-[13px] font-medium ${
-              active ? "text-[#ededed]" : "text-[#d4d4d8]"
+            className={`truncate text-[13px] font-bold ${
+              active ? "text-indigo-950" : "text-slate-800"
             }`}
           >
             {profile.employee.name}
           </span>
           {hasMessages && (
-            <MessageSquare size={12} className="flex-shrink-0 text-[#3f3f46]" />
+            <MessageSquare size={12} className="flex-shrink-0 text-indigo-500" />
           )}
         </div>
-        <p className="truncate text-[11.5px] text-[#71717a]">
+        <p className="truncate text-[11px] font-medium text-slate-500">
           {profile.employee.role} · {profile.employee.team}
         </p>
       </div>
@@ -114,11 +111,11 @@ function SuggestedQuestion({
   return (
     <button
       onClick={onClick}
-      className="group flex items-center gap-2 rounded-lg border border-[#1e1e22] bg-[#131316] px-3 py-2.5 text-left text-[12.5px] text-[#a1a1aa] transition-all hover:border-[#2a2a2e] hover:bg-[#19191d] hover:text-[#d4d4d8]"
+      className="group flex items-center gap-2 rounded-xl border border-[#e2eaf3] bg-[#f1f5fa] px-3.5 py-3 text-left text-[12.5px] font-medium text-slate-700 shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] transition-all hover:shadow-[inset_2px_2px_4px_#cfd8e5,inset_-2px_-2px_4px_#ffffff] hover:text-indigo-600"
     >
       <ArrowRight
         size={12}
-        className="flex-shrink-0 text-[#3f3f46] transition-colors group-hover:text-[#c4b5a0]"
+        className="flex-shrink-0 text-slate-400 transition-colors group-hover:text-indigo-600"
       />
       <span className="line-clamp-2">{question}</span>
     </button>
@@ -143,22 +140,22 @@ function ChatBubble({
     >
       {/* Avatar */}
       <div
-        className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${
+        className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
           isUser
-            ? "bg-[#c4b5a0] text-[#0a0a0c]"
-            : getAvatarColor(colorIndex)
+            ? "bg-[#4f46e5] text-white shadow-[2px_2px_5px_#4f46e540]"
+            : `border shadow-[2px_2px_4px_#cfd8e5] ${getAvatarColor(colorIndex)}`
         }`}
       >
         {isUser ? "You" : employee.initials}
       </div>
 
-      {/* Content */}
+      {/* Bubble */}
       <div className={`max-w-[75%] ${isUser ? "text-right" : ""}`}>
         <div
           className={`inline-block rounded-2xl px-4 py-3 text-[13px] leading-relaxed ${
             isUser
-              ? "rounded-tr-md bg-[#c4b5a0] text-[#0a0a0c]"
-              : "rounded-tl-md bg-[#19191d] text-[#d4d4d8] border border-[#1e1e22]"
+              ? "rounded-tr-sm bg-[#4f46e5] text-white shadow-[4px_4px_12px_#4f46e530]"
+              : "rounded-tl-sm bg-white text-slate-800 border border-[#e2eaf3] shadow-[4px_4px_12px_#cfd8e5,-4px_-4px_12px_#ffffff]"
           }`}
         >
           <div className="whitespace-pre-line">{message.content}</div>
@@ -170,15 +167,23 @@ function ChatBubble({
             {message.citations.map((c, i) => (
               <div
                 key={i}
-                className="inline-flex items-start gap-1.5 rounded-lg bg-[#131316] border border-[#1e1e22] px-2.5 py-1.5 text-left"
+                className="inline-flex items-start gap-2 rounded-xl bg-[#f1f5fa] border border-[#d8e2ed] px-3 py-2 text-left shadow-[inset_1px_1px_3px_#cfd8e5]"
               >
-                <Quote size={10} className="mt-0.5 flex-shrink-0 text-[#52525b]" />
+                <Quote
+                  size={11}
+                  className="mt-0.5 flex-shrink-0 text-indigo-600"
+                />
                 <div>
-                  <span className="text-[10px] font-medium text-[#71717a]">
+                  <span className="text-[10px] font-bold text-indigo-700">
                     {c.source}
                   </span>
-                  <span className="text-[10px] text-[#52525b]"> · {c.date}</span>
-                  <p className="mt-0.5 text-[11px] italic text-[#71717a] line-clamp-2">
+                  {c.date && (
+                    <span className="text-[10px] text-slate-400">
+                      {" "}
+                      · {c.date}
+                    </span>
+                  )}
+                  <p className="mt-0.5 text-[11px] italic text-slate-600 line-clamp-2">
                     &ldquo;{c.snippet}&rdquo;
                   </p>
                 </div>
@@ -191,60 +196,6 @@ function ChatBubble({
   );
 }
 
-function AgentThinkingSteps({ employeeName }: { employeeName: string }) {
-  const [step, setStep] = useState(0);
-
-  useEffect(() => {
-    const timers = [
-      setTimeout(() => setStep(1), 600),
-      setTimeout(() => setStep(2), 1800),
-      setTimeout(() => setStep(3), 3500),
-    ];
-    return () => timers.forEach(clearTimeout);
-  }, []);
-
-  const steps = [
-    { label: "Searching knowledge base", icon: <Search size={12} /> },
-    { label: "Retrieving relevant memories", icon: <Brain size={12} /> },
-    { label: "Consulting coworker agents", icon: <Users size={12} /> },
-    { label: "Composing response", icon: <Sparkles size={12} /> },
-  ];
-
-  return (
-    <div className="space-y-2.5 py-1">
-      {steps.map((s, i) => (
-        <div
-          key={i}
-          className="flex items-center gap-2.5 text-[12px]"
-          style={{
-            opacity: i <= step ? 1 : 0.3,
-            transition: "opacity 0.3s ease",
-          }}
-        >
-          {i < step ? (
-            <CheckCircle2 size={13} className="flex-shrink-0 text-[#34d399]" />
-          ) : i === step ? (
-            <Loader2 size={13} className="flex-shrink-0 animate-spin text-[#c4b5a0]" />
-          ) : (
-            <Circle size={13} className="flex-shrink-0 text-[#2a2a2e]" />
-          )}
-          <span
-            className={
-              i < step
-                ? "text-[#71717a] line-through decoration-[#3f3f46]"
-                : i === step
-                ? "text-[#a1a1aa]"
-                : "text-[#3f3f46]"
-            }
-          >
-            {s.label}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function TypingIndicator({
   employee,
   colorIndex,
@@ -253,21 +204,25 @@ function TypingIndicator({
   colorIndex: number;
 }) {
   return (
-    <div className="flex items-start gap-3">
+    <div className="flex items-center gap-3">
       <div
-        className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${getAvatarColor(colorIndex)}`}
+        className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-bold border shadow-[2px_2px_4px_#cfd8e5] ${getAvatarColor(
+          colorIndex
+        )}`}
       >
         {employee.initials}
       </div>
-      <div className="rounded-2xl rounded-tl-md border border-[#1e1e22] bg-[#19191d] px-4 py-3">
-        <AgentThinkingSteps employeeName={employee.name} />
+      <div className="inline-flex items-center gap-1.5 rounded-2xl rounded-tl-sm bg-white border border-[#e2eaf3] px-4 py-3 shadow-[4px_4px_12px_#cfd8e5,-4px_-4px_12px_#ffffff]">
+        <div className="h-2 w-2 animate-bounce rounded-full bg-indigo-600 [animation-delay:-0.3s]" />
+        <div className="h-2 w-2 animate-bounce rounded-full bg-indigo-600 [animation-delay:-0.15s]" />
+        <div className="h-2 w-2 animate-bounce rounded-full bg-indigo-600" />
       </div>
     </div>
   );
 }
 
 // ============================================
-// Main ClonesView
+// Main Clones View Component
 // ============================================
 
 interface ClonesViewProps {
@@ -275,13 +230,9 @@ interface ClonesViewProps {
 }
 
 export function ClonesView({ demoTrigger }: ClonesViewProps) {
-  const [profiles, setProfiles] = useState(getCloneProfiles());
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-
-  // Fetch real clone profiles from backend on mount
-  useEffect(() => {
-    fetchCloneProfiles().then((p) => setProfiles(p));
-  }, []);
+  const [profiles, setProfiles] = useState<CloneProfile[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedId, setSelectedId] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
   const [conversations, setConversations] = useState<
     Record<string, ChatMessage[]>
@@ -294,42 +245,43 @@ export function ClonesView({ demoTrigger }: ClonesViewProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const selectedProfile = profiles.find(
-    (p) => p.employee.id === selectedId
-  );
-  const messages = selectedId ? conversations[selectedId] ?? [] : [];
-
-  const filteredProfiles = searchQuery
-    ? profiles.filter(
-        (p) =>
-          p.employee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.employee.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.employee.team.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : profiles;
-
-  // Group filtered profiles by team
-  const groupedProfiles = filteredProfiles.reduce<
-    { team: string; members: typeof profiles }[]
-  >((groups, profile) => {
-    const existing = groups.find((g) => g.team === profile.employee.team);
-    if (existing) {
-      existing.members.push(profile);
-    } else {
-      groups.push({ team: profile.employee.team, members: [profile] });
-    }
-    return groups;
+  useEffect(() => {
+    fetchCloneProfiles().then((data) => {
+      setProfiles(data);
+      if (data.length > 0 && !selectedId) {
+        setSelectedId(data[0].employee.id);
+      }
+      setLoading(false);
+    });
   }, []);
 
-  // Auto-scroll
+  const selectedProfile = profiles.find((p) => p.employee.id === selectedId);
+  const messages = selectedId ? conversations[selectedId] ?? [] : [];
+
+  const filteredProfiles = profiles.filter((p) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      p.employee.name.toLowerCase().includes(q) ||
+      p.employee.role.toLowerCase().includes(q) ||
+      p.employee.team.toLowerCase().includes(q) ||
+      p.expertise.some((e) => e.toLowerCase().includes(q))
+    );
+  });
+
+  const teams = Array.from(new Set(filteredProfiles.map((p) => p.employee.team)));
+  const groupedProfiles = teams.map((team) => ({
+    team,
+    members: filteredProfiles.filter((p) => p.employee.team === team),
+  }));
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length, streamingContent]);
 
-  // Focus input when selecting a clone
   useEffect(() => {
-    if (selectedId) {
-      setTimeout(() => inputRef.current?.focus(), 100);
+    if (selectedId && inputRef.current) {
+      inputRef.current.focus();
     }
   }, [selectedId]);
 
@@ -337,7 +289,6 @@ export function ClonesView({ demoTrigger }: ClonesViewProps) {
     async (question: string) => {
       if (!selectedId || !question.trim() || isStreaming) return;
 
-      // Cancel any previous stream
       if (abortRef.current) abortRef.current.abort();
       const controller = new AbortController();
       abortRef.current = controller;
@@ -361,11 +312,12 @@ export function ClonesView({ demoTrigger }: ClonesViewProps) {
       try {
         let accumulated = "";
         let cites: Citation[] = [];
-        // Pass conversation history for RAG context
-        const prevMessages = (conversations[selectedId] ?? []).map((m) => ({
+        const currentConv = conversations[selectedId] ?? [];
+        const prevMessages = [...currentConv, userMsg].map((m) => ({
           role: m.role,
           content: m.content,
         }));
+
         const stream = streamCloneChat(
           selectedId,
           question,
@@ -382,7 +334,6 @@ export function ClonesView({ demoTrigger }: ClonesViewProps) {
           }
         }
 
-        // Finalize: add assistant message to conversation
         const assistantMsg: ChatMessage = {
           id: nextMsgId(),
           role: "assistant",
@@ -396,14 +347,14 @@ export function ClonesView({ demoTrigger }: ClonesViewProps) {
           [selectedId]: [...(prev[selectedId] ?? []), assistantMsg],
         }));
       } catch {
-        // aborted
+        // stream aborted
       }
 
       setIsStreaming(false);
       setStreamingContent("");
       setStreamingCitations([]);
     },
-    [selectedId, isStreaming]
+    [selectedId, isStreaming, conversations]
   );
 
   const handleSubmit = useCallback(
@@ -414,64 +365,73 @@ export function ClonesView({ demoTrigger }: ClonesViewProps) {
     [input, sendMessage]
   );
 
-  // Demo trigger — select Marcus Chen and ask about the query optimizer
   useEffect(() => {
     if (demoTrigger > 0 && profiles.length > 0) {
-      const marcus = profiles[0]; // Marcus Chen
-      setSelectedId(marcus.employee.id);
+      const first = profiles[0];
+      setSelectedId(first.employee.id);
       setTimeout(() => {
-        sendMessage("How does the analytics query optimizer work?");
+        sendMessage("What are you currently focusing on?");
       }, 300);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [demoTrigger]);
+  }, [demoTrigger, profiles]);
 
   const profileIndex = (id: string) =>
     profiles.findIndex((p) => p.employee.id === id);
 
+  if (loading) {
+    return (
+      <div className="flex h-full items-center justify-center bg-[#eaf0f6]">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 size={28} className="animate-spin text-indigo-600" />
+          <p className="text-xs font-semibold text-slate-500">Loading Teammate Twins…</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex h-full">
+    <div className="flex h-full bg-[#eaf0f6]">
       {/* ---- Left: Clone list ---- */}
-      <div className="flex w-[280px] flex-shrink-0 flex-col border-r border-[#1e1e22] bg-[#0e0e11]">
+      <div className="flex w-[290px] flex-shrink-0 flex-col border-r border-[#d8e2ed] bg-[#f1f5fa] shadow-[2px_0_8px_#cfd8e515]">
         {/* Header */}
-        <div className="border-b border-[#1e1e22] px-4 py-4">
-          <h2 className="text-[15px] font-semibold text-[#ededed]">
-            Agent Clones
+        <div className="border-b border-[#d8e2ed] px-4 py-4">
+          <h2 className="text-[15px] font-bold text-slate-800">
+            Pod Teammate Twins
           </h2>
-          <p className="mt-0.5 text-[12px] text-[#71717a]">
-            Chat with individual digital twins
+          <p className="mt-0.5 text-[12px] font-medium text-slate-500">
+            Consult individual domain twins
           </p>
         </div>
 
         {/* Search */}
-        <div className="border-b border-[#1e1e22] px-3 py-2.5">
+        <div className="border-b border-[#d8e2ed] px-3 py-3">
           <div className="relative">
             <Search
               size={14}
-              className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#52525b]"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
             />
             <input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search people…"
-              className="w-full rounded-md border border-[#1e1e22] bg-[#131316] py-1.5 pl-8 pr-3 text-[12.5px] text-[#ededed] placeholder:text-[#52525b] focus:border-[#2a2a2e] focus:outline-none focus:ring-1 focus:ring-[#2a2a2e]"
+              placeholder="Search people or skills…"
+              className="w-full rounded-xl border border-[#d8e2ed] bg-[#f1f5fa] py-2 pl-9 pr-3 text-[12.5px] font-medium text-slate-800 placeholder:text-slate-400 shadow-[inset_2px_2px_4px_#cfd8e5,inset_-2px_-2px_4px_#ffffff] focus:border-indigo-400 focus:outline-none"
             />
           </div>
         </div>
 
         {/* List grouped by team */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto p-2 space-y-3">
           {groupedProfiles.map((group) => (
             <div key={group.team}>
-              <div className="sticky top-0 z-10 border-b border-[#1e1e22] bg-[#111114]/90 px-4 py-1.5 backdrop-blur-sm">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#52525b]">
+              <div className="sticky top-0 z-10 bg-[#f1f5fa]/90 px-3 py-1 backdrop-blur-sm flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
                   {group.team}
                 </span>
-                <span className="ml-1.5 text-[10px] font-medium text-[#3f3f46]">
+                <span className="rounded-full bg-slate-200 px-1.5 py-0.2 text-[10px] font-semibold text-slate-600">
                   {group.members.length}
                 </span>
               </div>
-              <div className="divide-y divide-[#1e1e22]">
+              <div className="space-y-1 mt-1">
                 {group.members.map((profile) => (
                   <EmployeeListItem
                     key={profile.employee.id}
@@ -491,14 +451,14 @@ export function ClonesView({ demoTrigger }: ClonesViewProps) {
       </div>
 
       {/* ---- Right: Chat area ---- */}
-      <div className="flex flex-1 flex-col bg-[#0a0a0c]">
+      <div className="flex flex-1 flex-col bg-[#eaf0f6]">
         {selectedProfile ? (
           <>
             {/* Chat header */}
-            <div className="flex items-center justify-between border-b border-[#1e1e22] bg-[#0e0e11] px-5 py-3">
+            <div className="flex items-center justify-between border-b border-[#d8e2ed] bg-[#f1f5fa] px-6 py-3.5 shadow-[0_2px_8px_#cfd8e520]">
               <div className="flex items-center gap-3">
                 <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-full text-[13px] font-semibold ${getAvatarColor(
+                  className={`flex h-10 w-10 items-center justify-center rounded-2xl text-[13px] font-bold border shadow-[3px_3px_7px_#cfd8e5,-3px_-3px_7px_#ffffff] ${getAvatarColor(
                     profileIndex(selectedProfile.employee.id)
                   )}`}
                 >
@@ -506,26 +466,26 @@ export function ClonesView({ demoTrigger }: ClonesViewProps) {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-[14px] font-semibold text-[#ededed]">
+                    <h3 className="text-[14.5px] font-bold text-slate-800">
                       {selectedProfile.employee.name}
                     </h3>
-                    <span className="flex items-center gap-1 rounded-full bg-[#10b98120] px-2 py-0.5 text-[10px] font-medium text-[#10b981]">
-                      <Bot size={10} />
-                      AI Clone
+                    <span className="flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[10.5px] font-bold text-emerald-700 shadow-[1px_1px_3px_#cfd8e5]">
+                      <Bot size={11} />
+                      AI Twin Active
                     </span>
                   </div>
-                  <p className="text-[12px] text-[#71717a]">
+                  <p className="text-[12px] font-medium text-slate-500">
                     {selectedProfile.employee.role} ·{" "}
                     {selectedProfile.employee.team} ·{" "}
                     {selectedProfile.employee.tenure}
                   </p>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-1">
+              <div className="flex flex-wrap gap-1.5">
                 {selectedProfile.expertise.slice(0, 3).map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-md bg-[#1e1e22] px-2 py-0.5 text-[10px] font-medium text-[#71717a]"
+                    className="rounded-lg bg-indigo-50 border border-indigo-200/60 px-2.5 py-1 text-[10.5px] font-semibold text-indigo-700 shadow-[1px_1px_3px_#cfd8e5]"
                   >
                     {tag}
                   </span>
@@ -534,13 +494,13 @@ export function ClonesView({ demoTrigger }: ClonesViewProps) {
             </div>
 
             {/* Messages area */}
-            <div className="flex-1 overflow-y-auto px-5 py-5">
+            <div className="flex-1 overflow-y-auto px-6 py-6">
               {messages.length === 0 && !isStreaming ? (
                 /* Empty state with personality + suggested questions */
-                <div className="mx-auto max-w-lg">
-                  <div className="mb-6 rounded-xl border border-[#1e1e22] bg-[#131316] p-5 text-center">
+                <div className="mx-auto max-w-lg text-center py-8">
+                  <div className="mb-6 rounded-3xl border border-[#e2eaf3] bg-[#f1f5fa] p-6 text-center shadow-[6px_6px_14px_#cfd8e5,-6px_-6px_14px_#ffffff]">
                     <div
-                      className={`mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl ${getAvatarColor(
+                      className={`mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl border shadow-[3px_3px_8px_#cfd8e5] ${getAvatarColor(
                         profileIndex(selectedProfile.employee.id)
                       )}`}
                     >
@@ -548,18 +508,18 @@ export function ClonesView({ demoTrigger }: ClonesViewProps) {
                         {selectedProfile.employee.initials}
                       </span>
                     </div>
-                    <h3 className="mb-1 text-[15px] font-semibold text-[#ededed]">
+                    <h3 className="mb-1 text-[16px] font-bold text-slate-800">
                       {selectedProfile.employee.name}&apos;s Digital Twin
                     </h3>
-                    <p className="text-[12.5px] leading-relaxed text-[#71717a]">
+                    <p className="text-[12.5px] font-medium leading-relaxed text-slate-600">
                       {selectedProfile.personality}
                     </p>
                   </div>
 
-                  <p className="mb-3 text-center text-[12px] font-medium text-[#52525b]">
-                    Suggested questions
+                  <p className="mb-3 text-center text-[12px] font-bold uppercase tracking-wider text-slate-400">
+                    Suggested Questions
                   </p>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-2.5">
                     {selectedProfile.suggestedQuestions.map((q) => (
                       <SuggestedQuestion
                         key={q}
@@ -585,40 +545,41 @@ export function ClonesView({ demoTrigger }: ClonesViewProps) {
                   {isStreaming && streamingContent && (
                     <div className="flex items-start gap-3">
                       <div
-                        className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-semibold ${getAvatarColor(
+                        className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-bold border shadow-[2px_2px_4px_#cfd8e5] ${getAvatarColor(
                           profileIndex(selectedProfile.employee.id)
                         )}`}
                       >
                         {selectedProfile.employee.initials}
                       </div>
                       <div className="max-w-[75%]">
-                        <div className="inline-block rounded-2xl rounded-tl-md border border-[#1e1e22] bg-[#19191d] px-4 py-3 text-[13px] leading-relaxed text-[#d4d4d8]">
+                        <div className="inline-block rounded-2xl rounded-tl-sm border border-[#e2eaf3] bg-white px-4 py-3 text-[13px] leading-relaxed text-slate-800 shadow-[4px_4px_12px_#cfd8e5,-4px_-4px_12px_#ffffff]">
                           <div className="whitespace-pre-line">
                             {streamingContent}
-                            <span className="inline-block h-4 w-0.5 animate-pulse bg-[#52525b] align-text-bottom" />
+                            <span className="inline-block h-4 w-1 animate-pulse bg-indigo-600 align-text-bottom ml-1 rounded-full" />
                           </div>
                         </div>
-                        {/* Streaming citations */}
                         {streamingCitations.length > 0 && (
                           <div className="mt-2 space-y-1.5">
                             {streamingCitations.map((c, i) => (
                               <div
                                 key={i}
-                                className="inline-flex items-start gap-1.5 rounded-lg bg-[#131316] border border-[#1e1e22] px-2.5 py-1.5 text-left"
+                                className="inline-flex items-start gap-2 rounded-xl bg-[#f1f5fa] border border-[#d8e2ed] px-3 py-2 text-left shadow-[inset_1px_1px_3px_#cfd8e5]"
                               >
                                 <Quote
-                                  size={10}
-                                  className="mt-0.5 flex-shrink-0 text-[#52525b]"
+                                  size={11}
+                                  className="mt-0.5 flex-shrink-0 text-indigo-600"
                                 />
                                 <div>
-                                  <span className="text-[10px] font-medium text-[#71717a]">
+                                  <span className="text-[10px] font-bold text-indigo-700">
                                     {c.source}
                                   </span>
-                                  <span className="text-[10px] text-[#52525b]">
-                                    {" "}
-                                    · {c.date}
-                                  </span>
-                                  <p className="mt-0.5 text-[11px] italic text-[#71717a] line-clamp-2">
+                                  {c.date && (
+                                    <span className="text-[10px] text-slate-400">
+                                      {" "}
+                                      · {c.date}
+                                    </span>
+                                  )}
+                                  <p className="mt-0.5 text-[11px] italic text-slate-600 line-clamp-2">
                                     &ldquo;{c.snippet}&rdquo;
                                   </p>
                                 </div>
@@ -630,7 +591,7 @@ export function ClonesView({ demoTrigger }: ClonesViewProps) {
                     </div>
                   )}
 
-                  {/* Typing indicator (before content starts) */}
+                  {/* Typing indicator */}
                   {isStreaming && !streamingContent && (
                     <TypingIndicator
                       employee={selectedProfile.employee}
@@ -644,8 +605,8 @@ export function ClonesView({ demoTrigger }: ClonesViewProps) {
             </div>
 
             {/* Input area */}
-            <div className="border-t border-[#1e1e22] bg-[#0e0e11] px-5 py-3">
-              <form onSubmit={handleSubmit} className="flex items-end gap-3">
+            <div className="border-t border-[#d8e2ed] bg-[#f1f5fa] px-6 py-4 shadow-[0_-2px_8px_#cfd8e520]">
+              <form onSubmit={handleSubmit} className="flex items-end gap-3 max-w-3xl mx-auto w-full">
                 <textarea
                   ref={inputRef}
                   value={input}
@@ -658,12 +619,12 @@ export function ClonesView({ demoTrigger }: ClonesViewProps) {
                   }}
                   placeholder={`Ask ${selectedProfile.employee.name.split(" ")[0]} a question…`}
                   rows={1}
-                  className="max-h-32 min-h-[40px] flex-1 resize-none rounded-xl border border-[#1e1e22] bg-[#131316] px-4 py-2.5 text-[13px] text-[#ededed] placeholder:text-[#52525b] focus:border-[#2a2a2e] focus:bg-[#19191d] focus:outline-none focus:ring-1 focus:ring-[#2a2a2e]"
+                  className="max-h-32 min-h-[44px] flex-1 resize-none rounded-xl border border-[#d8e2ed] bg-[#f1f5fa] px-4 py-2.5 text-[13px] font-medium text-slate-800 placeholder:text-slate-400 shadow-[inset_2px_2px_5px_#cfd8e5,inset_-2px_-2px_5px_#ffffff] focus:border-indigo-400 focus:outline-none"
                 />
                 <button
                   type="submit"
                   disabled={!input.trim() || isStreaming}
-                  className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#c4b5a0] text-[#0a0a0c] transition-colors hover:bg-[#d4c5b0] disabled:cursor-not-allowed disabled:opacity-40"
+                  className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-[#4f46e5] text-white shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] transition-all hover:bg-indigo-700 hover:shadow-[inset_2px_2px_4px_#3730a3] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   {isStreaming ? (
                     <Loader2 size={16} className="animate-spin" />
@@ -675,15 +636,14 @@ export function ClonesView({ demoTrigger }: ClonesViewProps) {
             </div>
           </>
         ) : (
-          /* No clone selected */
-          <div className="flex h-full flex-col items-center justify-center text-center">
-            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1e1e22]">
-              <Sparkles size={24} className="text-[#52525b]" />
+          <div className="flex h-full flex-col items-center justify-center text-center p-8">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#f1f5fa] border border-[#e2eaf3] shadow-[6px_6px_14px_#cfd8e5,-6px_-6px_14px_#ffffff]">
+              <Sparkles size={24} className="text-indigo-600" />
             </div>
-            <h3 className="mb-1 text-[15px] font-medium text-[#a1a1aa]">
+            <h3 className="mb-1 text-[16px] font-bold text-slate-800">
               Select an agent clone
             </h3>
-            <p className="max-w-xs text-[13px] text-[#52525b]">
+            <p className="max-w-xs text-[13px] font-medium text-slate-500">
               Choose an employee from the list to chat with their AI digital
               twin. Each clone has unique expertise and perspective.
             </p>

@@ -54,43 +54,43 @@ const providerMeta: Record<
   { label: string; description: string; icon: React.ReactNode }
 > = {
   slack: {
-    label: "Slack",
-    description: "Sync channels and messages into organizational memory.",
-    icon: <MessageSquare size={18} />,
+    label: "Teams & Slack",
+    description: "Sync delivery channels and messages into organizational memory.",
+    icon: <MessageSquare size={18} className="text-indigo-600" />,
   },
   github: {
-    label: "GitHub",
-    description: "Sync repositories, issues, and PRs.",
-    icon: <Github size={18} />,
+    label: "GitHub Enterprise",
+    description: "Sync repositories, commits, PRs, and commit diffs.",
+    icon: <Github size={18} className="text-slate-800" />,
   },
   notion: {
-    label: "Notion",
-    description: "Sync workspace pages and databases.",
-    icon: <FileText size={18} />,
+    label: "Notion & Confluence",
+    description: "Sync engineering workspace pages and design documents.",
+    icon: <FileText size={18} className="text-amber-600" />,
   },
   google_drive: {
-    label: "Google",
-    description: "Sync Drive files and Gmail messages.",
-    icon: null, // custom SVG below
+    label: "Google Workspace & M365",
+    description: "Sync cloud architecture specs and shared presentations.",
+    icon: null,
   },
   jira: {
-    label: "Jira",
-    description: "Sync projects, issues, and sprints.",
-    icon: <ExternalLink size={18} />,
+    label: "Jira Enterprise",
+    description: "Sync agile sprints, epics, bug tracking, and release boards.",
+    icon: <ExternalLink size={18} className="text-blue-600" />,
   },
   email: {
-    label: "Email",
-    description: "Sync email messages via IMAP.",
-    icon: <Mail size={18} />,
+    label: "Corporate Mail (IMAP / Exchange)",
+    description: "Sync relevant architecture threads into private twin context.",
+    icon: <Mail size={18} className="text-rose-600" />,
   },
 };
 
 const providerFields: Record<Provider, ProviderField[]> = {
   slack: [
-    { key: "bot_token", label: "Bot Token", type: "password", placeholder: "xoxb-..." },
+    { key: "bot_token", label: "Bot / Webhook Token", type: "password", placeholder: "xoxb-... or webhook URL" },
   ],
   github: [
-    { key: "username", label: "Username", placeholder: "octocat" },
+    { key: "username", label: "GitHub Username", placeholder: "mohammadali-2000" },
     { key: "token", label: "Personal Access Token", type: "password", placeholder: "ghp_..." },
   ],
   notion: [
@@ -98,12 +98,12 @@ const providerFields: Record<Provider, ProviderField[]> = {
   ],
   google_drive: [],
   jira: [
-    { key: "base_url", label: "Base URL", placeholder: "https://your-company.atlassian.net" },
-    { key: "email", label: "Email" },
+    { key: "base_url", label: "Base URL", placeholder: "https://accenture.atlassian.net" },
+    { key: "email", label: "Corporate Email", placeholder: "ali@accenture.com" },
     { key: "api_token", label: "API Token", type: "password" },
   ],
   email: [
-    { key: "address", label: "Email Address", placeholder: "you@company.com" },
+    { key: "address", label: "Email Address", placeholder: "ali@company.com" },
     { key: "app_password", label: "App Password", type: "password" },
   ],
 };
@@ -122,7 +122,6 @@ function formatSyncResult(result: Record<string, unknown>): string {
   return parts.length > 0 ? parts.join(", ") : "Sync complete";
 }
 
-// ---- Google logo SVG ----
 function GoogleLogo({ size = 18 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 48 48" className="flex-shrink-0">
@@ -134,10 +133,6 @@ function GoogleLogo({ size = 18 }: { size?: number }) {
   );
 }
 
-// ============================================
-// Main component
-// ============================================
-
 function SettingsContent() {
   const searchParams = useSearchParams();
   const [formState, setFormState] = useState<Record<Provider, Record<string, string>>>({
@@ -148,106 +143,99 @@ function SettingsContent() {
   });
   const [savingProvider, setSavingProvider] = useState<Provider | null>(null);
   const [syncingProvider, setSyncingProvider] = useState<Provider | null>(null);
-  const [syncFeedback, setSyncFeedback] = useState<Record<Provider, SyncFeedback | null>>({
-    slack: null, github: null, notion: null, google_drive: null, jira: null, email: null,
-  });
+  const [syncFeedback, setSyncFeedback] = useState<Record<string, SyncFeedback>>({});
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" | "info" } | null>(null);
 
-  // Handle Google OAuth redirects
+  const isGoogleOAuth = useMemo(() => {
+    const s = statuses.google_drive;
+    return s?.has_config === true && s?.config_preview?.auth_type === "oauth";
+  }, [statuses.google_drive]);
+
+  const googleEmail = useMemo(() => {
+    const s = statuses.google_drive;
+    return typeof s?.config_preview?.email === "string" ? s.config_preview.email : null;
+  }, [statuses.google_drive]);
+
+  const googleStatus = statuses.google_drive;
+
+  const fetchStatuses = useCallback(async () => {
+    try {
+      const res = await fetch("/api/integrations");
+      if (res.ok) {
+        const data = await res.json();
+        const map: Record<Provider, IntegrationStatus | null> = {
+          slack: null, github: null, notion: null, google_drive: null, jira: null, email: null,
+        };
+        for (const item of data.integrations as IntegrationStatus[]) {
+          map[item.provider] = item;
+        }
+        setStatuses(map);
+      }
+    } catch {
+      // ignore error
+    }
+  }, []);
+
   useEffect(() => {
-    const connected = searchParams.get("google_connected");
-    const error = searchParams.get("google_error");
-    if (connected === "true") {
+    fetchStatuses();
+  }, [fetchStatuses]);
+
+  useEffect(() => {
+    const success = searchParams.get("success");
+    const error = searchParams.get("error");
+    if (success === "google_connected") {
       setMessage({ text: "Google account connected successfully.", type: "success" });
     } else if (error) {
-      setMessage({ text: `Google connection failed: ${error}`, type: "error" });
+      setMessage({ text: `OAuth error: ${error}`, type: "error" });
     }
   }, [searchParams]);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch("/api/integrations");
-        const data = await res.json();
-        const next: Record<Provider, IntegrationStatus | null> = {
-          slack: null, github: null, notion: null, google_drive: null, jira: null, email: null,
-        };
-        for (const i of (data.integrations ?? []) as IntegrationStatus[]) {
-          next[i.provider] = i;
-        }
-        setStatuses(next);
-      } catch {
-        // ignore load errors
-      }
-    }
-    load();
-  }, []);
-
-  const googleStatus = statuses.google_drive;
-  const isGoogleOAuth = googleStatus?.has_config && googleStatus?.config_preview?.auth_type === "oauth";
-  const googleEmail = isGoogleOAuth && typeof googleStatus?.config_preview?.user_email === "string"
-    ? googleStatus.config_preview.user_email : null;
-
-  const handleInputChange = (provider: Provider, key: string, value: string) => {
-    setFormState((prev) => ({ ...prev, [provider]: { ...prev[provider], [key]: value } }));
+  const handleInputChange = (provider: Provider, key: string, val: string) => {
+    setFormState((prev) => ({
+      ...prev,
+      [provider]: { ...prev[provider], [key]: val },
+    }));
   };
 
   const handleSave = async (provider: Provider) => {
     setSavingProvider(provider);
-    setMessage(null);
-    setSyncFeedback((prev) => ({ ...prev, [provider]: null }));
-    const payload = Object.fromEntries(
-      Object.entries(formState[provider]).filter(([, v]) => v.trim() !== "")
-    );
     try {
       const res = await fetch("/api/integrations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ provider, config: payload }),
+        body: JSON.stringify({ provider, config: formState[provider] }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to save");
-      setStatuses((prev) => ({
-        ...prev,
-        [provider]: { provider, updated_at: data.updated_at, has_config: true, config_preview: {} },
-      }));
-      setFormState((prev) => ({ ...prev, [provider]: {} }));
-      if (data.sync?.success && data.sync.result) {
-        const summary = formatSyncResult(data.sync.result as Record<string, unknown>);
-        setSyncFeedback((prev) => ({ ...prev, [provider]: { success: true, message: `Saved & synced: ${summary}` } }));
-      } else if (data.sync?.error) {
-        setSyncFeedback((prev) => ({ ...prev, [provider]: { success: false, message: `Saved, sync failed: ${data.sync.error}` } }));
+      if (res.ok) {
+        setMessage({ text: `${providerMeta[provider].label} configuration saved.`, type: "success" });
+        await fetchStatuses();
       } else {
-        setMessage({ text: `${providerMeta[provider].label} saved.`, type: "success" });
+        setMessage({ text: "Failed to save configuration.", type: "error" });
       }
-    } catch (err) {
-      setMessage({ text: err instanceof Error ? err.message : "Save failed", type: "error" });
-    } finally {
-      setSavingProvider(null);
+    } catch {
+      setMessage({ text: "Failed to save configuration.", type: "error" });
     }
+    setSavingProvider(null);
   };
 
-  const handleSyncNow = useCallback(async (provider: Provider, route?: string) => {
-    const syncRoute = route || syncRoutes[provider];
-    if (!syncRoute) return;
+  const handleSyncNow = async (provider: Provider, route?: string) => {
+    const endpoint = route || syncRoutes[provider];
+    if (!endpoint) return;
     setSyncingProvider(provider);
-    setSyncFeedback((prev) => ({ ...prev, [provider]: null }));
     try {
-      const res = await fetch(syncRoute, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cloneId: "auto" }),
-      });
+      const res = await fetch(endpoint, { method: "POST" });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Sync failed");
-      const result = (data.result ?? data) as Record<string, unknown>;
-      setSyncFeedback((prev) => ({ ...prev, [provider]: { success: true, message: `Synced: ${formatSyncResult(result)}` } }));
-    } catch (err) {
-      setSyncFeedback((prev) => ({ ...prev, [provider]: { success: false, message: err instanceof Error ? err.message : "Sync failed" } }));
-    } finally {
-      setSyncingProvider(null);
+      if (res.ok) {
+        const detail = formatSyncResult(data);
+        setSyncFeedback((prev) => ({ ...prev, [provider]: { success: true, message: detail } }));
+        await fetchStatuses();
+      } else {
+        setSyncFeedback((prev) => ({ ...prev, [provider]: { success: false, message: data.error || "Sync failed" } }));
+      }
+    } catch {
+      setSyncFeedback((prev) => ({ ...prev, [provider]: { success: false, message: "Sync network error" } }));
     }
-  }, []);
+    setSyncingProvider(null);
+  };
 
   const handleDisconnectGoogle = useCallback(async () => {
     try {
@@ -269,76 +257,79 @@ function SettingsContent() {
   const googleFeedback = syncFeedback.google_drive;
 
   return (
-    <div className="flex h-screen bg-[#0a0a0c]">
-      {/* Slim sidebar nav */}
-      <aside className="flex w-[240px] flex-shrink-0 flex-col border-r border-[#1e1e22] bg-[#111114]">
-        <div className="flex items-center gap-2 px-5 py-5">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#c4b5a0] text-[#0a0a0c]">
-            <Sparkles size={15} />
+    <div className="flex h-screen bg-[#eaf0f6]">
+      {/* Sidebar nav */}
+      <aside className="flex w-[260px] flex-shrink-0 flex-col border-r border-[#d8e2ed] bg-[#f1f5fa] shadow-[2px_0_8px_#cfd8e515]">
+        <div className="flex items-center gap-3 px-6 py-6">
+          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-[#4f46e5] text-white shadow-[3px_3px_7px_#4f46e540]">
+            <Sparkles size={16} />
           </div>
-          <span className="text-[15px] font-semibold tracking-tight text-[#ededed]">GhostWorker</span>
+          <div>
+            <span className="text-[15px] font-extrabold tracking-tight text-slate-800">TwinOps</span>
+            <span className="block text-[10px] font-bold text-indigo-600 uppercase tracking-wider">Enterprise Pod</span>
+          </div>
         </div>
-        <nav className="flex-1 px-3">
+        <nav className="flex-1 px-4 space-y-1">
           <a
             href="/"
-            className="mb-1 flex items-center gap-2.5 rounded-md px-2.5 py-2 text-[13.5px] text-[#a1a1aa] transition-colors hover:bg-[#19191d] hover:text-[#d4d4d8]"
+            className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-[13px] font-bold text-slate-700 bg-white border border-[#e2eaf3] shadow-[2px_2px_6px_#cfd8e5,-2px_-2px_6px_#ffffff] transition-all hover:text-indigo-600"
           >
-            <ArrowLeft size={16} className="text-[#52525b]" />
-            Back to GhostWorker
+            <ArrowLeft size={16} className="text-slate-400" />
+            Back to Twin Portal
           </a>
         </nav>
       </aside>
 
       {/* Main content */}
       <main className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-3xl px-8 py-10">
+        <div className="mx-auto max-w-3xl px-8 py-10 space-y-6">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-[22px] font-semibold tracking-tight text-[#ededed]">
-              Integrations
+          <div>
+            <h1 className="text-[24px] font-extrabold tracking-tight text-slate-800">
+              Enterprise Integrations & Sync
             </h1>
-            <p className="mt-1 text-[13.5px] text-[#71717a]">
-              Connect data sources to sync into organizational memory for RAG.
+            <p className="mt-1 text-[13.5px] font-medium text-slate-500">
+              Configure real repository tokens and webhooks to ground your team digital twins in live codebases.
             </p>
           </div>
 
           {/* Flash message */}
           {message && (
             <div
-              className={`mb-6 flex items-center gap-2.5 rounded-xl border px-4 py-3 text-[13px] ${
+              className={`flex items-center gap-2.5 rounded-2xl border px-4 py-3 text-[13px] font-bold shadow-[2px_2px_6px_#cfd8e5] ${
                 message.type === "success"
-                  ? "border-[#10b98130] bg-[#10b98110] text-[#34d399]"
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-800"
                   : message.type === "error"
-                  ? "border-[#ef444430] bg-[#ef444410] text-[#f87171]"
-                  : "border-[#1e1e22] bg-[#131316] text-[#a1a1aa]"
+                  ? "border-rose-200 bg-rose-50 text-rose-800"
+                  : "border-slate-200 bg-white text-slate-700"
               }`}
             >
-              {message.type === "success" ? <Check size={14} /> : <AlertCircle size={14} />}
+              {message.type === "success" ? <Check size={15} /> : <AlertCircle size={15} />}
               {message.text}
               <button
                 onClick={() => setMessage(null)}
-                className="ml-auto text-current opacity-50 hover:opacity-80"
+                className="ml-auto text-current opacity-60 hover:opacity-100 font-extrabold text-base"
               >
                 &times;
               </button>
             </div>
           )}
 
-          {/* ---- Google Account Card ---- */}
-          <div className="mb-6 rounded-xl border border-[#1e1e22] bg-[#131316] p-6">
+          {/* Google Account Card */}
+          <div className="rounded-3xl border border-[#e2eaf3] bg-[#f1f5fa] p-6 shadow-[6px_6px_14px_#cfd8e5,-6px_-6px_14px_#ffffff]">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <GoogleLogo size={22} />
+                <GoogleLogo size={24} />
                 <div>
-                  <h2 className="text-[14px] font-semibold text-[#ededed]">Google Account</h2>
-                  <p className="text-[12.5px] text-[#71717a]">Google Drive & Gmail</p>
+                  <h2 className="text-[15px] font-bold text-slate-800">Google Workspace & M365</h2>
+                  <p className="text-[12px] font-medium text-slate-500">Architecture decks, Drive folders & Mail sync</p>
                 </div>
               </div>
               <span
-                className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${
+                className={`rounded-full px-3 py-1 text-[11px] font-bold border ${
                   isGoogleOAuth
-                    ? "bg-[#10b98120] text-[#34d399]"
-                    : "bg-[#1e1e22] text-[#71717a]"
+                    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                    : "bg-slate-100 text-slate-500 border-slate-200"
                 }`}
               >
                 {isGoogleOAuth ? "Connected" : "Not connected"}
@@ -346,78 +337,71 @@ function SettingsContent() {
             </div>
 
             {isGoogleOAuth ? (
-              <>
-                <div className="mb-4 flex items-center gap-2 rounded-lg border border-[#10b98130] bg-[#10b98110] px-3 py-2.5 text-[13px] text-[#34d399]">
-                  <Check size={14} />
-                  Signed in as <strong>{googleEmail || "unknown"}</strong>
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-[13px] font-bold text-emerald-800">
+                  <Check size={15} />
+                  Authenticated as: <strong>{googleEmail || "Enterprise User"}</strong>
                 </div>
 
                 {googleFeedback && (
                   <div
-                    className={`mb-4 rounded-lg border px-3 py-2.5 text-[12px] ${
+                    className={`rounded-xl border px-3.5 py-2.5 text-[12px] font-bold ${
                       googleFeedback.success
-                        ? "border-[#10b98130] bg-[#10b98110] text-[#34d399]"
-                        : "border-[#ef444430] bg-[#ef444410] text-[#f87171]"
+                        ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                        : "border-rose-200 bg-rose-50 text-rose-800"
                     }`}
                   >
                     {googleFeedback.message}
                   </div>
                 )}
 
-                {googleStatus?.updated_at && (
-                  <p className="mb-4 text-[11.5px] text-[#52525b]">
-                    Last synced: {new Date(googleStatus.updated_at).toLocaleString()}
-                  </p>
-                )}
-
                 <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => handleSyncNow("google_drive", "/api/google-drive/sync")}
                     disabled={isGoogleSyncing}
-                    className="flex items-center gap-2 rounded-lg border border-[#1e1e22] bg-[#19191d] px-3.5 py-2 text-[13px] font-medium text-[#d4d4d8] transition-colors hover:bg-[#222226] disabled:opacity-50"
+                    className="flex items-center gap-2 rounded-xl border border-[#e2eaf3] bg-white px-4 py-2 text-[13px] font-bold text-slate-700 shadow-[3px_3px_7px_#cfd8e5] transition-all hover:bg-slate-50 disabled:opacity-50"
                   >
                     <HardDrive size={14} className={isGoogleSyncing ? "animate-spin" : ""} />
-                    {isGoogleSyncing ? "Syncing..." : "Sync Drive"}
+                    {isGoogleSyncing ? "Syncing..." : "Sync Drive Specs"}
                   </button>
                   <button
                     onClick={() => handleSyncNow("google_drive", "/api/gmail/sync")}
                     disabled={isGoogleSyncing}
-                    className="flex items-center gap-2 rounded-lg border border-[#1e1e22] bg-[#19191d] px-3.5 py-2 text-[13px] font-medium text-[#d4d4d8] transition-colors hover:bg-[#222226] disabled:opacity-50"
+                    className="flex items-center gap-2 rounded-xl border border-[#e2eaf3] bg-white px-4 py-2 text-[13px] font-bold text-slate-700 shadow-[3px_3px_7px_#cfd8e5] transition-all hover:bg-slate-50 disabled:opacity-50"
                   >
                     <Mail size={14} className={isGoogleSyncing ? "animate-spin" : ""} />
-                    {isGoogleSyncing ? "Syncing..." : "Sync Gmail"}
+                    {isGoogleSyncing ? "Syncing..." : "Sync Architecture Mail"}
                   </button>
                   <button
                     onClick={handleDisconnectGoogle}
-                    className="flex items-center gap-2 rounded-lg border border-[#ef444430] px-3.5 py-2 text-[13px] font-medium text-[#f87171] transition-colors hover:bg-[#ef444410]"
+                    className="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-[13px] font-bold text-rose-700 transition-all hover:bg-rose-100"
                   >
                     <LogOut size={14} />
                     Disconnect
                   </button>
                 </div>
-              </>
+              </div>
             ) : (
-              <>
-                <p className="mb-4 text-[13px] leading-relaxed text-[#71717a]">
-                  Connect your Google account to sync Drive files and Gmail messages into organizational memory.
-                  Requires OAuth credentials configured on the server.
+              <div className="space-y-4">
+                <p className="text-[13px] font-medium leading-relaxed text-slate-600">
+                  Connect your corporate account to automatically ingest technical design documents and team emails into local semantic memory.
                 </p>
                 <a
                   href="/api/auth/google"
-                  className="inline-flex items-center gap-2 rounded-lg bg-[#c4b5a0] px-4 py-2.5 text-[13px] font-medium text-[#0a0a0c] transition-colors hover:bg-[#d4c5b0]"
+                  className="inline-flex items-center gap-2 rounded-xl bg-[#4f46e5] px-5 py-2.5 text-[13px] font-bold text-white shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] transition-all hover:bg-indigo-700"
                 >
-                  <LogIn size={14} />
-                  Connect Google Account
+                  <LogIn size={15} />
+                  Connect Google Workspace
                 </a>
-              </>
+              </div>
             )}
           </div>
 
-          {/* ---- Other Integrations ---- */}
-          <div className="mb-4">
-            <h2 className="text-[14px] font-semibold text-[#ededed]">Other Integrations</h2>
-            <p className="mt-0.5 text-[12.5px] text-[#71717a]">
-              Add API keys to connect additional data sources.
+          {/* Other Integrations */}
+          <div>
+            <h2 className="text-[16px] font-bold text-slate-800">Pod Connectors & Dev Ecosystem</h2>
+            <p className="mt-0.5 text-[12.5px] font-medium text-slate-500">
+              Configure credentials to ingest commit diffs, sprint boards, and Slack/Teams threads.
             </p>
           </div>
 
@@ -434,32 +418,34 @@ function SettingsContent() {
               return (
                 <div
                   key={provider}
-                  className="rounded-xl border border-[#1e1e22] bg-[#131316] p-5"
+                  className="rounded-3xl border border-[#e2eaf3] bg-[#f1f5fa] p-6 shadow-[6px_6px_14px_#cfd8e5,-6px_-6px_14px_#ffffff]"
                 >
-                  <div className="mb-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-[#52525b]">{meta.icon}</span>
+                  <div className="mb-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white border border-[#e2eaf3] shadow-[2px_2px_5px_#cfd8e5]">
+                        {meta.icon}
+                      </div>
                       <div>
-                        <h3 className="text-[13.5px] font-semibold text-[#ededed]">{meta.label}</h3>
-                        <p className="text-[11.5px] text-[#71717a]">{meta.description}</p>
+                        <h3 className="text-[14.5px] font-bold text-slate-800">{meta.label}</h3>
+                        <p className="text-[12px] font-medium text-slate-500">{meta.description}</p>
                       </div>
                     </div>
                     <span
-                      className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${
+                      className={`rounded-full px-3 py-0.5 text-[10.5px] font-bold border ${
                         status?.has_config
-                          ? "bg-[#10b98120] text-[#34d399]"
-                          : "bg-[#1e1e22] text-[#71717a]"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : "bg-slate-100 text-slate-400 border-slate-200"
                       }`}
                     >
-                      {status?.has_config ? "Connected" : "Not configured"}
+                      {status?.has_config ? "Connected" : "Not Configured"}
                     </span>
                   </div>
 
                   {fields.length > 0 && (
-                    <div className="mb-3 space-y-2">
+                    <div className="mb-4 space-y-3">
                       {fields.map((field) => (
                         <div key={field.key}>
-                          <label className="mb-1 block text-[11.5px] font-medium text-[#71717a]">
+                          <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-500">
                             {field.label}
                           </label>
                           <input
@@ -467,7 +453,7 @@ function SettingsContent() {
                             value={formState[provider][field.key] || ""}
                             placeholder={field.placeholder || ""}
                             onChange={(e) => handleInputChange(provider, field.key, e.target.value)}
-                            className="w-full rounded-lg border border-[#1e1e22] bg-[#19191d] px-3 py-2 text-[13px] text-[#ededed] placeholder:text-[#52525b] focus:border-[#2a2a2e] focus:bg-[#1e1e22] focus:outline-none focus:ring-1 focus:ring-[#2a2a2e]"
+                            className="w-full rounded-xl border border-[#d8e2ed] bg-[#f1f5fa] px-4 py-2.5 text-[13px] font-medium text-slate-800 placeholder:text-slate-400 shadow-[inset_2px_2px_4px_#cfd8e5,inset_-2px_-2px_4px_#ffffff] focus:border-indigo-400 focus:outline-none"
                           />
                         </div>
                       ))}
@@ -476,40 +462,34 @@ function SettingsContent() {
 
                   {feedback && (
                     <div
-                      className={`mb-3 rounded-lg border px-3 py-2 text-[12px] ${
+                      className={`mb-4 rounded-xl border px-3.5 py-2.5 text-[12px] font-bold ${
                         feedback.success
-                          ? "border-[#10b98130] bg-[#10b98110] text-[#34d399]"
-                          : "border-[#ef444430] bg-[#ef444410] text-[#f87171]"
+                          ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                          : "border-rose-200 bg-rose-50 text-rose-800"
                       }`}
                     >
                       {feedback.message}
                     </div>
                   )}
 
-                  {status?.updated_at && (
-                    <p className="mb-3 text-[11.5px] text-[#52525b]">
-                      Last updated: {new Date(status.updated_at).toLocaleString()}
-                    </p>
-                  )}
-
-                  <div className="flex gap-2">
+                  <div className="flex gap-2.5">
                     {fields.length > 0 && (
                       <button
                         onClick={() => handleSave(provider)}
                         disabled={isSaving || isSyncing}
-                        className="flex items-center gap-2 rounded-lg bg-[#c4b5a0] px-4 py-2 text-[13px] font-medium text-[#0a0a0c] transition-colors hover:bg-[#d4c5b0] disabled:opacity-50"
+                        className="flex items-center gap-2 rounded-xl bg-[#4f46e5] px-5 py-2.5 text-[13px] font-bold text-white shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] transition-all hover:bg-indigo-700 disabled:opacity-50"
                       >
-                        {isSaving ? "Saving..." : `Save`}
+                        {isSaving ? "Saving..." : `Save Configuration`}
                       </button>
                     )}
                     {isSyncable && status?.has_config && (
                       <button
                         onClick={() => handleSyncNow(provider)}
                         disabled={isSaving || isSyncing}
-                        className="flex items-center gap-2 rounded-lg border border-[#1e1e22] bg-[#19191d] px-3.5 py-2 text-[13px] font-medium text-[#d4d4d8] transition-colors hover:bg-[#222226] disabled:opacity-50"
+                        className="flex items-center gap-2 rounded-xl border border-[#e2eaf3] bg-white px-4 py-2.5 text-[13px] font-bold text-slate-700 shadow-[3px_3px_7px_#cfd8e5] transition-all hover:bg-slate-50 disabled:opacity-50"
                       >
                         <RefreshCw size={14} className={isSyncing ? "animate-spin" : ""} />
-                        {isSyncing ? "Syncing..." : "Sync Now"}
+                        {isSyncing ? "Syncing..." : "Sync Live Data"}
                       </button>
                     )}
                   </div>
@@ -527,8 +507,8 @@ export default function SettingsPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex h-screen items-center justify-center bg-[#0a0a0c]">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#c4b5a0] border-t-transparent" />
+        <div className="flex h-screen items-center justify-center bg-[#eaf0f6]">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
         </div>
       }
     >

@@ -42,22 +42,22 @@ import type {
 type KnowledgeTab = "onboarding" | "memory" | "offboarding";
 
 const SEVERITY_COLORS = {
-  low: "bg-[#3b82f620] text-[#60a5fa] border-[#3b82f630]",
-  medium: "bg-[#f59e0b20] text-[#fbbf24] border-[#f59e0b30]",
-  high: "bg-[#ef444420] text-[#f87171] border-[#ef444430]",
+  low: "bg-blue-50 text-blue-700 border-blue-200",
+  medium: "bg-amber-50 text-amber-700 border-amber-200",
+  high: "bg-rose-50 text-rose-700 border-rose-200",
 };
 
 const PRIORITY_COLORS = {
-  low: "bg-[#1e1e22] text-[#a1a1aa]",
-  medium: "bg-[#f59e0b20] text-[#fbbf24]",
-  high: "bg-[#fb923c20] text-[#fb923c]",
-  critical: "bg-[#ef444420] text-[#f87171]",
+  low: "bg-slate-100 text-slate-700 border-slate-200",
+  medium: "bg-amber-50 text-amber-700 border-amber-200",
+  high: "bg-orange-50 text-orange-700 border-orange-200",
+  critical: "bg-rose-50 text-rose-700 border-rose-200",
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  active: "bg-[#10b98120] text-[#34d399]",
-  transitioning: "bg-[#f59e0b20] text-[#fbbf24]",
-  "needs-owner": "bg-[#ef444420] text-[#f87171]",
+  active: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  transitioning: "bg-amber-50 text-amber-700 border-amber-200",
+  "needs-owner": "bg-rose-50 text-rose-700 border-rose-200",
 };
 
 // ============================================
@@ -70,9 +70,8 @@ function OnboardingTab({ autoTrigger }: { autoTrigger: number }) {
   const [selectedTeam, setSelectedTeam] = useState("");
   const [brief, setBrief] = useState<OnboardingBrief | null>(null);
   const [loading, setLoading] = useState(false);
-  const [expandedSection, setExpandedSection] = useState<string | null>(null);
+  const [expandedSection, setExpandedSection] = useState<string | null>("context");
 
-  // Fetch real onboarding options from Supabase on mount
   useEffect(() => {
     fetchOnboardingOptions().then((opts) => setOptions(opts));
   }, []);
@@ -101,7 +100,7 @@ function OnboardingTab({ autoTrigger }: { autoTrigger: number }) {
         setLoading(false);
       }, 200);
     }
-  }, [autoTrigger]);
+  }, [autoTrigger, options]);
 
   const SectionHeader = ({
     title,
@@ -116,20 +115,20 @@ function OnboardingTab({ autoTrigger }: { autoTrigger: number }) {
   }) => (
     <button
       onClick={() => setExpandedSection(expandedSection === id ? null : id)}
-      className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-[#19191d]"
+      className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left transition-colors hover:bg-[#e2eaf3]"
     >
       <div className="flex items-center gap-2">
-        <span className="text-[#52525b]">{icon}</span>
-        <span className="text-[13.5px] font-semibold text-[#ededed]">
+        <span className="text-indigo-600">{icon}</span>
+        <span className="text-[14px] font-bold text-slate-800">
           {title}
         </span>
-        <span className="rounded-full bg-[#1e1e22] px-1.5 py-0.5 text-[11px] font-medium text-[#71717a]">
+        <span className="rounded-full bg-slate-200 border border-slate-300/50 px-2 py-0.5 text-[11px] font-bold text-slate-700">
           {count}
         </span>
       </div>
       <ChevronDown
-        size={14}
-        className={`text-[#52525b] transition-transform ${
+        size={15}
+        className={`text-slate-400 transition-transform ${
           expandedSection === id ? "rotate-180" : ""
         }`}
       />
@@ -137,261 +136,192 @@ function OnboardingTab({ autoTrigger }: { autoTrigger: number }) {
   );
 
   return (
-    <div className="h-full overflow-y-auto">
-      {/* Selector */}
-      <div className="border-b border-[#1e1e22] px-6 py-5">
-        <h3 className="mb-1 text-[15px] font-semibold text-[#ededed]">
+    <div className="h-full overflow-y-auto p-6 space-y-6">
+      {/* Selector card */}
+      <div className="rounded-3xl border border-[#e2eaf3] bg-[#f1f5fa] p-6 shadow-[6px_6px_14px_#cfd8e5,-6px_-6px_14px_#ffffff]">
+        <h3 className="mb-1 text-[16px] font-bold text-slate-800">
           Onboarding Brief Generator
         </h3>
-        <p className="mb-4 text-[12.5px] text-[#71717a]">
-          Select a role and team to generate a contextual onboarding brief
+        <p className="mb-4 text-[13px] font-medium text-slate-500">
+          Select an engineering role and team to synthesize a contextual digital onboarding briefing.
         </p>
-        <div className="flex items-end gap-3">
-          <div className="flex-1">
-            <label className="mb-1 block text-[12px] font-medium text-[#71717a]">
+        <div className="flex items-end gap-3 flex-wrap sm:flex-nowrap">
+          <div className="flex-1 min-w-[200px]">
+            <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-500">
               Role
             </label>
             <select
               value={selectedRole}
-              onChange={(e) => {
-                setSelectedRole(e.target.value);
-                const match = options.find((o) => o.role === e.target.value);
-                if (match) setSelectedTeam(match.team);
-              }}
-              className="w-full rounded-lg border border-[#1e1e22] bg-[#131316] px-3 py-2 text-[13px] text-[#ededed] focus:border-[#2a2a2e] focus:outline-none focus:ring-1 focus:ring-[#2a2a2e]"
+              onChange={(e) => setSelectedRole(e.target.value)}
+              className="w-full rounded-xl border border-[#d8e2ed] bg-[#f1f5fa] px-3.5 py-2.5 text-[13px] font-medium text-slate-800 shadow-[inset_2px_2px_4px_#cfd8e5,inset_-2px_-2px_4px_#ffffff] outline-none"
             >
-              <option value="">Select role…</option>
-              {options.map((o) => (
-                <option key={o.role} value={o.role}>
-                  {o.role}
+              <option value="">Select a role…</option>
+              {Array.from(new Set(options.map((o) => o.role))).map((r) => (
+                <option key={r} value={r}>
+                  {r}
                 </option>
               ))}
             </select>
           </div>
-          <div className="flex-1">
-            <label className="mb-1 block text-[12px] font-medium text-[#71717a]">
-              Team
+          <div className="flex-1 min-w-[200px]">
+            <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              Team / Pod
             </label>
-            <input
+            <select
               value={selectedTeam}
               onChange={(e) => setSelectedTeam(e.target.value)}
-              placeholder="Team"
-              className="w-full rounded-lg border border-[#1e1e22] bg-[#131316] px-3 py-2 text-[13px] text-[#ededed] focus:border-[#2a2a2e] focus:outline-none focus:ring-1 focus:ring-[#2a2a2e]"
-            />
+              className="w-full rounded-xl border border-[#d8e2ed] bg-[#f1f5fa] px-3.5 py-2.5 text-[13px] font-medium text-slate-800 shadow-[inset_2px_2px_4px_#cfd8e5,inset_-2px_-2px_4px_#ffffff] outline-none"
+            >
+              <option value="">Select a team…</option>
+              {Array.from(new Set(options.map((o) => o.team))).map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
           </div>
           <button
             onClick={handleGenerate}
             disabled={!selectedRole || !selectedTeam || loading}
-            className="flex items-center gap-2 rounded-lg bg-[#c4b5a0] px-4 py-2 text-[13px] font-medium text-[#0a0a0c] transition-colors hover:bg-[#d4c5b0] disabled:opacity-40"
+            className="flex h-11 items-center gap-2 rounded-xl bg-[#4f46e5] px-5 text-[13px] font-bold text-white shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] transition-all hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {loading ? (
-              <Loader2 size={14} className="animate-spin" />
-            ) : (
-              <FileText size={14} />
-            )}
-            Generate
+            {loading ? <Loader2 size={15} className="animate-spin" /> : <BookOpen size={15} />}
+            Generate Brief
           </button>
         </div>
       </div>
 
-      {/* Loading */}
-      {loading && !brief && (
-        <div className="flex items-center justify-center py-16">
-          <div className="flex items-center gap-3 text-[13px] text-[#71717a]">
-            <Loader2 size={18} className="animate-spin text-[#c4b5a0]" />
-            Generating onboarding brief…
-          </div>
-        </div>
-      )}
-
       {/* Brief content */}
       {brief && (
-        <div className="animate-fade-in px-6 py-5">
-          <div className="mb-5 rounded-xl border border-[#1e1e22] bg-[#131316] p-5">
-            <div className="mb-1 text-[11px] font-medium uppercase tracking-wider text-[#52525b]">
-              Onboarding Brief
-            </div>
-            <h3 className="text-[16px] font-semibold text-[#ededed]">
-              {brief.role}, {brief.team}
-            </h3>
-          </div>
-
+        <div className="space-y-4 max-w-4xl mx-auto">
           {/* Key Context */}
-          <div className="mb-4 rounded-xl border border-[#1e1e22] bg-[#131316]">
-            <SectionHeader
-              title="Key Context"
-              icon={<BookOpen size={15} />}
-              id="context"
-              count={brief.keyContext.length}
-            />
-            {(expandedSection === "context" || expandedSection === null) && (
-              <div className="px-3 pb-3">
-                <div className="space-y-2 pl-2">
-                  {brief.keyContext.map((item, i) => (
-                    <div
-                      key={i}
-                      className="flex items-start gap-2 text-[12.5px] leading-relaxed text-[#a1a1aa]"
-                    >
-                      <CircleDot
-                        size={10}
-                        className="mt-1.5 flex-shrink-0 text-[#3f3f46]"
-                      />
-                      {item}
-                    </div>
-                  ))}
+          <div className="rounded-3xl border border-[#e2eaf3] bg-white p-6 shadow-[6px_6px_14px_#cfd8e5,-6px_-6px_14px_#ffffff]">
+            <h4 className="mb-3 text-[15px] font-bold text-slate-800">
+              Executive Context & Objectives
+            </h4>
+            <div className="space-y-2">
+              {brief.keyContext.map((c, i) => (
+                <div key={i} className="flex items-start gap-2.5 text-[13px] font-medium text-slate-700">
+                  <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-indigo-50 text-[10px] font-bold text-indigo-700 border border-indigo-200">
+                    {i + 1}
+                  </span>
+                  <span>{c}</span>
                 </div>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
 
           {/* Key People */}
-          <div className="mb-4 rounded-xl border border-[#1e1e22] bg-[#131316]">
+          <div className="rounded-2xl border border-[#e2eaf3] bg-[#f1f5fa] shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] overflow-hidden">
             <SectionHeader
-              title="Key People"
-              icon={<Users2 size={15} />}
+              title="Key Teammates & Pod Leads"
+              icon={<Users2 size={16} />}
               id="people"
               count={brief.keyPeople.length}
             />
-            {(expandedSection === "people" || expandedSection === null) && (
-              <div className="px-3 pb-3">
-                <div className="space-y-2">
-                  {brief.keyPeople.map((person, i) => (
-                    <div
-                      key={i}
-                      className="rounded-lg border border-[#1e1e22] bg-[#19191d] p-3"
-                    >
-                      <div className="mb-1 flex items-center justify-between">
-                        <span className="text-[13px] font-medium text-[#d4d4d8]">
-                          {person.name}
-                        </span>
-                        <span className="text-[11px] text-[#52525b]">
-                          {person.role}
-                        </span>
-                      </div>
-                      <p className="mb-1 text-[12px] text-[#71717a]">
-                        {person.relationship}
-                      </p>
-                      <p className="text-[12px] italic text-[#c4b5a0]">
-                        {person.tip}
-                      </p>
+            {expandedSection === "people" && (
+              <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {brief.keyPeople.map((person, i) => (
+                  <div
+                    key={i}
+                    className="rounded-xl border border-[#e2eaf3] bg-white p-3.5 shadow-[2px_2px_6px_#cfd8e5]"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[13px] font-bold text-slate-800">{person.name}</span>
+                      <span className="text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200/50">{person.role}</span>
                     </div>
-                  ))}
-                </div>
+                    <p className="mt-1 text-[11.5px] font-medium text-slate-500">{person.relationship}</p>
+                    {person.tip && (
+                      <p className="mt-1 text-[11px] italic text-indigo-700 bg-indigo-50/50 p-1.5 rounded-lg border border-indigo-100">
+                        Tip: {person.tip}
+                      </p>
+                    )}
+                  </div>
+                ))}
               </div>
             )}
           </div>
 
-          {/* Key Docs */}
-          <div className="mb-4 rounded-xl border border-[#1e1e22] bg-[#131316]">
+          {/* Documents */}
+          <div className="rounded-2xl border border-[#e2eaf3] bg-[#f1f5fa] shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] overflow-hidden">
             <SectionHeader
-              title="Key Documents"
-              icon={<FileText size={15} />}
+              title="Core Architecture Specs & Docs"
+              icon={<FileText size={16} />}
               id="docs"
               count={brief.keyDocs.length}
             />
-            {(expandedSection === "docs" || expandedSection === null) && (
-              <div className="px-3 pb-3">
-                <div className="space-y-2">
-                  {brief.keyDocs.map((doc, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center justify-between rounded-lg border border-[#1e1e22] bg-[#19191d] p-3"
-                    >
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-[13px] font-medium text-[#d4d4d8]">
-                            {doc.title}
-                          </span>
-                          <span className="rounded bg-[#1e1e22] px-1.5 py-0.5 text-[10px] font-medium text-[#71717a]">
-                            {doc.type}
-                          </span>
-                        </div>
-                        <p className="mt-0.5 text-[12px] text-[#71717a]">
-                          {doc.relevance}
-                        </p>
+            {expandedSection === "docs" && (
+              <div className="p-4 space-y-2">
+                {brief.keyDocs.map((doc, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between rounded-xl border border-[#e2eaf3] bg-white p-3.5 shadow-[2px_2px_6px_#cfd8e5]"
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[13px] font-bold text-slate-800">{doc.title}</span>
+                        <span className="rounded bg-slate-100 px-2 py-0.5 text-[10.5px] font-semibold text-slate-600">{doc.type}</span>
                       </div>
-                      <ExternalLink
-                        size={14}
-                        className="flex-shrink-0 text-[#3f3f46]"
-                      />
+                      <p className="mt-0.5 text-[12px] text-slate-500 font-medium">{doc.relevance}</p>
                     </div>
-                  ))}
-                </div>
+                    <ExternalLink size={14} className="text-indigo-600" />
+                  </div>
+                ))}
               </div>
             )}
           </div>
 
           {/* Decisions */}
-          <div className="mb-4 rounded-xl border border-[#1e1e22] bg-[#131316]">
+          <div className="rounded-2xl border border-[#e2eaf3] bg-[#f1f5fa] shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] overflow-hidden">
             <SectionHeader
-              title="Recent Decisions"
-              icon={<Calendar size={15} />}
+              title="Recent Architectural Decisions"
+              icon={<Calendar size={16} />}
               id="decisions"
               count={brief.decisions.length}
             />
             {expandedSection === "decisions" && (
-              <div className="px-3 pb-3">
-                <div className="space-y-2">
-                  {brief.decisions.map((d, i) => (
-                    <div
-                      key={i}
-                      className="rounded-lg border border-[#1e1e22] bg-[#19191d] p-3"
-                    >
-                      <div className="mb-1 flex items-center gap-2">
-                        <span className="rounded bg-[#1e1e22] px-1.5 py-0.5 text-[10px] font-medium text-[#71717a]">
-                          {d.date}
-                        </span>
-                      </div>
-                      <p className="mb-1 text-[13px] font-medium text-[#d4d4d8]">
-                        {d.decision}
-                      </p>
-                      <p className="mb-1 text-[12px] text-[#71717a]">
-                        {d.rationale}
-                      </p>
-                      <p className="text-[11px] text-[#52525b]">
-                        Participants: {d.participants.join(", ")}
-                      </p>
+              <div className="p-4 space-y-2.5">
+                {brief.decisions.map((d, i) => (
+                  <div
+                    key={i}
+                    className="rounded-xl border border-[#e2eaf3] bg-white p-4 shadow-[2px_2px_6px_#cfd8e5]"
+                  >
+                    <div className="mb-1 flex items-center gap-2">
+                      <span className="rounded-md bg-indigo-50 border border-indigo-200/50 px-2 py-0.5 text-[10.5px] font-bold text-indigo-700">
+                        {d.date}
+                      </span>
                     </div>
-                  ))}
-                </div>
+                    <p className="text-[13.5px] font-bold text-slate-800">{d.decision}</p>
+                    <p className="mt-1 text-[12px] text-slate-600 font-medium">{d.rationale}</p>
+                    <p className="mt-1 text-[11px] text-slate-400 font-medium">Participants: {d.participants.join(", ")}</p>
+                  </div>
+                ))}
               </div>
             )}
           </div>
 
           {/* Risks */}
-          <div className="mb-4 rounded-xl border border-[#1e1e22] bg-[#131316]">
+          <div className="rounded-2xl border border-[#e2eaf3] bg-[#f1f5fa] shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] overflow-hidden">
             <SectionHeader
-              title="Risks & Landmines"
-              icon={<AlertTriangle size={15} />}
+              title="Known Bottlenecks & Landmines"
+              icon={<AlertTriangle size={16} />}
               id="risks"
               count={brief.risks.length}
             />
             {expandedSection === "risks" && (
-              <div className="px-3 pb-3">
-                <div className="space-y-2">
-                  {brief.risks.map((r, i) => (
-                    <div
-                      key={i}
-                      className="rounded-lg border border-[#1e1e22] bg-[#19191d] p-3"
-                    >
-                      <div className="mb-1 flex items-center gap-2">
-                        <span
-                          className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase ${
-                            SEVERITY_COLORS[r.severity]
-                          }`}
-                        >
-                          {r.severity}
-                        </span>
-                      </div>
-                      <p className="mb-1 text-[13px] font-medium text-[#d4d4d8]">
-                        {r.risk}
-                      </p>
-                      <p className="text-[12px] text-[#71717a]">
-                        {r.context}
-                      </p>
-                    </div>
-                  ))}
-                </div>
+              <div className="p-4 space-y-2.5">
+                {brief.risks.map((r, i) => (
+                  <div
+                    key={i}
+                    className="rounded-xl border border-[#e2eaf3] bg-white p-4 shadow-[2px_2px_6px_#cfd8e5]"
+                  >
+                    <span className={`inline-flex rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase mb-2 ${SEVERITY_COLORS[r.severity]}`}>
+                      Severity: {r.severity}
+                    </span>
+                    <p className="text-[13.5px] font-bold text-slate-800">{r.risk}</p>
+                    <p className="mt-1 text-[12px] text-slate-600 font-medium">{r.context}</p>
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -402,7 +332,7 @@ function OnboardingTab({ autoTrigger }: { autoTrigger: number }) {
 }
 
 // ============================================
-// MEMORY EXPLORER TAB
+// MEMORY EXPLORER TAB (Real DB Knowledge)
 // ============================================
 
 function MemoryTab() {
@@ -431,32 +361,30 @@ function MemoryTab() {
   };
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full bg-[#eaf0f6]">
       {/* Results list */}
-      <div className="flex flex-1 flex-col border-r border-[#1e1e22]">
+      <div className="flex flex-1 flex-col border-r border-[#d8e2ed]">
         {/* Search */}
         <form
           onSubmit={handleSearch}
-          className="border-b border-[#1e1e22] px-5 py-4"
+          className="border-b border-[#d8e2ed] bg-[#f1f5fa] px-6 py-4 shadow-[0_2px_6px_#cfd8e515]"
         >
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1">
-              <Search
-                size={14}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#52525b]"
-              />
-              <input
-                value={query}
-                onChange={(e) => {
-                  setQuery(e.target.value);
-                  doSearch(e.target.value, typeFilter);
-                }}
-                placeholder="Search organizational memory…"
-                className="w-full rounded-lg border border-[#1e1e22] bg-[#131316] py-2 pl-9 pr-3 text-[13px] text-[#ededed] placeholder:text-[#52525b] focus:border-[#2a2a2e] focus:outline-none focus:ring-1 focus:ring-[#2a2a2e]"
-              />
-            </div>
+          <div className="relative">
+            <Search
+              size={14}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+            />
+            <input
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                doSearch(e.target.value, typeFilter);
+              }}
+              placeholder="Search episodic memories, pull requests & code embeddings…"
+              className="w-full rounded-xl border border-[#d8e2ed] bg-[#f1f5fa] py-2.5 pl-9 pr-3 text-[13px] font-medium text-slate-800 placeholder:text-slate-400 shadow-[inset_2px_2px_4px_#cfd8e5,inset_-2px_-2px_4px_#ffffff] focus:border-indigo-400 focus:outline-none"
+            />
           </div>
-          <div className="mt-2.5 flex gap-1.5">
+          <div className="mt-3 flex gap-2">
             {(["all", "episodic", "semantic"] as const).map((t) => {
               const active = typeFilter === t;
               return (
@@ -467,16 +395,16 @@ function MemoryTab() {
                     setTypeFilter(t);
                     doSearch(query, t);
                   }}
-                  className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[11.5px] font-medium transition-colors ${
+                  className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-[12px] font-bold transition-all ${
                     active
-                      ? "bg-[#c4b5a020] text-[#c4b5a0]"
-                      : "bg-[#1e1e22] text-[#71717a] hover:bg-[#222226]"
+                      ? "bg-[#4f46e5] text-white shadow-[2px_2px_5px_#4f46e540]"
+                      : "bg-[#f1f5fa] text-slate-600 border border-[#e2eaf3] shadow-[2px_2px_5px_#cfd8e5,-2px_-2px_5px_#ffffff] hover:text-slate-900"
                   }`}
                 >
                   {t === "episodic" ? (
-                    <Clock size={11} />
+                    <Clock size={12} />
                   ) : t === "semantic" ? (
-                    <Brain size={11} />
+                    <Brain size={12} />
                   ) : null}
                   {t.charAt(0).toUpperCase() + t.slice(1)}
                 </button>
@@ -486,58 +414,58 @@ function MemoryTab() {
         </form>
 
         {/* Results */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto p-3 space-y-2">
           {loading ? (
-            <div className="flex items-center justify-center py-12 text-[13px] text-[#52525b]">
-              <Loader2 size={16} className="mr-2 animate-spin" />
-              Searching…
+            <div className="flex items-center justify-center py-12 text-[13px] font-semibold text-slate-500">
+              <Loader2 size={18} className="mr-2 animate-spin text-indigo-600" />
+              Searching vector brain…
             </div>
           ) : results.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <Search size={20} className="mb-2 text-[#3f3f46]" />
-              <p className="text-[13px] text-[#52525b]">
-                {hasSearched
-                  ? "No memories found"
-                  : "Search organizational memory"}
+              <Search size={24} className="mb-2 text-slate-400" />
+              <p className="text-[13px] font-medium text-slate-500">
+                {hasSearched ? "No matching memory chunks found" : "Search knowledge base"}
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-[#1e1e22]">
+            <div className="space-y-2">
               {results.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => setSelectedMemory(item)}
-                  className={`w-full px-5 py-3 text-left transition-colors hover:bg-[#131316] ${
-                    selectedMemory?.id === item.id ? "bg-[#19191d]" : ""
+                  className={`w-full p-4 text-left transition-all rounded-2xl border ${
+                    selectedMemory?.id === item.id
+                      ? "bg-[#e2eaf3] border-indigo-400 shadow-[inset_2px_2px_4px_#cfd8e5,inset_-2px_-2px_4px_#ffffff]"
+                      : "bg-[#f1f5fa] border-[#e2eaf3] shadow-[3px_3px_8px_#cfd8e5,-3px_-3px_8px_#ffffff] hover:bg-white"
                   }`}
                 >
                   <div className="mb-1 flex items-center gap-2">
                     {item.type === "episodic" ? (
-                      <Clock size={12} className="text-[#818cf8]" />
+                      <Clock size={13} className="text-indigo-600" />
                     ) : (
-                      <Brain size={12} className="text-[#a78bfa]" />
+                      <Brain size={13} className="text-purple-600" />
                     )}
-                    <span className="text-[13px] font-medium text-[#d4d4d8]">
+                    <span className="text-[13.5px] font-bold text-slate-800">
                       {item.title}
                     </span>
                   </div>
-                  <p className="mb-1.5 line-clamp-2 text-[12px] leading-relaxed text-[#71717a]">
-                    {item.content.slice(0, 120)}…
+                  <p className="mb-2 line-clamp-2 text-[12px] font-medium leading-relaxed text-slate-600">
+                    {item.content}
                   </p>
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] text-[#52525b]">
+                    <span className="text-[11px] font-medium text-slate-400">
                       {new Date(item.timestamp).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
                         year: "numeric",
                       })}
                     </span>
-                    <span className="text-[#3f3f46]">·</span>
+                    <span className="text-slate-300">·</span>
                     <div className="flex gap-1">
                       {item.tags.slice(0, 3).map((tag) => (
                         <span
                           key={tag}
-                          className="rounded bg-[#1e1e22] px-1.5 py-0.5 text-[10px] text-[#71717a]"
+                          className="rounded-md bg-white border border-slate-200 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600"
                         >
                           {tag}
                         </span>
@@ -552,39 +480,33 @@ function MemoryTab() {
       </div>
 
       {/* Detail panel */}
-      <div className="w-[420px] flex-shrink-0 overflow-y-auto bg-[#0e0e11]">
+      <div className="w-[440px] flex-shrink-0 overflow-y-auto bg-[#f1f5fa] border-l border-[#d8e2ed] p-6 shadow-[-4px_0_12px_#cfd8e515]">
         {selectedMemory ? (
-          <div className="animate-fade-in px-5 py-5">
-            <div className="mb-4 flex items-start justify-between">
+          <div className="space-y-4">
+            <div className="flex items-start justify-between">
               <div>
-                <div className="mb-1 flex items-center gap-2">
-                  {selectedMemory.type === "episodic" ? (
-                    <span className="rounded-full bg-[#818cf820] px-2 py-0.5 text-[11px] font-medium text-[#818cf8]">
-                      Episodic
-                    </span>
-                  ) : (
-                    <span className="rounded-full bg-[#a78bfa20] px-2 py-0.5 text-[11px] font-medium text-[#a78bfa]">
-                      Semantic
-                    </span>
-                  )}
-                  <span className="text-[11px] text-[#52525b]">
+                <div className="mb-1.5 flex items-center gap-2">
+                  <span className="rounded-full bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 text-[10.5px] font-bold text-indigo-700">
+                    {selectedMemory.type.toUpperCase()}
+                  </span>
+                  <span className="text-[11px] font-semibold text-slate-500">
                     {selectedMemory.team}
                   </span>
                 </div>
-                <h3 className="text-[15px] font-semibold text-[#ededed]">
+                <h3 className="text-[16px] font-bold text-slate-800">
                   {selectedMemory.title}
                 </h3>
               </div>
               <button
                 onClick={() => setSelectedMemory(null)}
-                className="rounded-lg p-1 text-[#52525b] hover:bg-[#1e1e22]"
+                className="rounded-xl p-1.5 text-slate-400 hover:bg-slate-200 hover:text-slate-700"
               >
                 <X size={16} />
               </button>
             </div>
 
-            <div className="mb-4 flex items-center gap-2 text-[12px] text-[#52525b]">
-              <Calendar size={12} />
+            <div className="flex items-center gap-2 text-[12px] font-medium text-slate-500">
+              <Calendar size={13} />
               {new Date(selectedMemory.timestamp).toLocaleDateString("en-US", {
                 weekday: "long",
                 month: "long",
@@ -593,46 +515,36 @@ function MemoryTab() {
               })}
             </div>
 
-            {/* Tags */}
-            <div className="mb-4 flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1.5">
               {selectedMemory.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="flex items-center gap-1 rounded-md bg-[#1e1e22] px-2 py-1 text-[11px] font-medium text-[#71717a]"
+                  className="rounded-lg bg-white border border-slate-200 px-2 py-1 text-[11px] font-semibold text-slate-700 shadow-[1px_1px_3px_#cfd8e5]"
                 >
-                  <Tag size={10} />
-                  {tag}
+                  #{tag}
                 </span>
               ))}
             </div>
 
-            {/* Content */}
-            <div className="mb-5 whitespace-pre-line text-[13px] leading-relaxed text-[#a1a1aa]">
-              {selectedMemory.content}
+            <div className="rounded-2xl border border-[#e2eaf3] bg-white p-5 shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff]">
+              <p className="text-[13px] font-medium leading-relaxed text-slate-700 whitespace-pre-line">
+                {selectedMemory.content}
+              </p>
             </div>
 
-            {/* Citations */}
-            {selectedMemory.citations.length > 0 && (
+            {selectedMemory.citations && selectedMemory.citations.length > 0 && (
               <div>
-                <div className="mb-2 text-[11px] font-medium uppercase tracking-wider text-[#52525b]">
-                  Sources
-                </div>
-                <div className="space-y-2">
+                <h5 className="mb-2 text-[12px] font-bold uppercase tracking-wider text-slate-500">
+                  Grounding Sources & Commits
+                </h5>
+                <div className="space-y-1.5">
                   {selectedMemory.citations.map((c, i) => (
                     <div
                       key={i}
-                      className="rounded-lg border border-[#1e1e22] bg-[#131316] p-3"
+                      className="rounded-xl border border-[#e2eaf3] bg-white p-3 text-[12px] font-medium text-slate-700 shadow-[2px_2px_5px_#cfd8e5]"
                     >
-                      <div className="mb-1 flex items-center gap-2 text-[11px] text-[#52525b]">
-                        <Quote size={11} />
-                        <span className="font-medium text-[#71717a]">
-                          {c.source}
-                        </span>
-                        <span>· {c.date}</span>
-                      </div>
-                      <p className="text-[12px] italic text-[#a1a1aa]">
-                        &ldquo;{c.snippet}&rdquo;
-                      </p>
+                      <div className="font-bold text-indigo-700 text-[11px]">{c.source} · {c.date}</div>
+                      <p className="italic text-slate-600 mt-0.5">&ldquo;{c.snippet}&rdquo;</p>
                     </div>
                   ))}
                 </div>
@@ -641,9 +553,10 @@ function MemoryTab() {
           </div>
         ) : (
           <div className="flex h-full flex-col items-center justify-center text-center">
-            <Brain size={24} className="mb-3 text-[#3f3f46]" />
-            <p className="text-[13px] text-[#52525b]">
-              Select a memory to view details
+            <Brain size={28} className="mb-3 text-slate-400" />
+            <h4 className="text-[14px] font-bold text-slate-700">Select a memory</h4>
+            <p className="text-[12px] font-medium text-slate-500 max-w-xs mt-1">
+              Click any semantic chunk on the left to inspect full reasoning, dates, and grounding links.
             </p>
           </div>
         )}
@@ -657,204 +570,105 @@ function MemoryTab() {
 // ============================================
 
 function OffboardingTab({ autoTrigger }: { autoTrigger: number }) {
-  const [offboardingEmployees, setOffboardingEmployees] = useState(
-    getOffboardingEmployees()
-  );
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
-    null
-  );
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [selectedEmpId, setSelectedEmpId] = useState("");
   const [pack, setPack] = useState<HandoffPack | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Fetch real employees from Supabase on mount
   useEffect(() => {
-    fetchOffboardingEmployees().then((emps) => setOffboardingEmployees(emps));
+    fetchOffboardingEmployees().then((data) => {
+      setEmployees(data);
+      if (data.length > 0 && !selectedEmpId) {
+        setSelectedEmpId(data[0].id);
+      }
+    });
   }, []);
 
-  const handleGenerate = useCallback(async (emp: Employee) => {
-    setSelectedEmployee(emp);
+  const handleGenerate = async () => {
+    if (!selectedEmpId) return;
     setLoading(true);
-    setPack(null);
-    const result = await generateHandoffPack(emp.id);
-    setPack(result);
+    const p = await generateHandoffPack(selectedEmpId);
+    setPack(p);
     setLoading(false);
-  }, []);
+  };
 
   useEffect(() => {
-    if (autoTrigger > 0 && offboardingEmployees.length > 0) {
-      handleGenerate(offboardingEmployees[0]);
+    if (autoTrigger > 0 && employees.length > 0) {
+      setSelectedEmpId(employees[0].id);
+      setTimeout(async () => {
+        setLoading(true);
+        const p = await generateHandoffPack(employees[0].id);
+        setPack(p);
+        setLoading(false);
+      }, 300);
     }
-  }, [autoTrigger, handleGenerate, offboardingEmployees]);
+  }, [autoTrigger, employees]);
 
   return (
-    <div className="h-full overflow-y-auto">
-      {/* Employee selector */}
-      <div className="border-b border-[#1e1e22] px-6 py-5">
-        <h3 className="mb-1 text-[15px] font-semibold text-[#ededed]">
-          Offboarding Handoff Pack
+    <div className="h-full overflow-y-auto p-6 space-y-6">
+      <div className="rounded-3xl border border-[#e2eaf3] bg-[#f1f5fa] p-6 shadow-[6px_6px_14px_#cfd8e5,-6px_-6px_14px_#ffffff]">
+        <h3 className="mb-1 text-[16px] font-bold text-slate-800">
+          Digital Handoff & Knowledge Preservation Pack
         </h3>
-        <p className="mb-4 text-[12.5px] text-[#71717a]">
-          Select a departing employee to generate their handoff documentation
+        <p className="mb-4 text-[13px] font-medium text-slate-500">
+          Synthesize full institutional memory, outstanding pull requests, and implicit knowledge before team transitions.
         </p>
-        <div className="flex gap-3">
-          {offboardingEmployees.map((emp) => {
-            const active = selectedEmployee?.id === emp.id;
-            return (
-              <button
-                key={emp.id}
-                onClick={() => handleGenerate(emp)}
-                disabled={loading}
-                className={`flex-1 rounded-xl border p-4 text-left transition-all ${
-                  active
-                    ? "border-[#c4b5a050] bg-[#c4b5a010]"
-                    : "border-[#1e1e22] bg-[#131316] hover:border-[#2a2a2e] hover:bg-[#19191d]"
-                }`}
-              >
-                <div className="mb-1 text-[13.5px] font-medium text-[#d4d4d8]">
-                  {emp.name}
-                </div>
-                <p className="text-[12px] text-[#71717a]">
-                  {emp.role} · {emp.team}
-                </p>
-                <p className="mt-1 text-[11px] text-[#52525b]">
-                  {emp.tenure}
-                </p>
-              </button>
-            );
-          })}
+        <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap">
+          <select
+            value={selectedEmpId}
+            onChange={(e) => setSelectedEmpId(e.target.value)}
+            className="flex-1 rounded-xl border border-[#d8e2ed] bg-[#f1f5fa] px-3.5 py-2.5 text-[13px] font-medium text-slate-800 shadow-[inset_2px_2px_4px_#cfd8e5,inset_-2px_-2px_4px_#ffffff] outline-none"
+          >
+            {employees.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.name} — {e.role} ({e.team})
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={handleGenerate}
+            disabled={!selectedEmpId || loading}
+            className="flex h-11 items-center gap-2 rounded-xl bg-[#4f46e5] px-5 text-[13px] font-bold text-white shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] transition-all hover:bg-indigo-700 disabled:opacity-40"
+          >
+            {loading ? <Loader2 size={15} className="animate-spin" /> : <UserMinus size={15} />}
+            Generate Pack
+          </button>
         </div>
       </div>
 
-      {/* Loading */}
-      {loading && (
-        <div className="flex items-center justify-center py-16">
-          <div className="flex items-center gap-3 text-[13px] text-[#71717a]">
-            <Loader2 size={18} className="animate-spin text-[#c4b5a0]" />
-            Generating handoff pack…
-          </div>
-        </div>
-      )}
-
-      {/* Handoff pack */}
-      {pack && !loading && (
-        <div className="animate-fade-in px-6 py-5">
-          {/* Summary bullets */}
-          <div className="mb-5 rounded-xl border border-[#f59e0b30] bg-[#f59e0b10] p-5">
-            <div className="mb-3 flex items-center gap-2 text-[13px] font-semibold text-[#fbbf24]">
-              <AlertTriangle size={15} />
-              What the next owner must know
-            </div>
+      {pack && (
+        <div className="space-y-4 max-w-4xl mx-auto">
+          <div className="rounded-3xl border border-[#e2eaf3] bg-white p-6 shadow-[6px_6px_14px_#cfd8e5,-6px_-6px_14px_#ffffff]">
+            <h4 className="mb-3 text-[15px] font-bold text-slate-800">
+              Preservation Summary & Handover Points
+            </h4>
             <div className="space-y-2">
               {pack.summaryBullets.map((bullet, i) => (
-                <div
-                  key={i}
-                  className="flex items-start gap-2 text-[12.5px] leading-relaxed text-[#d4d4d8]"
-                >
-                  <CircleDot
-                    size={10}
-                    className="mt-1.5 flex-shrink-0 text-[#fbbf24]"
-                  />
-                  {bullet}
+                <div key={i} className="flex items-start gap-2.5 text-[13px] font-medium text-slate-700">
+                  <span className="mt-1 h-2 w-2 rounded-full bg-indigo-600 flex-shrink-0" />
+                  <span>{bullet}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Ownership areas */}
-          <div className="mb-5">
-            <h4 className="mb-3 text-[14px] font-semibold text-[#ededed]">
-              Ownership Areas
-            </h4>
-            <div className="space-y-3">
-              {pack.ownershipAreas.map((area, i) => (
-                <div
-                  key={i}
-                  className="rounded-xl border border-[#1e1e22] bg-[#131316] p-4"
-                >
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-[13.5px] font-medium text-[#d4d4d8]">
-                      {area.area}
-                    </span>
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                        STATUS_COLORS[area.status] ||
-                        "bg-[#1e1e22] text-[#a1a1aa]"
-                      }`}
-                    >
-                      {area.status}
-                    </span>
-                  </div>
-                  <p className="text-[12.5px] leading-relaxed text-[#71717a]">
-                    {area.description}
-                  </p>
-                  {area.suggestedOwner && (
-                    <p className="mt-2 flex items-center gap-1.5 text-[12px] text-[#c4b5a0]">
-                      <Users2 size={12} />
-                      Suggested owner: {area.suggestedOwner}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Unresolved work */}
-          <div className="mb-5">
-            <h4 className="mb-3 text-[14px] font-semibold text-[#ededed]">
-              Unresolved Work
+          <div className="rounded-3xl border border-[#e2eaf3] bg-[#f1f5fa] p-6 shadow-[6px_6px_14px_#cfd8e5,-6px_-6px_14px_#ffffff]">
+            <h4 className="mb-3 text-[14.5px] font-bold text-slate-800">
+              Outstanding Work & System Ownership
             </h4>
             <div className="space-y-3">
               {pack.unresolvedWork.map((item, i) => (
                 <div
                   key={i}
-                  className="rounded-xl border border-[#1e1e22] bg-[#131316] p-4"
+                  className="rounded-xl border border-[#e2eaf3] bg-white p-4 shadow-[3px_3px_8px_#cfd8e5]"
                 >
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-[13.5px] font-medium text-[#d4d4d8]">
-                      {item.title}
-                    </span>
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase ${
-                        PRIORITY_COLORS[item.priority]
-                      }`}
-                    >
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[13.5px] font-bold text-slate-800">{item.title}</span>
+                    <span className={`rounded-md px-2 py-0.5 text-[10px] font-bold uppercase border ${PRIORITY_COLORS[item.priority]}`}>
                       {item.priority}
                     </span>
                   </div>
-                  <p className="text-[12.5px] leading-relaxed text-[#71717a]">
-                    {item.description}
-                  </p>
-                  {item.deadline && (
-                    <p className="mt-2 flex items-center gap-1.5 text-[12px] text-[#52525b]">
-                      <Clock size={12} />
-                      Due: {item.deadline}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Key links */}
-          <div className="mb-5">
-            <h4 className="mb-3 text-[14px] font-semibold text-[#ededed]">
-              Key Links & Resources
-            </h4>
-            <div className="grid grid-cols-2 gap-2">
-              {pack.keyLinks.map((link, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-3 rounded-lg border border-[#1e1e22] bg-[#131316] p-3"
-                >
-                  <Link2 size={14} className="flex-shrink-0 text-[#52525b]" />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-[12.5px] font-medium text-[#d4d4d8]">
-                      {link.title}
-                    </p>
-                    <p className="text-[11px] text-[#52525b]">
-                      {link.category}
-                    </p>
-                  </div>
+                  <p className="text-[12px] font-medium text-slate-600 leading-relaxed">{item.description}</p>
                 </div>
               ))}
             </div>
@@ -883,22 +697,22 @@ export function KnowledgeView({ demoTrigger }: KnowledgeViewProps) {
   const [activeTab, setActiveTab] = useState<KnowledgeTab>("onboarding");
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col bg-[#eaf0f6]">
       {/* Tab bar */}
-      <div className="flex items-center border-b border-[#1e1e22] bg-[#0e0e11] px-5">
+      <div className="flex items-center border-b border-[#d8e2ed] bg-[#f1f5fa] px-6 shadow-[0_2px_8px_#cfd8e520]">
         {tabs.map((tab) => {
           const active = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 border-b-2 px-4 py-3 text-[13px] font-medium transition-colors ${
+              className={`flex items-center gap-2 border-b-2 px-5 py-3.5 text-[13px] font-bold transition-all ${
                 active
-                  ? "border-[#c4b5a0] text-[#ededed]"
-                  : "border-transparent text-[#71717a] hover:text-[#a1a1aa]"
+                  ? "border-indigo-600 text-indigo-700 bg-[#e6ecf4]"
+                  : "border-transparent text-slate-500 hover:text-slate-800"
               }`}
             >
-              <span className={active ? "text-[#c4b5a0]" : "text-[#52525b]"}>
+              <span className={active ? "text-indigo-600" : "text-slate-400"}>
                 {tab.icon}
               </span>
               {tab.label}
@@ -908,7 +722,7 @@ export function KnowledgeView({ demoTrigger }: KnowledgeViewProps) {
       </div>
 
       {/* Tab content */}
-      <div className="flex-1 overflow-hidden bg-[#0a0a0c]">
+      <div className="flex-1 overflow-hidden bg-[#eaf0f6]">
         {activeTab === "onboarding" && (
           <OnboardingTab autoTrigger={demoTrigger} />
         )}

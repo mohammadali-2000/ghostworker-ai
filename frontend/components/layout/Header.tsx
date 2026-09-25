@@ -9,37 +9,37 @@ interface HeaderProps {
 }
 
 export function Header({
-  title = "Digital Twin",
+  title = "TwinOps Enterprise",
   noBorder = false,
 }: HeaderProps) {
   const reminders = getActiveReminders();
 
   return (
     <header
-      className={`flex h-14 items-center justify-between bg-[#0e0e11] px-4 ${
+      className={`flex h-14 items-center justify-between bg-[#f1f5fa] px-6 shadow-[0_2px_8px_#cfd8e520] ${
         noBorder
           ? ""
-          : "border-b border-[#1e1e22]"
+          : "border-b border-[#d8e2ed]"
       }`}
     >
-      <h1 className="text-lg font-semibold text-[#ededed]">
+      <h1 className="text-[16px] font-bold text-slate-800">
         {title}
       </h1>
 
-      <div className="flex items-center gap-2">
-        <button className="flex h-9 w-9 items-center justify-center rounded-lg text-[#71717a] transition-colors hover:bg-[#1e1e22] hover:text-[#d4d4d8]">
-          <Search size={18} />
+      <div className="flex items-center gap-2.5">
+        <button className="flex h-9 w-9 items-center justify-center rounded-xl bg-white border border-[#e2eaf3] text-slate-500 shadow-[2px_2px_5px_#cfd8e5,-2px_-2px_5px_#ffffff] transition-all hover:text-indigo-600 hover:shadow-[inset_1px_1px_3px_#cfd8e5]">
+          <Search size={16} />
         </button>
 
-        <button className="relative flex h-9 w-9 items-center justify-center rounded-lg text-[#71717a] transition-colors hover:bg-[#1e1e22] hover:text-[#d4d4d8]">
-          <Bell size={18} />
+        <button className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white border border-[#e2eaf3] text-slate-500 shadow-[2px_2px_5px_#cfd8e5,-2px_-2px_5px_#ffffff] transition-all hover:text-indigo-600 hover:shadow-[inset_1px_1px_3px_#cfd8e5]">
+          <Bell size={16} />
           {reminders.length > 0 && (
-            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-[#ef4444]" />
+            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-rose-500" />
           )}
         </button>
 
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#c4b5a0] text-xs font-bold text-[#0a0a0c]">
-          A
+        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#4f46e5] text-xs font-bold text-white shadow-[2px_2px_5px_#4f46e540]">
+          SA
         </div>
       </div>
     </header>

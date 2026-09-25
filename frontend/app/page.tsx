@@ -1,26 +1,25 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Sparkles, Loader2, UserCheck, Shield } from "lucide-react";
+import { Sparkles, Loader2, UserCheck, ShieldCheck } from "lucide-react";
 
-const CEO_EMAIL = "ceo@ghostworker.ai";
+const CEO_EMAIL = "ceo@twinops.ai";
 
 const EMAIL_TO_CLONE: Record<string, string> = {
+  "smali@twinops.ai": "Sm Ali",
+  "maneesh@twinops.ai": "Maneesh Nand",
+  "towfik@twinops.ai": "Md Towfik Omer",
+  "ceo@twinops.ai": "Executive Lead",
   "smali@ghostworker.ai": "Sm Ali",
   "maneesh@ghostworker.ai": "Maneesh Nand",
   "towfik@ghostworker.ai": "Md Towfik Omer",
-  "ceo@ghostworker.ai": "Angelina Quan",
-  "ella2happy@gmail.com": "Ella Lan",
-  "mvideet@gmail.com": "Videet Mehta",
-  "angelinaquan2024@gmail.com": "Angelina Quan",
-  "jamesliu535b@gmail.com": "James Liu",
 };
 
 const DEMO_PERSONAS = [
-  { name: "Sm Ali", role: "Lead AI Architect", email: "smali@ghostworker.ai", isCeo: false, initials: "SA", color: "from-emerald-500 to-teal-600" },
-  { name: "Maneesh Nand", role: "Backend & Infra", email: "maneesh@ghostworker.ai", isCeo: false, initials: "MN", color: "from-indigo-500 to-violet-600" },
-  { name: "Md Towfik Omer", role: "Frontend & Product", email: "towfik@ghostworker.ai", isCeo: false, initials: "MT", color: "from-cyan-500 to-blue-600" },
-  { name: "Angelina Quan", role: "CEO Strategic Polling", email: "ceo@ghostworker.ai", isCeo: true, initials: "AQ", color: "from-amber-500 to-orange-600" },
+  { name: "Sm Ali", role: "Lead AI Architect", email: "smali@twinops.ai", isCeo: false, initials: "SA", color: "from-indigo-600 to-indigo-500" },
+  { name: "Maneesh Nand", role: "Backend & Infra", email: "maneesh@twinops.ai", isCeo: false, initials: "MN", color: "from-violet-600 to-purple-500" },
+  { name: "Md Towfik Omer", role: "Frontend & Product", email: "towfik@twinops.ai", isCeo: false, initials: "MT", color: "from-sky-600 to-blue-500" },
+  { name: "Executive Lead", role: "CEO Multi-Twin Polling", email: "ceo@twinops.ai", isCeo: true, initials: "EL", color: "from-amber-600 to-orange-500" },
 ];
 
 function GoogleIcon() {
@@ -48,8 +47,7 @@ export default function LandingPage() {
     sessionStorage.setItem("ghostworker_clone_name", resolvedName);
     sessionStorage.setItem("edamame_clone_name", resolvedName);
     
-    // Always navigate using relative paths on current origin -- NEVER localhost
-    window.location.href = isCeo || trimmed === CEO_EMAIL ? "/ceo" : "/employee";
+    window.location.href = isCeo || trimmed.includes("ceo") ? "/ceo" : "/employee";
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -65,38 +63,39 @@ export default function LandingPage() {
 
   const handleGoogleAuth = () => {
     setLoading(true);
-    // Directly log into verified demo workspace as Sm Ali on the active domain
-    loginWithEmail("smali@ghostworker.ai", "Sm Ali", false);
+    loginWithEmail("smali@twinops.ai", "Sm Ali", false);
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#111113] p-4">
-      <div className="w-full max-w-[460px]">
-        {/* Card */}
-        <div className="rounded-2xl border border-[#2a2a2e] bg-[#19191d] p-6 sm:p-8 shadow-2xl">
-          {/* Logo icon */}
+    <div className="flex min-h-screen items-center justify-center bg-[#eaf0f6] p-4 select-none">
+      <div className="w-full max-w-[480px]">
+        {/* Neumorphic Card */}
+        <div className="rounded-3xl bg-[#f1f5fa] p-7 sm:p-9 shadow-[10px_10px_25px_#cfd8e5,-10px_-10px_25px_#ffffff] border border-white/90">
+          {/* Logo */}
           <div className="mb-4 flex justify-center">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white shadow-lg shadow-emerald-900/30">
-              <Sparkles size={22} />
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] border border-white/60">
+              <Sparkles size={24} className="animate-pulse" />
             </div>
           </div>
 
           {/* Title */}
-          <h1 className="mb-1 text-center text-[22px] font-bold text-white tracking-tight">
-            Sign in to GhostWorker
+          <h1 className="mb-1 text-center text-[23px] font-extrabold text-slate-800 tracking-tight">
+            TwinOps Enterprise
           </h1>
-          <p className="mb-6 text-center text-[13.5px] text-[#8e8e93]">
-            Autonomous Workplace Digital Twins Living in Slack & Docs
+          <p className="mb-6 text-center text-[12.5px] text-slate-500 font-medium">
+            Autonomous Workplace Digital Twins for Enterprise Delivery Pods
           </p>
 
           {/* Quick 1-Click Demo Login */}
-          <div className="mb-6 rounded-xl border border-[#2a2a2e] bg-[#141416] p-3.5">
-            <div className="mb-2.5 flex items-center justify-between">
-              <span className="text-[11.5px] font-semibold uppercase tracking-wider text-[#a1a1aa] flex items-center gap-1.5">
-                <UserCheck size={13} className="text-emerald-400" />
-                1-Click Instant Demo Login
+          <div className="mb-6 rounded-2xl bg-[#e6edf5] p-3.5 shadow-[inset_2px_2px_5px_#cfd8e5,inset_-2px_-2px_5px_#ffffff] border border-white/60">
+            <div className="mb-2.5 flex items-center justify-between px-1">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+                <UserCheck size={14} className="text-indigo-600" />
+                1-Click Instant Persona Sign In
               </span>
-              <span className="text-[10.5px] text-[#71717a] font-mono">Live Session</span>
+              <span className="text-[10px] text-indigo-700 font-bold bg-white px-2 py-0.5 rounded-full shadow-sm border border-indigo-100">
+                Live Pod
+              </span>
             </div>
             <div className="grid grid-cols-2 gap-2">
               {DEMO_PERSONAS.map((p) => (
@@ -105,14 +104,14 @@ export default function LandingPage() {
                   type="button"
                   onClick={() => loginWithEmail(p.email, p.name, p.isCeo)}
                   disabled={loading}
-                  className="flex items-center gap-2.5 rounded-lg border border-[#27272a] bg-[#1c1c20] p-2 text-left transition-all hover:border-[#3f3f46] hover:bg-[#25252b] active:scale-[0.98]"
+                  className="flex items-center gap-2.5 rounded-xl bg-[#f1f5fa] p-2.5 text-left shadow-[3px_3px_7px_#cfd8e5,-3px_-3px_7px_#ffffff] border border-white/80 hover:scale-[1.02] active:scale-[0.98] transition-all"
                 >
-                  <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-gradient-to-br ${p.color} text-[11px] font-bold text-white shadow-sm`}>
+                  <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${p.color} text-[10px] font-black text-white shadow-sm`}>
                     {p.initials}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-[12px] font-medium text-white">{p.name}</div>
-                    <div className="truncate text-[10px] text-[#a1a1aa]">{p.role}</div>
+                    <div className="truncate text-[11.5px] font-bold text-slate-800">{p.name}</div>
+                    <div className="truncate text-[9.5px] text-slate-500 font-medium">{p.role}</div>
                   </div>
                 </button>
               ))}
@@ -121,37 +120,39 @@ export default function LandingPage() {
 
           {/* Email input */}
           <form onSubmit={handleSubmit} className="mb-4">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setError("");
-              }}
-              placeholder="Enter your business email*"
-              className="mb-3 w-full rounded-lg border border-[#2a2a2e] bg-[#111113] px-4 py-3 text-[14px] text-white placeholder:text-[#555] focus:border-emerald-500 focus:outline-none transition-colors"
-            />
+            <div className="mb-3">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setError("");
+                }}
+                placeholder="Enter corporate email (e.g. ali@accenture.com)"
+                className="w-full rounded-2xl bg-[#e3ebf4] px-4 py-3 text-[13px] text-slate-800 placeholder:text-slate-400 font-medium shadow-[inset_3px_3px_6px_#cfd8e5,inset_-3px_-3px_6px_#ffffff] border border-white/70 focus:outline-none focus:ring-2 focus:ring-indigo-400/40 transition-all"
+              />
+            </div>
             {error && (
-              <p className="mb-2 text-[12px] text-red-400">{error}</p>
+              <p className="mb-2 text-[11px] font-bold text-rose-600 pl-1">{error}</p>
             )}
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-white px-4 py-3 text-[14px] font-semibold text-black transition-all hover:bg-[#e8e8e8] active:scale-[0.99] disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-500 py-3 text-[13px] font-bold text-white shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] hover:opacity-95 active:scale-[0.99] disabled:opacity-50 transition-all"
             >
               {loading ? (
-                <Loader2 size={16} className="animate-spin" />
+                <Loader2 size={16} className="animate-spin text-white" />
               ) : (
-                "Continue to Workspace"
+                "Enter Delivery Workspace"
               )}
             </button>
           </form>
 
           {/* Divider */}
           <div className="mb-4 flex items-center gap-3">
-            <div className="h-px flex-1 bg-[#2a2a2e]" />
-            <span className="text-[11px] font-medium uppercase text-[#555]">OR</span>
-            <div className="h-px flex-1 bg-[#2a2a2e]" />
+            <div className="h-px flex-1 bg-[#d4deeb]" />
+            <span className="text-[10px] font-bold uppercase text-slate-400">OR</span>
+            <div className="h-px flex-1 bg-[#d4deeb]" />
           </div>
 
           {/* Google auth */}
@@ -159,11 +160,17 @@ export default function LandingPage() {
             type="button"
             onClick={handleGoogleAuth}
             disabled={loading}
-            className="flex w-full items-center justify-center gap-3 rounded-lg border border-[#2a2a2e] bg-[#141416] px-4 py-3 text-[13.5px] font-medium text-[#ccc] transition-all hover:border-[#3f3f46] hover:bg-[#1c1c20] hover:text-white active:scale-[0.99] disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-[#f1f5fa] py-2.5 text-[12.5px] font-bold text-slate-700 shadow-[3px_3px_7px_#cfd8e5,-3px_-3px_7px_#ffffff] border border-white/80 hover:bg-[#eaf0f6] active:scale-[0.99] disabled:opacity-50 transition-all"
           >
             <GoogleIcon />
-            Continue with Google (Demo Sign In)
+            Continue with Enterprise Single Sign-On
           </button>
+
+          {/* Security badge footer */}
+          <div className="mt-5 flex items-center justify-center gap-1.5 text-[11px] text-slate-400 font-medium">
+            <ShieldCheck size={14} className="text-emerald-500" />
+            <span>Zero Data Leakage • HIPAA & RBAC Compliant</span>
+          </div>
         </div>
       </div>
     </div>

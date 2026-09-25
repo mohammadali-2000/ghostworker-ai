@@ -37,15 +37,15 @@ import type {
 // ---- Constants ----
 
 const STANCE_COLORS: Record<Stance, string> = {
-  support: "#10b981",
-  neutral: "#f59e0b",
-  oppose: "#ef4444",
+  support: "#059669",
+  neutral: "#d97706",
+  oppose: "#e11d48",
 };
 
 const STANCE_BG: Record<Stance, string> = {
-  support: "bg-[#10b98120] text-[#10b981] border-[#10b98130]",
-  neutral: "bg-[#f59e0b20] text-[#f59e0b] border-[#f59e0b30]",
-  oppose: "bg-[#ef444420] text-[#ef4444] border-[#ef444430]",
+  support: "bg-emerald-50 text-emerald-700 border-emerald-200/80",
+  neutral: "bg-amber-50 text-amber-700 border-amber-200/80",
+  oppose: "bg-rose-50 text-rose-700 border-rose-200/80",
 };
 
 const STANCE_LABELS: Record<Stance, string> = {
@@ -59,12 +59,12 @@ const STANCE_LABELS: Record<Stance, string> = {
 function StageIndicator({ stage }: { stage: StreamStage }) {
   const stages: { key: StreamStage; label: string }[] = [
     { key: "planning", label: "Plan" },
-    { key: "querying", label: "Query Employees" },
+    { key: "querying", label: "Query Pod Twins" },
     { key: "aggregating", label: "Aggregate" },
   ];
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-1.5 flex-wrap">
       {stages.map((s, i) => {
         const stageOrder = ["planning", "querying", "aggregating", "complete"];
         const currentIdx = stageOrder.indexOf(stage);
@@ -77,16 +77,16 @@ function StageIndicator({ stage }: { stage: StreamStage }) {
             {i > 0 && (
               <ChevronRight
                 size={12}
-                className={isDone ? "text-[#c4b5a0]" : "text-[#3f3f46]"}
+                className={isDone ? "text-indigo-600" : "text-slate-300"}
               />
             )}
             <div
-              className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-medium transition-all ${
+              className={`flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-[11.5px] font-bold transition-all ${
                 isActive
-                  ? "bg-[#c4b5a020] text-[#c4b5a0]"
+                  ? "bg-indigo-100 text-indigo-700 border border-indigo-200 shadow-[inset_1px_1px_3px_#cfd8e5]"
                   : isDone
-                  ? "bg-[#10b98120] text-[#10b981]"
-                  : "bg-[#1e1e22] text-[#52525b]"
+                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-[1px_1px_3px_#cfd8e5]"
+                  : "bg-slate-100 text-slate-400"
               }`}
             >
               {isDone ? (
@@ -115,10 +115,10 @@ function StanceBar({
   animated?: boolean;
 }) {
   return (
-    <div className="space-y-2">
-      <div className="flex h-3 overflow-hidden rounded-full bg-[#1e1e22]">
+    <div className="space-y-2.5">
+      <div className="flex h-3.5 overflow-hidden rounded-full bg-slate-200 p-0.5 shadow-[inset_1px_1px_3px_#cfd8e5]">
         <div
-          className="transition-all duration-700"
+          className="transition-all duration-700 rounded-l-full"
           style={{
             width: `${distribution.support}%`,
             backgroundColor: STANCE_COLORS.support,
@@ -132,7 +132,7 @@ function StanceBar({
           }}
         />
         <div
-          className="transition-all duration-700"
+          className="transition-all duration-700 rounded-r-full"
           style={{
             width: `${distribution.oppose}%`,
             backgroundColor: STANCE_COLORS.oppose,
@@ -147,22 +147,22 @@ function StanceBar({
           return (
             <div key={s} className="flex items-center gap-1.5">
               <span
-                className="inline-block h-2 w-2 rounded-full"
+                className="inline-block h-2.5 w-2.5 rounded-full shadow-[1px_1px_2px_#00000020]"
                 style={{ backgroundColor: STANCE_COLORS[s] }}
               />
-              <span className="font-medium text-[#d4d4d8]">
+              <span className="font-bold text-slate-800">
                 {STANCE_LABELS[s]} {val}%
               </span>
               {delta != null && delta !== 0 && animated && (
                 <span
-                  className={`text-[11px] font-medium ${
+                  className={`text-[11px] font-bold ${
                     delta > 0
                       ? s === "oppose"
-                        ? "text-[#ef4444]"
-                        : "text-[#10b981]"
+                        ? "text-rose-600"
+                        : "text-emerald-600"
                       : s === "oppose"
-                      ? "text-[#10b981]"
-                      : "text-[#ef4444]"
+                      ? "text-emerald-600"
+                      : "text-rose-600"
                   }`}
                 >
                   {delta > 0 ? "+" : ""}
@@ -191,21 +191,21 @@ function ThemeCard({
   return (
     <button
       onClick={onClick}
-      className="group w-full rounded-xl border border-[#1e1e22] bg-[#131316] p-4 text-left transition-all hover:border-[#2a2a2e] hover:bg-[#19191d]"
+      className="group w-full rounded-2xl border border-[#e2eaf3] bg-white p-4 text-left shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] transition-all hover:shadow-[inset_2px_2px_4px_#cfd8e5,inset_-2px_-2px_4px_#ffffff]"
     >
       <div className="mb-2 flex items-center justify-between">
         <span
-          className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium ${STANCE_BG[theme.dominantStance]}`}
+          className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10.5px] font-bold ${STANCE_BG[theme.dominantStance]}`}
         >
           {STANCE_LABELS[theme.dominantStance]}
         </span>
-        <div className="flex items-center gap-1 text-[12px] text-[#52525b]">
+        <div className="flex items-center gap-1 text-[12px] font-bold text-slate-500">
           <Users size={12} />
           {theme.count}
           {delta != null && delta !== 0 && (
             <span
-              className={`ml-1 font-medium ${
-                delta > 0 ? "text-[#c4b5a0]" : "text-[#52525b]"
+              className={`ml-1 font-bold ${
+                delta > 0 ? "text-indigo-600" : "text-slate-400"
               }`}
             >
               {delta > 0 ? "+" : ""}
@@ -214,10 +214,10 @@ function ThemeCard({
           )}
         </div>
       </div>
-      <h4 className="mb-1 text-[13.5px] font-semibold text-[#d4d4d8] group-hover:text-[#ededed]">
+      <h4 className="mb-1 text-[13.5px] font-bold text-slate-800 group-hover:text-indigo-600">
         {theme.label}
       </h4>
-      <p className="text-[12.5px] leading-relaxed text-[#71717a]">
+      <p className="text-[12px] font-medium leading-relaxed text-slate-500 line-clamp-2">
         {theme.description}
       </p>
     </button>
@@ -234,52 +234,51 @@ function EmployeeCard({
   index: number;
 }) {
   const avatarColors = [
-    "bg-[#1e1e22] text-[#818cf8]",
-    "bg-[#1e1e22] text-[#34d399]",
-    "bg-[#1e1e22] text-[#fbbf24]",
-    "bg-[#1e1e22] text-[#fb7185]",
-    "bg-[#1e1e22] text-[#a78bfa]",
-    "bg-[#1e1e22] text-[#38bdf8]",
-    "bg-[#1e1e22] text-[#fb923c]",
+    "bg-indigo-50 text-indigo-700 border-indigo-200",
+    "bg-emerald-50 text-emerald-700 border-emerald-200",
+    "bg-amber-50 text-amber-700 border-amber-200",
+    "bg-rose-50 text-rose-700 border-rose-200",
+    "bg-purple-50 text-purple-700 border-purple-200",
+    "bg-sky-50 text-sky-700 border-sky-200",
   ];
   const color = avatarColors[index % avatarColors.length];
 
   return (
     <button
       onClick={onClick}
-      className="animate-fade-in-up group w-full rounded-xl border border-[#1e1e22] bg-[#131316] p-4 text-left transition-all hover:border-[#2a2a2e] hover:bg-[#19191d]"
+      className="animate-fade-in-up group w-full rounded-2xl border border-[#e2eaf3] bg-white p-4 text-left shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] transition-all hover:shadow-[inset_2px_2px_4px_#cfd8e5,inset_-2px_-2px_4px_#ffffff]"
       style={{ animationDelay: `${index * 40}ms`, animationFillMode: "both" }}
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-3.5">
         <div
-          className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-[12px] font-semibold ${color}`}
+          className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-[12px] font-bold border shadow-[2px_2px_4px_#cfd8e5] ${color}`}
         >
           {response.employee.initials}
         </div>
         <div className="min-w-0 flex-1">
           <div className="mb-1 flex items-center justify-between">
             <div>
-              <span className="text-[13.5px] font-medium text-[#d4d4d8]">
+              <span className="text-[14px] font-bold text-slate-800">
                 {response.employee.name}
               </span>
-              <span className="ml-2 text-[12px] text-[#52525b]">
+              <span className="ml-2 text-[11.5px] font-medium text-slate-500">
                 {response.employee.role} · {response.employee.team}
               </span>
             </div>
             <span
-              className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium ${STANCE_BG[response.stance]}`}
+              className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10.5px] font-bold ${STANCE_BG[response.stance]}`}
             >
               {STANCE_LABELS[response.stance]}
             </span>
           </div>
-          <p className="text-[12.5px] leading-relaxed text-[#71717a]">
+          <p className="text-[12.5px] font-medium leading-relaxed text-slate-600">
             {response.summary}
           </p>
-          <div className="mt-2 flex items-center gap-2 text-[11px] text-[#52525b]">
+          <div className="mt-2 flex items-center gap-3 text-[11px] font-semibold text-slate-400">
             <span>Confidence: {Math.round(response.confidence * 100)}%</span>
             <span>·</span>
-            <span className="flex items-center gap-1 text-[#c4b5a0] group-hover:text-[#d4c5b0]">
-              View details <ArrowRight size={10} />
+            <span className="flex items-center gap-1 text-indigo-600 group-hover:text-indigo-800">
+              View reasoning <ArrowRight size={11} />
             </span>
           </div>
         </div>
@@ -297,80 +296,72 @@ function DetailDrawer({
 }) {
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="animate-slide-in-right relative z-10 flex h-full w-full max-w-lg flex-col bg-[#111114] shadow-xl border-l border-[#1e1e22]">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#1e1e22] px-6 py-4">
+      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs" onClick={onClose} />
+      <div className="animate-slide-in-right relative z-10 flex h-full w-full max-w-lg flex-col bg-[#f1f5fa] shadow-2xl border-l border-[#d8e2ed]">
+        <div className="flex items-center justify-between border-b border-[#d8e2ed] px-6 py-4 bg-white">
           <div>
-            <h3 className="text-[15px] font-semibold text-[#ededed]">
+            <h3 className="text-[16px] font-bold text-slate-800">
               {response.employee.name}
             </h3>
-            <p className="text-[12.5px] text-[#71717a]">
+            <p className="text-[12px] font-medium text-slate-500">
               {response.employee.role} · {response.employee.team} ·{" "}
               {response.employee.tenure}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-[#52525b] hover:bg-[#1e1e22] hover:text-[#a1a1aa]"
+            className="rounded-xl p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-800"
           >
             <X size={18} />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto px-6 py-5">
-          {/* Stance */}
-          <div className="mb-5">
-            <div className="mb-2 text-[11px] font-medium uppercase tracking-wider text-[#52525b]">
-              Position
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+          <div>
+            <div className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              Position & Confidence
             </div>
             <span
-              className={`inline-flex items-center rounded-full border px-3 py-1 text-[13px] font-medium ${STANCE_BG[response.stance]}`}
+              className={`inline-flex items-center rounded-xl border px-3 py-1 text-[13px] font-bold ${STANCE_BG[response.stance]}`}
             >
-              {STANCE_LABELS[response.stance]} · {Math.round(response.confidence * 100)}% confidence
+              {STANCE_LABELS[response.stance]} · {Math.round(response.confidence * 100)}% Confidence
             </span>
           </div>
 
-          {/* Summary */}
-          <div className="mb-5">
-            <div className="mb-2 text-[11px] font-medium uppercase tracking-wider text-[#52525b]">
-              Summary
+          <div className="rounded-2xl border border-[#e2eaf3] bg-white p-4 shadow-[3px_3px_8px_#cfd8e5]">
+            <div className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              Stance Summary
             </div>
-            <p className="text-[13.5px] leading-relaxed text-[#d4d4d8]">
+            <p className="text-[13.5px] font-semibold leading-relaxed text-slate-800">
               {response.summary}
             </p>
           </div>
 
-          {/* Reasoning */}
-          <div className="mb-5">
-            <div className="mb-2 text-[11px] font-medium uppercase tracking-wider text-[#52525b]">
-              Detailed Reasoning
+          <div className="rounded-2xl border border-[#e2eaf3] bg-white p-4 shadow-[3px_3px_8px_#cfd8e5]">
+            <div className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              Detailed AI Twin Reasoning
             </div>
-            <p className="text-[13.5px] leading-relaxed text-[#a1a1aa]">
+            <p className="text-[13px] font-medium leading-relaxed text-slate-600">
               {response.reasoning}
             </p>
           </div>
 
-          {/* Citations */}
           <div>
-            <div className="mb-3 text-[11px] font-medium uppercase tracking-wider text-[#52525b]">
-              Evidence & Citations
+            <div className="mb-2.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              Grounding Citations
             </div>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {response.citations.map((c, i) => (
                 <div
                   key={i}
-                  className="rounded-lg border border-[#1e1e22] bg-[#131316] p-3"
+                  className="rounded-xl border border-[#e2eaf3] bg-white p-3.5 shadow-[2px_2px_5px_#cfd8e5]"
                 >
-                  <div className="mb-1.5 flex items-center gap-2 text-[11px] text-[#52525b]">
-                    <Quote size={12} />
-                    <span className="font-medium text-[#71717a]">
-                      {c.source}
-                    </span>
-                    <span>· {c.date}</span>
+                  <div className="mb-1 flex items-center gap-1.5 text-[11px] font-bold text-indigo-700">
+                    <Quote size={11} />
+                    <span>{c.source}</span>
+                    <span className="text-slate-400 font-normal">· {c.date}</span>
                   </div>
-                  <p className="text-[12.5px] italic leading-relaxed text-[#a1a1aa]">
+                  <p className="text-[12px] italic text-slate-600 line-clamp-3">
                     &ldquo;{c.snippet}&rdquo;
                   </p>
                 </div>
@@ -393,65 +384,70 @@ function ThemeDrawer({
   responses: EmployeeResponse[];
   onClose: () => void;
   onSelectEmployee: (r: EmployeeResponse) => void;
-}) {
+  }) {
   const themeEmployees = responses.filter((r) =>
     theme.employeeIds.includes(r.employee.id)
   );
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="animate-slide-in-right relative z-10 flex h-full w-full max-w-lg flex-col bg-[#111114] shadow-xl border-l border-[#1e1e22]">
-        <div className="flex items-center justify-between border-b border-[#1e1e22] px-6 py-4">
+      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs" onClick={onClose} />
+      <div className="animate-slide-in-right relative z-10 flex h-full w-full max-w-lg flex-col bg-[#f1f5fa] shadow-2xl border-l border-[#d8e2ed]">
+        <div className="flex items-center justify-between border-b border-[#d8e2ed] px-6 py-4 bg-white">
           <div>
             <span
-              className={`mb-1 inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium ${STANCE_BG[theme.dominantStance]}`}
+              className={`mb-1 inline-flex items-center rounded-md border px-2 py-0.5 text-[10.5px] font-bold ${STANCE_BG[theme.dominantStance]}`}
             >
               {STANCE_LABELS[theme.dominantStance]}
             </span>
-            <h3 className="text-[15px] font-semibold text-[#ededed]">
+            <h3 className="text-[16px] font-bold text-slate-800">
               {theme.label}
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-[#52525b] hover:bg-[#1e1e22] hover:text-[#a1a1aa]"
+            className="rounded-xl p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-800"
           >
             <X size={18} />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto px-6 py-5">
-          <p className="mb-5 text-[13.5px] leading-relaxed text-[#a1a1aa]">
-            {theme.description}
-          </p>
-          <div className="mb-3 text-[11px] font-medium uppercase tracking-wider text-[#52525b]">
-            Employees in this theme ({themeEmployees.length})
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+          <div className="rounded-2xl border border-[#e2eaf3] bg-white p-4 shadow-[3px_3px_8px_#cfd8e5]">
+            <p className="text-[13px] font-medium leading-relaxed text-slate-700">
+              {theme.description}
+            </p>
           </div>
-          <div className="space-y-3">
-            {themeEmployees.map((r) => (
-              <button
-                key={r.employee.id}
-                onClick={() => {
-                  onClose();
-                  setTimeout(() => onSelectEmployee(r), 100);
-                }}
-                className="w-full rounded-lg border border-[#1e1e22] bg-[#131316] p-3 text-left transition-colors hover:bg-[#19191d]"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-[13px] font-medium text-[#d4d4d8]">
-                    {r.employee.name}
-                  </span>
-                  <span
-                    className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium ${STANCE_BG[r.stance]}`}
-                  >
-                    {STANCE_LABELS[r.stance]}
-                  </span>
-                </div>
-                <p className="mt-1 text-[12px] text-[#71717a]">
-                  {r.summary}
-                </p>
-              </button>
-            ))}
+
+          <div>
+            <div className="mb-2.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              Teammate Twins in this theme ({themeEmployees.length})
+            </div>
+            <div className="space-y-2">
+              {themeEmployees.map((r) => (
+                <button
+                  key={r.employee.id}
+                  onClick={() => {
+                    onClose();
+                    setTimeout(() => onSelectEmployee(r), 100);
+                  }}
+                  className="w-full rounded-xl border border-[#e2eaf3] bg-white p-3.5 text-left shadow-[2px_2px_6px_#cfd8e5] transition-all hover:bg-slate-50"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[13.5px] font-bold text-slate-800">
+                      {r.employee.name}
+                    </span>
+                    <span
+                      className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10.5px] font-bold ${STANCE_BG[r.stance]}`}
+                    >
+                      {STANCE_LABELS[r.stance]}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-[12px] font-medium text-slate-500 line-clamp-1">
+                    {r.summary}
+                  </p>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -459,30 +455,8 @@ function ThemeDrawer({
   );
 }
 
-function SkeletonCards({ count }: { count: number }) {
-  return (
-    <div className="space-y-3">
-      {Array.from({ length: count }).map((_, i) => (
-        <div
-          key={i}
-          className="rounded-xl border border-[#1e1e22] bg-[#131316] p-4"
-        >
-          <div className="flex items-start gap-3">
-            <div className="skeleton h-9 w-9 rounded-full" />
-            <div className="flex-1 space-y-2">
-              <div className="skeleton h-4 w-1/3" />
-              <div className="skeleton h-3 w-full" />
-              <div className="skeleton h-3 w-2/3" />
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 // ============================================
-// Main InsightsView
+// Main Management Insights Component
 // ============================================
 
 interface InsightsViewProps {
@@ -490,7 +464,6 @@ interface InsightsViewProps {
 }
 
 export function InsightsView({ demoTrigger }: InsightsViewProps) {
-  // ---- State ----
   const [query, setQuery] = useState("");
   const [stage, setStage] = useState<StreamStage>("idle");
   const [plan, setPlan] = useState<QueryPlan | null>(null);
@@ -514,14 +487,12 @@ export function InsightsView({ demoTrigger }: InsightsViewProps) {
   const abortRef = useRef<AbortController | null>(null);
   const responsesEndRef = useRef<HTMLDivElement>(null);
 
-  // ---- Run query ----
   const runQuery = useCallback(
     async (q: string, f: InsightsFilters) => {
       if (abortRef.current) abortRef.current.abort();
       const controller = new AbortController();
       abortRef.current = controller;
 
-      // Store previous results for delta
       if (aggregation) {
         setPreviousAggregation(aggregation);
         const counts: Record<string, number> = {};
@@ -555,14 +526,13 @@ export function InsightsView({ demoTrigger }: InsightsViewProps) {
           }
         }
       } catch {
-        // aborted
+        // stream aborted
       }
       setIsRunning(false);
     },
     [aggregation]
   );
 
-  // ---- Submit handler ----
   const handleSubmit = useCallback(
     (e?: FormEvent) => {
       e?.preventDefault();
@@ -574,7 +544,6 @@ export function InsightsView({ demoTrigger }: InsightsViewProps) {
     [query, filters, isRunning, runQuery]
   );
 
-  // ---- Filter change → rerun ----
   const handleFilterChange = useCallback(
     (newFilters: InsightsFilters) => {
       setFilters(newFilters);
@@ -585,24 +554,20 @@ export function InsightsView({ demoTrigger }: InsightsViewProps) {
     [query, stage, runQuery]
   );
 
-  // ---- Demo trigger ----
   useEffect(() => {
     if (demoTrigger > 0) {
       const demoQuery =
-        "If we discontinue Meridian Analytics, what will employees think?";
+        "If we migrate the backend from AWS to on-prem OpenShift, what will the pod engineers say?";
       setQuery(demoQuery);
       setPreviousAggregation(null);
       setPreviousThemeCounts({});
       setFilters({ teams: [] });
-      // Short delay so UI updates before streaming starts
       setTimeout(() => {
         runQuery(demoQuery, { teams: [] });
       }, 100);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [demoTrigger]);
 
-  // Auto-scroll to latest responses
   useEffect(() => {
     responsesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [responses.length]);
@@ -610,27 +575,27 @@ export function InsightsView({ demoTrigger }: InsightsViewProps) {
   const showDelta = previousAggregation != null && aggregation != null;
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full bg-[#eaf0f6]">
       {/* ---- Left Panel ---- */}
-      <div className="flex w-[380px] flex-shrink-0 flex-col border-r border-[#1e1e22] bg-[#0e0e11]">
+      <div className="flex w-[390px] flex-shrink-0 flex-col border-r border-[#d8e2ed] bg-[#f1f5fa] shadow-[2px_0_8px_#cfd8e515]">
         {/* Header */}
-        <div className="border-b border-[#1e1e22] px-5 py-4">
-          <h2 className="text-[15px] font-semibold text-[#ededed]">
-            Management Insights
+        <div className="border-b border-[#d8e2ed] px-5 py-4">
+          <h2 className="text-[15px] font-bold text-slate-800">
+            Pod Alignment & Polling
           </h2>
-          <p className="mt-0.5 text-[12.5px] text-[#71717a]">
-            Ask a question to query employee digital twins
+          <p className="mt-0.5 text-[12px] font-medium text-slate-500">
+            Simulate decisions across all employee digital twins
           </p>
         </div>
 
         {/* Query input */}
-        <form onSubmit={handleSubmit} className="border-b border-[#1e1e22] p-4">
+        <form onSubmit={handleSubmit} className="border-b border-[#d8e2ed] p-4">
           <textarea
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="e.g. If we discontinue Product X, what will employees think?"
+            placeholder="e.g. If we deprecate legacy APIs or mandate 3-day office, what is team reaction?"
             rows={3}
-            className="mb-3 w-full resize-none rounded-lg border border-[#1e1e22] bg-[#131316] px-3 py-2.5 text-[13.5px] text-[#ededed] placeholder:text-[#52525b] focus:border-[#2a2a2e] focus:bg-[#19191d] focus:outline-none focus:ring-1 focus:ring-[#2a2a2e]"
+            className="mb-3 w-full resize-none rounded-xl border border-[#d8e2ed] bg-[#f1f5fa] px-3.5 py-2.5 text-[13px] font-medium text-slate-800 placeholder:text-slate-400 shadow-[inset_2px_2px_4px_#cfd8e5,inset_-2px_-2px_4px_#ffffff] focus:border-indigo-400 focus:outline-none"
             onKeyDown={(e) => {
               if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSubmit();
             }}
@@ -638,79 +603,71 @@ export function InsightsView({ demoTrigger }: InsightsViewProps) {
           <button
             type="submit"
             disabled={!query.trim() || isRunning}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#c4b5a0] px-4 py-2 text-[13px] font-medium text-[#0a0a0c] transition-colors hover:bg-[#d4c5b0] disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#4f46e5] px-4 py-2.5 text-[13px] font-bold text-white shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] transition-all hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {isRunning ? (
-              <Loader2 size={14} className="animate-spin" />
+              <Loader2 size={15} className="animate-spin" />
             ) : (
-              <Play size={14} />
+              <Play size={15} />
             )}
-            {isRunning ? "Analyzing…" : "Run Analysis"}
+            {isRunning ? "Synthesizing Mesh…" : "Poll Digital Twins"}
           </button>
         </form>
 
         {/* Stage indicator */}
         {stage !== "idle" && (
-          <div className="border-b border-[#1e1e22] px-4 py-3">
+          <div className="border-b border-[#d8e2ed] px-4 py-3">
             <StageIndicator stage={stage} />
           </div>
         )}
 
         {/* Filters */}
         {stage !== "idle" && (
-          <div className="border-b border-[#1e1e22] px-4 py-3">
-            <div className="mb-2 flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-[#52525b]">
-              <Filter size={11} />
-              Filters
+          <div className="border-b border-[#d8e2ed] px-4 py-3">
+            <div className="mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              <Filter size={12} />
+              Filter by Pod
             </div>
-
-            {/* Team filter */}
-            <div className="mb-3">
-              <label className="mb-1 block text-[12px] text-[#71717a]">
-                Teams
-              </label>
-              <div className="flex flex-wrap gap-1.5">
-                {getAvailableTeams().map((team) => {
-                  const active = filters.teams.includes(team);
-                  return (
-                    <button
-                      key={team}
-                      onClick={() => {
-                        const newTeams = active
-                          ? filters.teams.filter((t) => t !== team)
-                          : [...filters.teams, team];
-                        handleFilterChange({ ...filters, teams: newTeams });
-                      }}
-                      disabled={isRunning}
-                      className={`rounded-md px-2 py-1 text-[11.5px] font-medium transition-colors ${
-                        active
-                          ? "bg-[#c4b5a020] text-[#c4b5a0]"
-                          : "bg-[#1e1e22] text-[#71717a] hover:bg-[#222226]"
-                      }`}
-                    >
-                      {team}
-                    </button>
-                  );
-                })}
-              </div>
+            <div className="flex flex-wrap gap-1.5">
+              {getAvailableTeams().map((team) => {
+                const active = filters.teams.includes(team);
+                return (
+                  <button
+                    key={team}
+                    onClick={() => {
+                      const newTeams = active
+                        ? filters.teams.filter((t) => t !== team)
+                        : [...filters.teams, team];
+                      handleFilterChange({ ...filters, teams: newTeams });
+                    }}
+                    disabled={isRunning}
+                    className={`rounded-xl px-2.5 py-1 text-[11.5px] font-bold transition-all ${
+                      active
+                        ? "bg-[#4f46e5] text-white shadow-[2px_2px_5px_#4f46e540]"
+                        : "bg-[#f1f5fa] text-slate-600 border border-[#e2eaf3] shadow-[2px_2px_5px_#cfd8e5,-2px_-2px_5px_#ffffff]"
+                    }`}
+                  >
+                    {team}
+                  </button>
+                );
+              })}
             </div>
-
           </div>
         )}
 
         {/* Plan */}
         {plan && (
           <div className="flex-1 overflow-y-auto px-4 py-3">
-            <div className="mb-2 text-[11px] font-medium uppercase tracking-wider text-[#52525b]">
-              Query Plan
+            <div className="mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              Execution Plan
             </div>
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               {plan.steps.map((step, i) => (
                 <div
                   key={i}
-                  className="flex items-start gap-2 text-[12.5px] text-[#a1a1aa]"
+                  className="flex items-start gap-2 text-[12.5px] font-medium text-slate-600"
                 >
-                  <span className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-[#1e1e22] text-[10px] font-medium text-[#71717a]">
+                  <span className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-[10px] font-bold text-indigo-700">
                     {i + 1}
                   </span>
                   {step}
@@ -722,43 +679,41 @@ export function InsightsView({ demoTrigger }: InsightsViewProps) {
       </div>
 
       {/* ---- Right Panel ---- */}
-      <div className="flex-1 overflow-y-auto bg-[#0a0a0c] px-6 py-5">
+      <div className="flex-1 overflow-y-auto bg-[#eaf0f6] px-6 py-6">
         {stage === "idle" ? (
           <div className="flex h-full flex-col items-center justify-center text-center">
-            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1e1e22]">
-              <Search size={24} className="text-[#52525b]" />
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#f1f5fa] border border-[#e2eaf3] shadow-[6px_6px_14px_#cfd8e5,-6px_-6px_14px_#ffffff]">
+              <Search size={24} className="text-indigo-600" />
             </div>
-            <h3 className="mb-1 text-[15px] font-medium text-[#a1a1aa]">
-              Ask a management question
+            <h3 className="mb-1 text-[16px] font-bold text-slate-800">
+              Simulate organizational decisions
             </h3>
-            <p className="max-w-sm text-[13px] text-[#52525b]">
-              Edamame will query employee digital twins, aggregate sentiment,
-              and surface key themes with evidence.
+            <p className="max-w-sm text-[13px] font-medium text-slate-500">
+              TwinOps will query each domain twin, evaluate impacts against real codebases, and synthesize aggregate sentiment.
             </p>
           </div>
         ) : (
-          <div className="mx-auto max-w-3xl">
+          <div className="mx-auto max-w-3xl space-y-6">
             {/* Agent Network Visualization */}
             {(isRunning || stage !== "complete") && (
-              <div className="animate-fade-in mb-6">
+              <div className="animate-fade-in">
                 <AgentNetworkView trigger={networkTrigger} />
               </div>
             )}
 
             {/* Aggregation Summary */}
             {aggregation && (
-              <div className="animate-fade-in mb-6 rounded-xl border border-[#1e1e22] bg-[#131316] p-5">
+              <div className="animate-fade-in rounded-3xl border border-[#e2eaf3] bg-[#f1f5fa] p-6 shadow-[6px_6px_14px_#cfd8e5,-6px_-6px_14px_#ffffff]">
                 <div className="mb-4 flex items-center justify-between">
-                  <h3 className="text-[14px] font-semibold text-[#ededed]">
-                    Population Sentiment
+                  <h3 className="text-[15px] font-bold text-slate-800">
+                    Pod Population Sentiment
                   </h3>
-                  <div className="flex items-center gap-2 text-[12px] text-[#52525b]">
+                  <div className="flex items-center gap-2 text-[12px] font-semibold text-slate-500">
                     <Users size={13} />
-                    {aggregation.totalResponses} responses
-                    <span className="text-[#3f3f46]">·</span>
+                    {aggregation.totalResponses} Responses
+                    <span className="text-slate-300">·</span>
                     <span>
-                      {Math.round(aggregation.overallConfidence * 100)}%
-                      confidence
+                      {Math.round(aggregation.overallConfidence * 100)}% Confidence
                     </span>
                   </div>
                 </div>
@@ -769,47 +724,7 @@ export function InsightsView({ demoTrigger }: InsightsViewProps) {
                   animated={showDelta}
                 />
 
-                {/* Delta summary */}
-                {showDelta && (
-                  <div className="mt-4 flex items-start gap-2 rounded-lg border border-[#c4b5a030] bg-[#c4b5a010] px-3 py-2.5">
-                    <RotateCcw
-                      size={14}
-                      className="mt-0.5 flex-shrink-0 text-[#c4b5a0]"
-                    />
-                    <div>
-                      <p className="text-[12.5px] font-medium text-[#c4b5a0]">
-                        What changed
-                      </p>
-                      <p className="text-[12px] text-[#a1a1aa]">
-                        {(() => {
-                          const sd =
-                            aggregation.distribution.support -
-                            (previousAggregation?.distribution.support ?? 0);
-                          const od =
-                            aggregation.distribution.oppose -
-                            (previousAggregation?.distribution.oppose ?? 0);
-                          const parts: string[] = [];
-                          if (sd > 0)
-                            parts.push(`Support increased by ${sd}pp`);
-                          if (sd < 0)
-                            parts.push(
-                              `Support decreased by ${Math.abs(sd)}pp`
-                            );
-                          if (od < 0)
-                            parts.push(
-                              `Opposition decreased by ${Math.abs(od)}pp`
-                            );
-                          if (od > 0)
-                            parts.push(`Opposition increased by ${od}pp`);
-                          return parts.join(". ") + ".";
-                        })()}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Summary text */}
-                <p className="mt-3 text-[12.5px] leading-relaxed text-[#71717a]">
+                <p className="mt-4 text-[13px] font-medium leading-relaxed text-slate-700 bg-white p-4 rounded-2xl border border-[#e2eaf3] shadow-[inset_1px_1px_3px_#cfd8e5]">
                   {aggregation.summary}
                 </p>
               </div>
@@ -817,9 +732,9 @@ export function InsightsView({ demoTrigger }: InsightsViewProps) {
 
             {/* Themes */}
             {aggregation && aggregation.themes.length > 0 && (
-              <div className="animate-fade-in mb-6">
-                <h3 className="mb-3 text-[14px] font-semibold text-[#ededed]">
-                  Key Themes
+              <div className="animate-fade-in">
+                <h3 className="mb-3 text-[14.5px] font-bold text-slate-800">
+                  Key Organizational Themes
                 </h3>
                 <div className="grid grid-cols-2 gap-3">
                   {aggregation.themes.map((theme) => (
@@ -834,19 +749,13 @@ export function InsightsView({ demoTrigger }: InsightsViewProps) {
               </div>
             )}
 
-            {/* Loading skeleton while querying */}
-            {stage === "querying" && responses.length === 0 && (
-              <SkeletonCards count={3} />
-            )}
-
             {/* Employee Responses */}
             {responses.length > 0 && (
               <div>
-                <h3 className="mb-3 text-[14px] font-semibold text-[#ededed]">
-                  Individual Responses
-                  <span className="ml-2 text-[12px] font-normal text-[#52525b]">
-                    {responses.length}
-                    {stage === "querying" ? "…" : ""}
+                <h3 className="mb-3 text-[14.5px] font-bold text-slate-800">
+                  Individual Twin Assessments
+                  <span className="ml-2 text-[12px] font-normal text-slate-400">
+                    ({responses.length})
                   </span>
                 </h3>
                 <div className="space-y-3">
@@ -862,18 +771,11 @@ export function InsightsView({ demoTrigger }: InsightsViewProps) {
                 <div ref={responsesEndRef} />
               </div>
             )}
-
-            {/* Querying skeleton below existing responses */}
-            {stage === "querying" && responses.length > 0 && (
-              <div className="mt-3">
-                <SkeletonCards count={2} />
-              </div>
-            )}
           </div>
         )}
       </div>
 
-      {/* ---- Drawers ---- */}
+      {/* Drawers */}
       {selectedEmployee && (
         <DetailDrawer
           response={selectedEmployee}

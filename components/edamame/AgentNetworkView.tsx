@@ -38,22 +38,22 @@ interface Particle {
 // ============================================
 
 const EVENT_TYPE_STYLES: Record<string, { color: string; label: string }> = {
-  task: { color: "#60a5fa", label: "TASK" },
-  data: { color: "#34d399", label: "DATA" },
-  status: { color: "#fbbf24", label: "STATUS" },
-  query: { color: "#818cf8", label: "QUERY" },
-  response: { color: "#c4b5a0", label: "RESPONSE" },
-  approval: { color: "#f472b6", label: "COMPLETE" },
+  task: { color: "#2563eb", label: "TASK" },
+  data: { color: "#059669", label: "DATA" },
+  status: { color: "#d97706", label: "STATUS" },
+  query: { color: "#4f46e5", label: "QUERY" },
+  response: { color: "#7c3aed", label: "RESPONSE" },
+  approval: { color: "#db2777", label: "COMPLETE" },
 };
 
 const DEFAULT_AGENTS: AgentNode[] = [
-  { id: "orchestrator", name: "Orchestrator", role: "Coordinator", color: "#c4b5a0", x: 300, y: 50 },
-  { id: "research", name: "Research", role: "Data Gathering", color: "#60a5fa", x: 120, y: 160 },
-  { id: "aggregator", name: "Aggregator", role: "Synthesis", color: "#a78bfa", x: 480, y: 160 },
-  { id: "clone_1", name: "James L.", role: "ML Engineer", color: "#34d399", x: 60, y: 300 },
-  { id: "clone_2", name: "Ella L.", role: "Full-Stack", color: "#fbbf24", x: 210, y: 316 },
-  { id: "clone_3", name: "Angelina Q.", role: "Product & Frontend", color: "#f472b6", x: 360, y: 300 },
-  { id: "clone_4", name: "Videet M.", role: "Backend & Infra", color: "#38bdf8", x: 510, y: 316 },
+  { id: "orchestrator", name: "TwinOps Lead", role: "Pod Orchestrator", color: "#4f46e5", x: 300, y: 50 },
+  { id: "research", name: "Code Intelligence", role: "Repo & AST Mesh", color: "#2563eb", x: 120, y: 160 },
+  { id: "aggregator", name: "Consensus Engine", role: "Stance Synthesis", color: "#7c3aed", x: 480, y: 160 },
+  { id: "clone_1", name: "James L.", role: "ML Engineer", color: "#059669", x: 60, y: 300 },
+  { id: "clone_2", name: "Ella L.", role: "Full-Stack", color: "#d97706", x: 210, y: 316 },
+  { id: "clone_3", name: "Angelina Q.", role: "Product & Frontend", color: "#db2777", x: 360, y: 300 },
+  { id: "clone_4", name: "Videet M.", role: "Backend & Infra", color: "#0284c7", x: 510, y: 316 },
 ];
 
 const DEFAULT_EDGES: [string, string][] = [
@@ -67,23 +67,19 @@ const DEFAULT_EDGES: [string, string][] = [
 ];
 
 const SIMULATION_SEQUENCE: Omit<AgentMessage, "id" | "timestamp">[] = [
-  { fromId: "orchestrator", toId: "research", type: "task", content: "Gather team status on the Ambient Intelligence demo — what's blocking launch?" },
-  { fromId: "research", toId: "clone_1", type: "query", content: "James, what's the status on the ML pipeline for Ambient Intelligence?" },
-  { fromId: "clone_1", toId: "research", type: "response", content: "Model inference is ready but we need Videet's streaming endpoint to go live first" },
-  { fromId: "research", toId: "clone_2", type: "query", content: "Ella, how's the full-stack integration looking for the demo?" },
-  { fromId: "clone_2", toId: "research", type: "response", content: "Frontend is wired up — waiting on the real-time WebSocket feed from backend" },
-  { fromId: "research", toId: "clone_3", type: "query", content: "Angelina, is the product flow and UI ready for the demo?" },
-  { fromId: "clone_3", toId: "research", type: "response", content: "UI is polished, but we need to finalize the onboarding copy and loading states" },
-  { fromId: "research", toId: "clone_4", type: "query", content: "Videet, what's the infra status for the streaming endpoint?" },
-  { fromId: "clone_4", toId: "research", type: "response", content: "Deploying to Modal tonight — should be live by morning, then James can hook in" },
-  { fromId: "research", toId: "aggregator", type: "data", content: "Compiled 4 team responses — transferring for status synthesis" },
-  { fromId: "aggregator", toId: "orchestrator", type: "status", content: "Synthesizing: ML ready, frontend ready, infra deploying tonight, UI needs copy pass" },
-  { fromId: "aggregator", toId: "orchestrator", type: "approval", content: "Demo on track — critical path: Videet's deploy → James hooks ML → Ella integrates → Angelina finalizes UI" },
+  { fromId: "orchestrator", toId: "research", type: "task", content: "Gather pod consensus on architecture migration and check for blocking PRs" },
+  { fromId: "research", toId: "clone_1", type: "query", content: "James, what is ML pipeline compatibility with the new target deployment?" },
+  { fromId: "clone_1", toId: "research", type: "response", content: "Vector embeddings and retrieval latency remain optimal under the target spec" },
+  { fromId: "research", toId: "clone_2", type: "query", content: "Ella, are full-stack frontend routes ready for streaming endpoints?" },
+  { fromId: "clone_2", toId: "research", type: "response", content: "All UI components updated with Soft-UI Neumorphic design and zero mock blockers" },
+  { fromId: "research", toId: "clone_3", type: "query", content: "Angelina, is the pod handoff documentation finalized in knowledge base?" },
+  { fromId: "clone_3", toId: "research", type: "response", content: "Knowledge base indexed with 39 active commit chunks and groundings" },
+  { fromId: "research", toId: "clone_4", type: "query", content: "Videet, what is infrastructure health for live streaming?" },
+  { fromId: "clone_4", toId: "research", type: "response", content: "Local vector store and OpenAI streaming endpoints verified operational" },
+  { fromId: "research", toId: "aggregator", type: "data", content: "Aggregated all 4 domain twin responses for executive consensus synthesis" },
+  { fromId: "aggregator", toId: "orchestrator", type: "status", content: "Consensus: High confidence (92%), zero breaking dependencies detected" },
+  { fromId: "aggregator", toId: "orchestrator", type: "approval", content: "Enterprise rollout approved across pod" },
 ];
-
-// ============================================
-// Helpers
-// ============================================
 
 function getEdgePath(from: AgentNode, to: AgentNode, curvature = 0.15): string {
   const dx = to.x - from.x;
@@ -102,7 +98,7 @@ function getAnimationPath(from: AgentNode, to: AgentNode, curvature = 0.15): str
   const dx = to.x - from.x;
   const dy = to.y - from.y;
   const len = Math.sqrt(dx * dx + dy * dy);
-  if (len === 0) return "M 0,0 L 0,0";
+  if (len === 0) return `M 0,0 L 0,0`;
   const nx = -dy / len;
   const ny = dx / len;
   const offset = len * curvature;
@@ -111,146 +107,131 @@ function getAnimationPath(from: AgentNode, to: AgentNode, curvature = 0.15): str
   return `M 0,0 Q ${cx},${cy} ${dx},${dy}`;
 }
 
-function getEdgeKey(a: string, b: string): string {
-  return [a, b].sort().join("--");
+function getEdgeKey(fromId: string, toId: string): string {
+  return `${fromId}->${toId}`;
 }
 
 let _particleId = 0;
-let _eventId = 0;
+function nextParticleId(): string {
+  return `p_${++_particleId}_${Date.now()}`;
+}
 
 // ============================================
 // Component
 // ============================================
 
 interface AgentNetworkViewProps {
-  trigger?: number;
+  agents?: AgentNode[];
   compact?: boolean;
+  trigger?: number;
 }
 
 export function AgentNetworkView({
-  trigger = 0,
+  agents = DEFAULT_AGENTS,
   compact = false,
+  trigger = 0,
 }: AgentNetworkViewProps) {
-  const agents = DEFAULT_AGENTS;
-  const agentMap = useMemo(
-    () => new Map(agents.map((a) => [a.id, a])),
-    [agents]
-  );
-
+  const [isRunning, setIsRunning] = useState(false);
   const [events, setEvents] = useState<AgentMessage[]>([]);
-  const [particles, setParticles] = useState<Particle[]>([]);
   const [activeNodes, setActiveNodes] = useState<Set<string>>(new Set());
   const [activeEdges, setActiveEdges] = useState<Set<string>>(new Set());
-  const [isRunning, setIsRunning] = useState(false);
+  const [particles, setParticles] = useState<Particle[]>([]);
   const [progress, setProgress] = useState(0);
-  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  const timersRef = useRef<NodeJS.Timeout[]>([]);
   const feedRef = useRef<HTMLDivElement>(null);
 
-  // Clean up timers on unmount
-  useEffect(() => {
-    return () => timersRef.current.forEach((t) => clearTimeout(t));
+  const clearAllTimers = useCallback(() => {
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current = [];
   }, []);
 
-  // Auto-scroll feed to top (newest first)
   useEffect(() => {
-    if (feedRef.current) {
-      feedRef.current.scrollTop = 0;
-    }
-  }, [events.length]);
+    return () => clearAllTimers();
+  }, [clearAllTimers]);
 
-  // Fire a single agent event
-  const fireEvent = useCallback(
-    (msg: Omit<AgentMessage, "id" | "timestamp">) => {
-      const event: AgentMessage = {
-        ...msg,
-        id: `evt_${++_eventId}`,
-        timestamp: Date.now(),
-      };
+  const agentMap = useMemo(() => {
+    const map = new Map<string, AgentNode>();
+    agents.forEach((a) => map.set(a.id, a));
+    return map;
+  }, [agents]);
 
-      setEvents((prev) => [event, ...prev]);
-
-      // Activate nodes
-      setActiveNodes(
-        (prev) => new Set([...prev, msg.fromId, msg.toId])
-      );
-
-      // Activate edge
-      const edgeKey = getEdgeKey(msg.fromId, msg.toId);
-      setActiveEdges((prev) => new Set([...prev, edgeKey]));
-
-      // Add particle
-      const particle: Particle = {
-        id: `p_${++_particleId}`,
-        fromId: msg.fromId,
-        toId: msg.toId,
-        color: EVENT_TYPE_STYLES[msg.type]?.color || "#c4b5a0",
-        duration: 900,
-      };
-      setParticles((prev) => [...prev, particle]);
-
-      // Deactivate nodes/edges after delay
-      const t1 = setTimeout(() => {
-        setActiveNodes((prev) => {
-          const next = new Set(prev);
-          next.delete(msg.fromId);
-          next.delete(msg.toId);
-          return next;
-        });
-        setActiveEdges((prev) => {
-          const next = new Set(prev);
-          next.delete(edgeKey);
-          return next;
-        });
-      }, 1400);
-
-      // Remove particle after animation completes
-      const t2 = setTimeout(() => {
-        setParticles((prev) => prev.filter((p) => p.id !== particle.id));
-      }, particle.duration + 200);
-
-      timersRef.current.push(t1, t2);
-    },
-    []
-  );
-
-  // Run the simulation sequence
   const runSimulation = useCallback(() => {
-    if (isRunning) return;
-
-    // Reset state
+    clearAllTimers();
     setEvents([]);
-    setParticles([]);
     setActiveNodes(new Set());
     setActiveEdges(new Set());
+    setParticles([]);
     setIsRunning(true);
     setProgress(0);
-    timersRef.current.forEach((t) => clearTimeout(t));
-    timersRef.current = [];
 
-    const delays = [
-      0, 1400, 2800, 4000, 5400, 6800, 8200, 9600, 11000, 12400, 13800, 15200,
-    ];
+    const stepDelay = 900;
+    const particleDuration = 700;
+    const totalSteps = SIMULATION_SEQUENCE.length;
 
-    SIMULATION_SEQUENCE.forEach((msg, i) => {
-      const t = setTimeout(() => {
-        fireEvent(msg);
-        setProgress(((i + 1) / SIMULATION_SEQUENCE.length) * 100);
-        if (i === SIMULATION_SEQUENCE.length - 1) {
-          const done = setTimeout(() => setIsRunning(false), 1800);
-          timersRef.current.push(done);
-        }
-      }, delays[i] ?? i * 1400);
-      timersRef.current.push(t);
+    SIMULATION_SEQUENCE.forEach((msg, idx) => {
+      const startTime = idx * stepDelay;
+
+      const t1 = setTimeout(() => {
+        const fromNode = agentMap.get(msg.fromId);
+        const style = EVENT_TYPE_STYLES[msg.type] || EVENT_TYPE_STYLES.status;
+
+        setActiveNodes((prev) => new Set([...prev, msg.fromId]));
+        setActiveEdges((prev) => new Set([...prev, getEdgeKey(msg.fromId, msg.toId)]));
+
+        const pId = nextParticleId();
+        setParticles((prev) => [
+          ...prev,
+          {
+            id: pId,
+            fromId: msg.fromId,
+            toId: msg.toId,
+            color: style.color || fromNode?.color || "#4f46e5",
+            duration: particleDuration,
+          },
+        ]);
+
+        const fullMsg: AgentMessage = {
+          ...msg,
+          id: `msg_${idx}_${Date.now()}`,
+          timestamp: Date.now(),
+        };
+        setEvents((prev) => [...prev, fullMsg]);
+        setProgress(Math.round(((idx + 1) / totalSteps) * 100));
+
+        const tParticle = setTimeout(() => {
+          setParticles((prev) => prev.filter((p) => p.id !== pId));
+          setActiveNodes((prev) => new Set([...prev, msg.toId]));
+        }, particleDuration);
+        timersRef.current.push(tParticle);
+
+        const tFade = setTimeout(() => {
+          setActiveEdges((prev) => {
+            const next = new Set(prev);
+            next.delete(getEdgeKey(msg.fromId, msg.toId));
+            return next;
+          });
+        }, particleDuration + 400);
+        timersRef.current.push(tFade);
+      }, startTime);
+
+      timersRef.current.push(t1);
     });
-  }, [isRunning, fireEvent]);
 
-  // Trigger from parent
+    const totalDuration = totalSteps * stepDelay + 1000;
+    const tEnd = setTimeout(() => {
+      setIsRunning(false);
+      setActiveNodes(new Set());
+      setActiveEdges(new Set());
+    }, totalDuration);
+    timersRef.current.push(tEnd);
+  }, [clearAllTimers, agentMap]);
+
   useEffect(() => {
     if (trigger > 0) {
       runSimulation();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [trigger]);
+  }, [trigger, runSimulation]);
 
   const svgWidth = 620;
   const svgHeight = compact ? 300 : 380;
@@ -259,54 +240,50 @@ export function AgentNetworkView({
     <div
       className={`flex ${
         compact ? "flex-col" : "flex-row"
-      } gap-0 rounded-xl border border-[#1e1e22] bg-[#0c0c0f] overflow-hidden`}
-      style={{
-        fontFamily:
-          "var(--font-geist-mono, 'SF Mono', 'Fira Code', 'Cascadia Code', monospace)",
-      }}
+      } gap-0 rounded-3xl border border-[#e2eaf3] bg-[#f1f5fa] shadow-[6px_6px_14px_#cfd8e5,-6px_-6px_14px_#ffffff] overflow-hidden`}
     >
-      {/* ──── Topology Panel ──── */}
+      {/* Topology Panel */}
       <div
-        className={`relative ${compact ? "w-full" : "flex-1"} bg-[#0c0c0f]`}
+        className={`relative ${compact ? "w-full" : "flex-1"} bg-[#eaf0f6]`}
       >
         {/* Header bar */}
-        <div className="flex items-center justify-between border-b border-[#1e1e22] px-4 py-2.5">
+        <div className="flex items-center justify-between border-b border-[#d8e2ed] bg-[#f1f5fa] px-5 py-3">
           <div className="flex items-center gap-2">
             <Radio
-              size={13}
+              size={14}
               className={
                 isRunning
-                  ? "text-[#34d399] animate-pulse"
-                  : "text-[#3f3f46]"
+                  ? "text-emerald-600 animate-pulse"
+                  : "text-slate-400"
               }
             />
-            <span className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#52525b]">
-              Agent Topology
+            <span className="text-[12px] font-bold uppercase tracking-wider text-slate-700">
+              Twin Mesh Topology
             </span>
           </div>
           <div className="flex items-center gap-3">
             {isRunning && (
-              <span className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-[#34d399]">
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#34d399] animate-pulse" />
-                Live
+              <span className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                <span className="inline-block h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
+                Synchronizing
               </span>
             )}
             <button
               onClick={runSimulation}
               disabled={isRunning}
-              className="flex items-center gap-1.5 rounded-md bg-[#1e1e22] px-2.5 py-1 text-[11px] font-medium text-[#a1a1aa] transition-all hover:bg-[#2a2a2e] hover:text-[#ededed] disabled:opacity-30 disabled:cursor-not-allowed"
+              className="flex items-center gap-1.5 rounded-xl border border-[#e2eaf3] bg-[#f1f5fa] px-3 py-1.5 text-[11.5px] font-bold text-slate-700 shadow-[2px_2px_5px_#cfd8e5,-2px_-2px_5px_#ffffff] transition-all hover:text-indigo-600 hover:shadow-[inset_1px_1px_3px_#cfd8e5] disabled:opacity-40"
             >
-              <Play size={10} />
-              Run Workflow
+              <Play size={11} />
+              Simulate Mesh Flow
             </button>
           </div>
         </div>
 
         {/* Progress bar */}
         {isRunning && (
-          <div className="h-[2px] w-full bg-[#1e1e22]">
+          <div className="h-[3px] w-full bg-slate-200">
             <div
-              className="h-full bg-gradient-to-r from-[#34d399] to-[#60a5fa] transition-all duration-700 ease-out"
+              className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500 transition-all duration-700 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -318,7 +295,6 @@ export function AgentNetworkView({
           className="w-full"
           style={{ minHeight: compact ? 240 : 300 }}
         >
-          {/* Background dot grid */}
           <defs>
             <pattern
               id="agentDotGrid"
@@ -331,9 +307,9 @@ export function AgentNetworkView({
               <circle
                 cx="12"
                 cy="12"
-                r="0.6"
-                fill="#ffffff"
-                opacity="0.035"
+                r="1"
+                fill="#94a3b8"
+                opacity="0.3"
               />
             </pattern>
             <filter
@@ -343,7 +319,7 @@ export function AgentNetworkView({
               width="300%"
               height="300%"
             >
-              <feGaussianBlur in="SourceGraphic" stdDeviation="6" />
+              <feGaussianBlur in="SourceGraphic" stdDeviation="5" />
             </filter>
           </defs>
 
@@ -353,7 +329,7 @@ export function AgentNetworkView({
             fill="url(#agentDotGrid)"
           />
 
-          {/* ── Edges ── */}
+          {/* Edges */}
           {DEFAULT_EDGES.map(([fromId, toId]) => {
             const from = agentMap.get(fromId);
             const to = agentMap.get(toId);
@@ -364,24 +340,22 @@ export function AgentNetworkView({
 
             return (
               <g key={key}>
-                {/* Active glow layer */}
                 {active && (
                   <path
                     d={path}
                     fill="none"
                     stroke={from.color}
                     strokeWidth={4}
-                    opacity={0.12}
+                    opacity={0.3}
                     filter="url(#agentGlow)"
                   />
                 )}
-                {/* Edge line */}
                 <path
                   d={path}
                   fill="none"
-                  stroke={active ? "#3f3f46" : "#1e1e22"}
-                  strokeWidth={active ? 1.2 : 0.7}
-                  opacity={active ? 0.9 : 0.35}
+                  stroke={active ? "#4f46e5" : "#cbd5e1"}
+                  strokeWidth={active ? 2 : 1}
+                  opacity={active ? 1 : 0.6}
                   strokeDasharray={active ? "none" : "4 3"}
                   style={{ transition: "all 0.3s ease" }}
                 />
@@ -389,7 +363,7 @@ export function AgentNetworkView({
             );
           })}
 
-          {/* ── Particles ── */}
+          {/* Particles */}
           {particles.map((p) => {
             const from = agentMap.get(p.fromId);
             const to = agentMap.get(p.toId);
@@ -401,24 +375,14 @@ export function AgentNetworkView({
                 key={p.id}
                 transform={`translate(${from.x},${from.y})`}
               >
-                {/* Outer glow */}
-                <circle r={8} fill={p.color} opacity={0.12}>
+                <circle r={8} fill={p.color} opacity={0.25}>
                   <animateMotion
                     dur={`${p.duration}ms`}
                     path={animPath}
                     fill="freeze"
                   />
                 </circle>
-                {/* Mid glow */}
-                <circle r={5} fill={p.color} opacity={0.25}>
-                  <animateMotion
-                    dur={`${p.duration}ms`}
-                    path={animPath}
-                    fill="freeze"
-                  />
-                </circle>
-                {/* Core particle */}
-                <circle r={2.5} fill={p.color} opacity={0.95}>
+                <circle r={4} fill={p.color} opacity={0.9}>
                   <animateMotion
                     dur={`${p.duration}ms`}
                     path={animPath}
@@ -429,77 +393,37 @@ export function AgentNetworkView({
             );
           })}
 
-          {/* ── Nodes ── */}
+          {/* Nodes */}
           {agents.map((node) => {
             const active = activeNodes.has(node.id);
             return (
               <g key={node.id}>
-                {/* Ambient glow behind node */}
                 {active && (
                   <circle
                     cx={node.x}
                     cy={node.y}
-                    r={28}
+                    r={26}
                     fill={node.color}
-                    opacity={0.1}
+                    opacity={0.2}
                     filter="url(#agentGlow)"
                   />
                 )}
-                {/* Ring pulse when active */}
-                {active && (
-                  <circle
-                    cx={node.x}
-                    cy={node.y}
-                    r={22}
-                    fill="none"
-                    stroke={node.color}
-                    strokeWidth={1}
-                    opacity={0.3}
-                  >
-                    <animate
-                      attributeName="r"
-                      from="22"
-                      to="34"
-                      dur="0.8s"
-                      fill="freeze"
-                    />
-                    <animate
-                      attributeName="opacity"
-                      from="0.3"
-                      to="0"
-                      dur="0.8s"
-                      fill="freeze"
-                    />
-                  </circle>
-                )}
-                {/* Node circle */}
                 <circle
                   cx={node.x}
                   cy={node.y}
-                  r={20}
-                  fill="#0c0c0f"
-                  stroke={node.color}
-                  strokeWidth={active ? 2.2 : 1.2}
-                  opacity={active ? 1 : 0.55}
-                  style={{
-                    transition: "all 0.3s ease",
-                    filter: active
-                      ? `drop-shadow(0 0 8px ${node.color}50)`
-                      : "none",
-                  }}
+                  r={18}
+                  fill="#ffffff"
+                  stroke={active ? node.color : "#cbd5e1"}
+                  strokeWidth={active ? 2.5 : 1.5}
+                  style={{ transition: "all 0.3s ease" }}
                 />
-                {/* Initials */}
                 <text
                   x={node.x}
-                  y={node.y + 1}
+                  y={node.y + 4.5}
                   textAnchor="middle"
-                  dominantBaseline="middle"
                   fill={node.color}
                   fontSize="10"
-                  fontWeight="600"
-                  fontFamily="inherit"
-                  opacity={active ? 1 : 0.65}
-                  style={{ transition: "opacity 0.3s ease" }}
+                  fontWeight="bold"
                 >
                   {node.name
                     .split(" ")
@@ -508,27 +432,24 @@ export function AgentNetworkView({
                     .slice(0, 2)
                     .toUpperCase()}
                 </text>
-                {/* Name */}
                 <text
                   x={node.x}
-                  y={node.y + 34}
+                  y={node.y + 32}
                   textAnchor="middle"
-                  fill={active ? "#ededed" : "#71717a"}
-                  fontSize="9.5"
-                  fontFamily="inherit"
-                  style={{ transition: "fill 0.3s ease" }}
+                  fill="#1e293b"
+                  fontSize="11"
+                  fontWeight="bold"
                 >
                   {node.name}
                 </text>
-                {/* Role */}
                 <text
                   x={node.x}
-                  y={node.y + 46}
+                  y={node.y + 44}
                   textAnchor="middle"
-                  fill="#3f3f46"
-                  fontSize="7"
-                  fontFamily="inherit"
-                  letterSpacing="0.06em"
+                  fill="#64748b"
+                  fontSize="8.5"
+                  fontWeight="bold"
+                  letterSpacing="0.05em"
                 >
                   {node.role.toUpperCase()}
                 </text>
@@ -538,37 +459,35 @@ export function AgentNetworkView({
         </svg>
       </div>
 
-      {/* ──── Event Stream Panel ──── */}
+      {/* Event Stream Panel */}
       <div
         className={`${
           compact ? "w-full border-t" : "w-[300px] border-l"
-        } border-[#1e1e22] flex flex-col bg-[#0a0a0c]`}
+        } border-[#d8e2ed] flex flex-col bg-[#f1f5fa]`}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#1e1e22] px-4 py-2.5">
-          <span className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#52525b]">
+        <div className="flex items-center justify-between border-b border-[#d8e2ed] px-4 py-3 bg-white">
+          <span className="text-[11.5px] font-bold uppercase tracking-wider text-slate-700">
             Event Stream
           </span>
-          <span className="text-[10px] tabular-nums text-[#3f3f46]">
-            {events.length} events
+          <span className="text-[10px] font-bold text-slate-400">
+            {events.length} Events
           </span>
         </div>
 
-        {/* Feed */}
         <div
           ref={feedRef}
-          className="flex-1 overflow-y-auto"
+          className="flex-1 overflow-y-auto p-3 space-y-2"
           style={{ maxHeight: compact ? 200 : svgHeight + 30 }}
         >
           {events.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-14 text-center">
-              <Radio size={16} className="mb-2.5 text-[#2a2a2e]" />
-              <p className="text-[11px] text-[#3f3f46]">
-                Waiting for agent activity…
+              <Radio size={20} className="mb-2 text-slate-300" />
+              <p className="text-[12px] font-medium text-slate-400">
+                Waiting for pod activity…
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-[#1e1e22]/60">
+            <div className="space-y-2">
               {events.map((evt) => {
                 const from = agentMap.get(evt.fromId);
                 const to = agentMap.get(evt.toId);
@@ -579,12 +498,11 @@ export function AgentNetworkView({
                 return (
                   <div
                     key={evt.id}
-                    className="animate-fade-in-up px-4 py-3"
+                    className="animate-fade-in-up rounded-xl border border-[#e2eaf3] bg-white p-3 shadow-[2px_2px_5px_#cfd8e5]"
                   >
-                    {/* Type badge + timestamp */}
-                    <div className="mb-1.5 flex items-center justify-between">
+                    <div className="mb-1 flex items-center justify-between">
                       <span
-                        className="rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.1em]"
+                        className="rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider"
                         style={{
                           color: style.color,
                           backgroundColor: `${style.color}15`,
@@ -592,37 +510,24 @@ export function AgentNetworkView({
                       >
                         {style.label}
                       </span>
-                      <span className="text-[9px] tabular-nums text-[#3f3f46]">
-                        {new Date(evt.timestamp).toLocaleTimeString(
-                          [],
-                          {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            second: "2-digit",
-                          }
-                        )}
+                      <span className="text-[9px] font-medium text-slate-400">
+                        {new Date(evt.timestamp).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          second: "2-digit",
+                        })}
                       </span>
                     </div>
-                    {/* Route */}
-                    <div className="mb-1 flex items-center gap-1.5 text-[10px]">
-                      <span
-                        style={{
-                          color: from?.color || "#71717a",
-                        }}
-                      >
+                    <div className="mb-1 flex items-center gap-1.5 text-[11px] font-bold">
+                      <span style={{ color: from?.color || "#4f46e5" }}>
                         {from?.name || evt.fromId}
                       </span>
-                      <span className="text-[#3f3f46]">→</span>
-                      <span
-                        style={{
-                          color: to?.color || "#71717a",
-                        }}
-                      >
+                      <span className="text-slate-300">→</span>
+                      <span style={{ color: to?.color || "#4f46e5" }}>
                         {to?.name || evt.toId}
                       </span>
                     </div>
-                    {/* Content */}
-                    <p className="text-[11px] leading-relaxed text-[#71717a]">
+                    <p className="text-[11.5px] font-medium leading-relaxed text-slate-600">
                       {evt.content}
                     </p>
                   </div>

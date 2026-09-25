@@ -14,6 +14,8 @@ import {
   Zap,
   CheckCircle2,
   ShieldCheck,
+  UserPlus,
+  X,
 } from "lucide-react";
 
 interface SlackMessage {
@@ -43,26 +45,30 @@ export function getTeammateAvatarInfo(sender: string, botFor?: string): Teammate
       ring: "ring-indigo-400/40",
     };
   }
-  if (name.includes("maneesh")) {
-    return {
-      initials: "MN",
-      gradient: "from-violet-600 to-purple-700 text-white",
-      ring: "ring-violet-400/40",
-    };
-  }
-  if (name.includes("towfik")) {
-    return {
-      initials: "MT",
-      gradient: "from-sky-600 to-blue-700 text-white",
-      ring: "ring-sky-400/40",
-    };
-  }
+  const initials = (botFor || sender)
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
   return {
-    initials: "YOU",
-    gradient: "from-slate-600 to-slate-700 text-white",
+    initials: initials || "YOU",
+    gradient: "from-slate-700 to-slate-800 text-white",
     ring: "ring-slate-400/40",
   };
 }
+
+interface PodMember {
+  key: string;
+  name: string;
+  role: string;
+  code: string;
+}
+
+const DEFAULT_MEMBERS: PodMember[] = [
+  { key: "ali", name: "Sm Ali", role: "Lead AI Architect (You)", code: "SA" },
+];
 
 const SLACK_CHANNELS = [
   { id: "eng-architecture", name: "eng-architecture", desc: "System design, microservices & v3 platform" },
@@ -80,7 +86,11 @@ export function SlackSimulatorView() {
   const [platform, setPlatform] = useState<"teams" | "slack">("teams");
   const [activeChannel, setActiveChannel] = useState("hls-backend-delivery");
   
-  // Starting from scratch with clean empty channel state (no fake mock chat clutter)
+  const [members, setMembers] = useState<PodMember[]>(DEFAULT_MEMBERS);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newMemberName, setNewMemberName] = useState("");
+  const [newMemberRole, setNewMemberRole] = useState("");
+
   const [messages, setMessages] = useState<Record<string, SlackMessage[]>>({
     "hls-backend-delivery": [],
     "architecture-governance": [],
@@ -95,15 +105,11 @@ export function SlackSimulatorView() {
   const [isSyncingGithub, setIsSyncingGithub] = useState(false);
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
 
-  // Presence State (Active vs Away)
   const [presence, setPresence] = useState<Record<string, "active" | "away">>({
     ali: "away",
-    maneesh: "away",
-    towfik: "away",
   });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
   const channels = platform === "teams" ? TEAMS_CHANNELS : SLACK_CHANNELS;
 
   useEffect(() => {
@@ -131,6 +137,26 @@ export function SlackSimulatorView() {
       ...prev,
       [activeChannel]: [],
     }));
+  };
+
+  const handleAddMember = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMemberName.trim()) return;
+    const name = newMemberName.trim();
+    const role = newMemberRole.trim() || "Teammate";
+    const key = name.toLowerCase().replace(/\s+/g, "_");
+    const code = name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+
+    setMembers((prev) => [...prev, { key, name, role, code }]);
+    setPresence((prev) => ({ ...prev, [key]: "away" }));
+    setNewMemberName("");
+    setNewMemberRole("");
+    setShowAddModal(false);
+  };
+
+  const handleRemoveMember = (key: string) => {
+    if (key === "ali") return; // keep primary user
+    setMembers((prev) => prev.filter((m) => m.key !== key));
   };
 
   const handleSyncGithubLive = async () => {
@@ -165,9 +191,9 @@ export function SlackSimulatorView() {
 
     const userMsg: SlackMessage = {
       id: `user-${Date.now()}`,
-      sender: "You (Teammate)",
+      sender: "Rohan (Junior Dev / Colleague)",
       avatar: "YOU",
-      role: "Teammate",
+      role: "Pod Teammate",
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       content: text,
     };
@@ -184,17 +210,15 @@ export function SlackSimulatorView() {
     let targetName = "Sm Ali";
     let presenceKey = "ali";
 
-    if (text.toLowerCase().includes("maneesh")) {
-      cloneId = "e5c02685-c1e0-4660-84a1-77ea33a593e1";
-      targetName = "Maneesh Nand";
-      presenceKey = "maneesh";
-    } else if (text.toLowerCase().includes("towfik") || text.toLowerCase().includes("sarah")) {
-      cloneId = "a8f7c9e2-3b1d-4e5f-9a8c-1d2e3f4a5b6c";
-      targetName = "Md Towfik Omer";
-      presenceKey = "towfik";
+    for (const m of members) {
+      if (text.toLowerCase().includes(m.name.toLowerCase().split(" ")[0])) {
+        targetName = m.name;
+        presenceKey = m.key;
+        break;
+      }
     }
 
-    const targetInitials = targetName.includes("Maneesh") ? "MN" : targetName.includes("Towfik") ? "MT" : "SA";
+    const targetInitials = targetName.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
 
     // IF TEAMMATE IS ACTIVE (ONLINE): TwinOps stays quiet, human replies!
     if (presence[presenceKey] === "active") {
@@ -256,13 +280,13 @@ export function SlackSimulatorView() {
         id: `bot-${Date.now()}`,
         sender: `TwinOps (${targetName})`,
         avatar: targetInitials,
-        role: "AI Digital Twin",
+        role: `On behalf of ${targetName} (In Deep Focus / Away)`,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        content: botText || `Hey! ${targetName} is currently away in a sprint meeting, but per recent commit and architecture logs, here is the answer.`,
         isBot: true,
-        botFor: `${targetName} (In 4-Hour Client Meeting)`,
-        content: botText || `Hi! ${targetName} is currently in a client meeting. Here is the verified context: All deliverables and active branches are tracked in TwinOps memory.`,
+        botFor: targetName,
         citations: citations.length > 0 ? citations : [
-          { source: "Local Memory Store", snippet: "Verified from local real repository records & sprint sync" },
+          { source: "github:mohammadali-2000/ghostworker-ai", snippet: "Synced commit history and architecture specifications." },
         ],
       };
 
@@ -271,82 +295,75 @@ export function SlackSimulatorView() {
         [activeChannel]: [...(prev[activeChannel] || []), botMsg],
       }));
     } catch {
-      const fallbackMsg: SlackMessage = {
+      const fallbackBotMsg: SlackMessage = {
         id: `bot-${Date.now()}`,
         sender: `TwinOps (${targetName})`,
         avatar: targetInitials,
-        role: "AI Digital Twin",
+        role: `On behalf of ${targetName} (Away)`,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        content: `Hey! ${targetName} is currently in a meeting. Per latest commits on GitHub, the services are actively synced and ready for testing.`,
         isBot: true,
-        botFor: `${targetName} (Away / In Meeting)`,
-        content: `Hi! ${targetName} is currently in a client meeting. Based on our verified GitHub commit history and sprint plans, the implementation is proceeding on schedule with zero blockers.`,
+        botFor: targetName,
         citations: [
-          { source: "Local Store", snippet: "data/local_memories.json: Synced GitHub commits" },
+          { source: "github:mohammadali-2000", snippet: "Repository commit & PR diff groundings." },
         ],
       };
-
       setMessages((prev) => ({
         ...prev,
-        [activeChannel]: [...(prev[activeChannel] || []), fallbackMsg],
+        [activeChannel]: [...(prev[activeChannel] || []), fallbackBotMsg],
       }));
     } finally {
       setIsTyping(false);
     }
   };
 
-  const currentChannelMessages = messages[activeChannel] || [];
+  const channelMessages = messages[activeChannel] || [];
 
   return (
-    <div className="flex h-full w-full bg-[#eaf0f6] overflow-hidden select-none">
-      {/* Neumorphic Channels & Presence Sidebar */}
-      <div className="flex w-[290px] flex-col border-r border-[#d4deeb] bg-[#eaf0f6] p-4">
-        {/* Workspace Card */}
-        <div className="mb-4 rounded-2xl p-3 bg-[#f1f5fa] shadow-[5px_5px_12px_#cfd8e5,-5px_-5px_12px_#ffffff] border border-white/80">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white font-black text-xs shadow-md">
-                {platform === "teams" ? "🟣" : "💬"}
-              </div>
-              <div className="flex flex-col">
-                <span className="font-extrabold text-slate-800 text-[13px] leading-none">
-                  {platform === "teams" ? "Accenture Teams" : "Accenture Slack"}
-                </span>
-                <span className="text-[10px] text-slate-500 font-medium mt-0.5">
-                  {platform === "teams" ? "HLS Delivery Pod" : "Innovation Hub"}
-                </span>
-              </div>
+    <div className="flex h-full w-full bg-[#eaf0f6] text-slate-800 font-sans overflow-hidden">
+      {/* Left Sidebar (Soft-UI Neumorphic) */}
+      <div className="flex w-72 flex-col bg-[#eaf0f6] border-r border-[#d4deeb] p-4 flex-shrink-0 shadow-[2px_0_8px_rgba(207,216,229,0.5)]">
+        {/* Workspace Brand / Header */}
+        <div className="mb-5 flex items-center justify-between rounded-2xl bg-[#f1f5fa] p-3 shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] border border-white/80">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#4f46e5] to-[#4338ca] text-white font-extrabold text-sm shadow-[2px_2px_5px_#4f46e540]">
+              T
             </div>
-            <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
+            <div>
+              <h2 className="text-xs font-extrabold text-slate-900 tracking-tight flex items-center gap-1.5">
+                Accenture Teams
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              </h2>
+              <p className="text-[10px] text-slate-500 font-medium">HLS Delivery Pod</p>
+            </div>
           </div>
         </div>
 
-        {/* Platform Switcher (Neumorphic Pills) */}
-        <div className="mb-4 flex p-1.5 rounded-2xl bg-[#e3ebf4] shadow-[inset_3px_3px_6px_#cfd8e5,inset_-3px_-3px_6px_#ffffff]">
+        {/* Platform Toggle (Teams vs Slack) */}
+        <div className="mb-4 flex rounded-xl bg-[#e2eaf3] p-1 shadow-[inset_2px_2px_5px_#cfd8e5,inset_-2px_-2px_5px_#ffffff] border border-white/50">
           <button
-            type="button"
             onClick={() => handlePlatformChange("teams")}
-            className={`flex-1 py-1.5 px-2 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all ${
+            className={`flex-1 py-1.5 text-center text-[11px] font-bold rounded-lg transition-all ${
               platform === "teams"
-                ? "bg-[#5B5FC7] text-white shadow-[3px_3px_7px_#5b5fc755] scale-[1.02]"
+                ? "bg-[#5B5FC7] text-white shadow-[2px_2px_6px_#5B5FC755]"
                 : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            <span>🟣</span> MS Teams
+            🟣 Teams
           </button>
           <button
-            type="button"
             onClick={() => handlePlatformChange("slack")}
-            className={`flex-1 py-1.5 px-2 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all ${
+            className={`flex-1 py-1.5 text-center text-[11px] font-bold rounded-lg transition-all ${
               platform === "slack"
-                ? "bg-[#0ea5e9] text-white shadow-[3px_3px_7px_#0ea5e955] scale-[1.02]"
+                ? "bg-[#4A154B] text-white shadow-[2px_2px_6px_#4A154B55]"
                 : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            <span>💬</span> Slack
+            💬 Slack
           </button>
         </div>
 
-        {/* Ambient Bot Status */}
+        {/* Ambient Mode Status Card */}
         <div className="mb-4 rounded-2xl bg-[#f1f5fa] p-3 shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] border border-white/70">
           <div className="flex items-center gap-2 text-xs font-bold text-emerald-600">
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
@@ -386,17 +403,17 @@ export function SlackSimulatorView() {
               <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
                 Pod Presence
               </p>
-              <span className="text-[9px] text-indigo-600 font-bold bg-indigo-50 px-1.5 py-0.5 rounded-full border border-indigo-200">
-                Live Toggle
-              </span>
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="flex items-center gap-1 text-[10px] text-indigo-600 font-bold hover:underline"
+              >
+                <UserPlus size={11} />
+                Add
+              </button>
             </div>
 
             <div className="space-y-2">
-              {[
-                { key: "ali", name: "Sm Ali", role: "Lead AI Architect", code: "SA" },
-                { key: "maneesh", name: "Maneesh Nand", role: "Backend & Infra", code: "MN" },
-                { key: "towfik", name: "Md Towfik Omer", role: "Frontend Lead", code: "MT" },
-              ].map((p) => {
+              {members.map((p) => {
                 const isAway = presence[p.key] === "away";
                 return (
                   <div
@@ -413,15 +430,28 @@ export function SlackSimulatorView() {
                         <span className="text-[9px] text-slate-400 truncate">{p.role}</span>
                       </div>
                     </div>
-                    <span
-                      className={`text-[9px] px-2 py-0.5 rounded-full font-bold transition-all ${
-                        isAway
-                          ? "bg-rose-100 text-rose-700 border border-rose-200 shadow-sm"
-                          : "bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-sm"
-                      }`}
-                    >
-                      {isAway ? "🔴 Away" : "🟢 Online"}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className={`text-[9px] px-2 py-0.5 rounded-full font-bold transition-all ${
+                          isAway
+                            ? "bg-rose-100 text-rose-700 border border-rose-200 shadow-sm"
+                            : "bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-sm"
+                        }`}
+                      >
+                        {isAway ? "🔴 Away" : "🟢 Online"}
+                      </span>
+                      {p.key !== "ali" && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveMember(p.key);
+                          }}
+                          className="text-slate-300 hover:text-rose-500 p-0.5"
+                        >
+                          &times;
+                        </button>
+                      )}
+                    </div>
                   </div>
                 );
               })}
@@ -448,135 +478,119 @@ export function SlackSimulatorView() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5">
-            {/* Quick Live GitHub Sync Button */}
+          <div className="flex items-center gap-2">
             <button
               onClick={handleSyncGithubLive}
               disabled={isSyncingGithub}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#f1f5fa] shadow-[3px_3px_7px_#cfd8e5,-3px_-3px_7px_#ffffff] text-indigo-700 text-[11px] font-bold border border-white/80 hover:bg-indigo-50 active:scale-[0.98] transition-all"
+              className="flex items-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-[11px] font-bold text-indigo-700 shadow-[2px_2px_5px_#cfd8e5] transition-all hover:bg-indigo-100 disabled:opacity-50"
             >
-              <RefreshCw size={13} className={isSyncingGithub ? "animate-spin text-indigo-600" : "text-indigo-600"} />
-              {isSyncingGithub ? "Syncing GitHub..." : "Sync Real GitHub Data"}
+              <RefreshCw size={12} className={isSyncingGithub ? "animate-spin" : ""} />
+              {isSyncingGithub ? "Syncing GitHub..." : "Sync GitHub Data"}
             </button>
-
-            {/* Clear Chat Button */}
-            {currentChannelMessages.length > 0 && (
-              <button
-                onClick={handleClearMessages}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#f1f5fa] shadow-[3px_3px_7px_#cfd8e5,-3px_-3px_7px_#ffffff] text-slate-500 text-[11px] font-semibold border border-white/80 hover:text-rose-600 transition-all"
-              >
-                <Trash2 size={13} />
-                Clear
-              </button>
-            )}
-
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#5B5FC7]/10 text-[#5B5FC7] border border-[#5B5FC7]/20 text-[11px] font-bold">
-              <ShieldCheck size={14} />
-              Enterprise RAG Guarded
-            </div>
+            <button
+              onClick={handleClearMessages}
+              title="Clear channel messages"
+              className="flex items-center gap-1 rounded-xl bg-[#f1f5fa] px-3 py-1.5 text-[11px] font-bold text-slate-600 shadow-[2px_2px_5px_#cfd8e5,-2px_-2px_5px_#ffffff] transition-all hover:text-rose-600 hover:shadow-[inset_1px_1px_3px_#cfd8e5]"
+            >
+              <Trash2 size={13} />
+              Clear
+            </button>
           </div>
         </div>
 
-        {/* Sync Status Banner */}
         {syncStatus && (
-          <div className="mx-6 mt-3 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11.5px] font-bold flex items-center gap-2 animate-fade-in shadow-sm">
-            <CheckCircle2 size={15} className="text-emerald-600" />
+          <div className="bg-indigo-600 text-white text-xs font-semibold px-4 py-1.5 text-center flex items-center justify-center gap-2 animate-fade-in">
+            <Zap size={12} />
             {syncStatus}
           </div>
         )}
 
-        {/* Messages Feed */}
-        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
-          {currentChannelMessages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center px-4 py-12">
-              <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#f1f5fa] shadow-[6px_6px_14px_#cfd8e5,-6px_-6px_14px_#ffffff] text-indigo-600 border border-white mb-4">
-                <Sparkles size={28} />
+        {/* Message Thread Area */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          {channelMessages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full py-16 text-center max-w-md mx-auto">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f1f5fa] shadow-[6px_6px_14px_#cfd8e5,-6px_-6px_14px_#ffffff] border border-white/80 mb-3 text-indigo-600">
+                <Hash size={24} />
               </div>
-              <h3 className="text-[15px] font-extrabold text-slate-800 mb-1">
+              <h3 className="font-extrabold text-slate-800 text-[16px] mb-1">
                 #{activeChannel} is Clean & Ready
               </h3>
-              <p className="text-[12px] text-slate-500 max-w-[420px] leading-relaxed mb-6">
-                Start from scratch! Ask any technical question or test how your digital twin answers on behalf of absent teammates.
+              <p className="text-[12.5px] font-medium text-slate-500 leading-relaxed mb-6">
+                Type a question below tagging <strong className="text-indigo-600 font-bold">@Sm Ali</strong>. Your AI Twin will automatically ground its answer in your real GitHub commits!
               </p>
-
-              {/* Sample Starters */}
-              <div className="flex flex-col gap-2 w-full max-w-[460px]">
-                <p className="text-[10.5px] font-extrabold uppercase tracking-widest text-slate-400">
-                  Try asking your Twin:
-                </p>
-                <button
-                  onClick={() => setInputValue("@Sm Ali what did you recently commit in TwinOps and what features were added?")}
-                  className="p-3 rounded-2xl bg-[#f1f5fa] shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] border border-white/80 text-left text-[12px] font-semibold text-slate-700 hover:text-indigo-600 hover:scale-[1.01] transition-all"
-                >
-                  💬 "@Sm Ali what did you recently commit in TwinOps and what features were added?"
-                </button>
-                <button
-                  onClick={() => setInputValue("@Maneesh Nand what is our Redis session token caching architecture?")}
-                  className="p-3 rounded-2xl bg-[#f1f5fa] shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] border border-white/80 text-left text-[12px] font-semibold text-slate-700 hover:text-indigo-600 hover:scale-[1.01] transition-all"
-                >
-                  💬 "@Maneesh Nand what is our Redis session token caching architecture?"
-                </button>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {[
+                  "Hey @Sm Ali, what did you commit to the repo recently?",
+                  "Hey @Sm Ali, what are the biggest architectural risks?",
+                  "Hey @Sm Ali, are Redis connections pooled in our backend?",
+                ].map((prompt, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setInputValue(prompt)}
+                    className="text-[11.5px] font-bold text-slate-700 bg-[#f1f5fa] hover:bg-white border border-[#d4deeb] rounded-xl px-3 py-2 shadow-[3px_3px_8px_#cfd8e5,-3px_-3px_8px_#ffffff] transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    💬 {prompt}
+                  </button>
+                ))}
               </div>
             </div>
           ) : (
-            currentChannelMessages.map((msg) => {
-              const isUser = !msg.isBot && msg.avatar === "YOU";
+            channelMessages.map((msg) => {
               const avatarInfo = getTeammateAvatarInfo(msg.sender, msg.botFor);
-
               return (
                 <div
                   key={msg.id}
-                  className={`flex gap-3.5 p-4 rounded-2xl transition-all ${
+                  className={`flex items-start gap-3 rounded-2xl p-4 transition-all ${
                     msg.isBot
-                      ? "bg-[#f1f5fa] shadow-[5px_5px_12px_#cfd8e5,-5px_-5px_12px_#ffffff] border border-white/90"
-                      : "bg-[#e5edf6] shadow-[inset_2px_2px_5px_#cfd8e5,inset_-2px_-2px_5px_#ffffff] border border-white/60"
+                      ? "bg-gradient-to-r from-[#f5f8fc] to-[#eef3f9] border border-indigo-200 shadow-[4px_4px_12px_#cfd8e5,-4px_-4px_12px_#ffffff]"
+                      : "bg-[#f1f5fa] border border-white shadow-[3px_3px_8px_#cfd8e5,-3px_-3px_8px_#ffffff]"
                   }`}
                 >
                   <div
-                    className={`relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${avatarInfo.gradient} text-xs font-black shadow-md`}
+                    className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${avatarInfo.gradient} font-bold text-xs shadow-md`}
                   >
                     {avatarInfo.initials}
-                    {msg.isBot && (
-                      <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#5B5FC7] ring-2 ring-white text-white">
-                        <Bot size={9} />
-                      </span>
-                    )}
                   </div>
-
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className="font-bold text-slate-800 text-[12.5px]">{msg.sender}</span>
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className="font-extrabold text-[13px] text-slate-900">
+                        {msg.sender}
+                      </span>
                       {msg.isBot && (
-                        <span className="rounded-full bg-[#5B5FC7] px-2 py-0.5 text-[8.5px] font-extrabold text-white uppercase tracking-wider">
-                          TWIN BOT
+                        <span className="flex items-center gap-1 rounded-full bg-indigo-100 text-indigo-700 border border-indigo-200 px-2 py-0.5 text-[10px] font-extrabold shadow-xs">
+                          <Bot size={11} />
+                          TwinOps AI
                         </span>
                       )}
-                      {msg.botFor && (
-                        <span className="text-[10px] text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
-                          • On behalf of {msg.botFor}
-                        </span>
-                      )}
-                      <span className="text-[10px] text-slate-400 ml-auto">{msg.timestamp}</span>
+                      <span className="text-[10.5px] font-semibold text-slate-400">
+                        {msg.role}
+                      </span>
+                      <span className="text-[10px] text-slate-400 ml-auto font-medium">
+                        {msg.timestamp}
+                      </span>
                     </div>
 
-                    <p className="text-[13px] text-slate-700 whitespace-pre-wrap leading-relaxed">
+                    <div className="text-[13px] text-slate-700 leading-relaxed font-medium whitespace-pre-wrap">
                       {msg.content}
-                    </p>
+                    </div>
 
-                    {/* Citations Box */}
                     {msg.citations && msg.citations.length > 0 && (
-                      <div className="mt-3 pt-2.5 border-t border-slate-200/70 flex flex-wrap items-center gap-2">
-                        <span className="text-[9.5px] font-extrabold uppercase tracking-widest text-slate-400">
-                          Grounded Citations:
+                      <div className="mt-3 pt-2.5 border-t border-indigo-100 space-y-1.5">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 flex items-center gap-1">
+                          <ShieldCheck size={12} />
+                          Grounding Citations
                         </span>
-                        {msg.citations.map((cit, idx) => (
+                        {msg.citations.map((c, i) => (
                           <div
-                            key={idx}
-                            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white shadow-[2px_2px_5px_#cfd8e5] border border-slate-200 text-[10.5px] font-bold text-indigo-700"
+                            key={i}
+                            className="flex items-start gap-2 rounded-xl bg-white border border-indigo-100 p-2 text-[11px] shadow-xs"
                           >
-                            <span className="text-slate-400">{cit.source}:</span>
-                            <span className="truncate max-w-[240px]">{cit.snippet}</span>
-                            {cit.url && <ExternalLink size={10} className="text-slate-400 ml-0.5" />}
+                            <span className="font-bold text-indigo-700 flex-shrink-0">
+                              [{c.source}]:
+                            </span>
+                            <span className="text-slate-600 font-medium italic">
+                              &ldquo;{c.snippet}&rdquo;
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -587,66 +601,95 @@ export function SlackSimulatorView() {
             })
           )}
 
-          {/* Typing Indicator */}
           {isTyping && (
-            <div className="flex items-center gap-2 text-xs text-indigo-600 font-semibold italic pl-2 animate-fade-in">
-              <Sparkles size={14} className="animate-spin text-indigo-600" />
-              TwinOps is consulting episodic vector memory & drafting verified response…
+            <div className="flex items-center gap-3 rounded-2xl bg-white/70 p-3 shadow-[2px_2px_6px_#cfd8e5] border border-indigo-100 w-fit animate-pulse">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-100 text-indigo-700 font-bold text-xs">
+                <Bot size={14} className="animate-spin" />
+              </div>
+              <span className="text-xs font-bold text-indigo-700">
+                TwinOps AI is searching real commit memories & typing reply...
+              </span>
             </div>
           )}
+
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Neumorphic Input Console */}
-        <div className="p-5 border-t border-[#d4deeb] bg-[#eaf0f6]">
-          {/* Quick Prompt Chips */}
-          <div className="mb-3 flex items-center gap-2 flex-wrap">
-            <span className="text-[10.5px] text-slate-500 font-bold">Quick Prompts:</span>
-            <button
-              type="button"
-              onClick={() => setInputValue("@Sm Ali what did you commit recently in GitHub?")}
-              className="text-[10.5px] font-bold bg-[#f1f5fa] shadow-[2px_2px_5px_#cfd8e5,-2px_-2px_5px_#ffffff] text-indigo-600 border border-white px-2.5 py-1 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all"
-            >
-              Ask @Ali (GitHub Commits)
-            </button>
-            <button
-              type="button"
-              onClick={() => setInputValue("@Maneesh Nand are patient session tokens cached in Redis for HLS-402?")}
-              className="text-[10.5px] font-bold bg-[#f1f5fa] shadow-[2px_2px_5px_#cfd8e5,-2px_-2px_5px_#ffffff] text-violet-600 border border-white px-2.5 py-1 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all"
-            >
-              Ask @Maneesh (Redis Architecture)
-            </button>
-            <button
-              type="button"
-              onClick={() => setInputValue("@Md Towfik Omer what is our frontend design system status?")}
-              className="text-[10.5px] font-bold bg-[#f1f5fa] shadow-[2px_2px_5px_#cfd8e5,-2px_-2px_5px_#ffffff] text-sky-600 border border-white px-2.5 py-1 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all"
-            >
-              Ask @Towfik (Frontend)
-            </button>
-          </div>
-
-          {/* Form */}
-          <form
-            onSubmit={handleSendMessage}
-            className="flex items-center gap-2 rounded-2xl bg-[#e3ebf4] p-2 shadow-[inset_3px_3px_6px_#cfd8e5,inset_-3px_-3px_6px_#ffffff] border border-white/70"
-          >
+        {/* Input Bar */}
+        <div className="border-t border-[#d4deeb] bg-[#f1f5fa] p-4 shadow-[0_-2px_8px_rgba(207,216,229,0.3)]">
+          <form onSubmit={handleSendMessage} className="flex items-center gap-3 max-w-4xl mx-auto">
             <input
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder={`Message #${activeChannel} (${platform === "teams" ? "Teams Pod" : "Slack"})...`}
-              className="flex-1 bg-transparent px-3 py-2 text-[13px] text-slate-800 placeholder-slate-400 focus:outline-none font-medium"
+              placeholder={`Message #${activeChannel} (e.g. "Hey @Sm Ali, what did you commit to the repo?")`}
+              className="flex-1 rounded-2xl border border-[#d4deeb] bg-[#f1f5fa] px-4 py-3 text-[13px] font-medium text-slate-800 placeholder:text-slate-400 shadow-[inset_2px_2px_5px_#cfd8e5,inset_-2px_-2px_5px_#ffffff] focus:border-indigo-400 focus:outline-none"
             />
             <button
               type="submit"
               disabled={!inputValue.trim() || isTyping}
-              className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-[3px_3px_7px_#cfd8e5] hover:opacity-90 active:scale-[0.95] disabled:opacity-40 disabled:cursor-not-allowed transition-all flex-shrink-0"
+              className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#4f46e5] text-white shadow-[3px_3px_8px_#cfd8e5,-3px_-3px_8px_#ffffff] transition-all hover:bg-indigo-700 disabled:opacity-40"
             >
-              <Send size={15} />
+              <Send size={16} />
             </button>
           </form>
         </div>
       </div>
+
+      {/* Add Teammate Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4">
+          <div className="w-full max-w-md rounded-3xl bg-[#f1f5fa] p-6 shadow-2xl border border-white">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-bold text-slate-800">Add Real Pod Teammate</h3>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="text-slate-400 hover:text-slate-700"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <form onSubmit={handleAddMember} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-600 mb-1">Teammate Full Name</label>
+                <input
+                  type="text"
+                  required
+                  value={newMemberName}
+                  onChange={(e) => setNewMemberName(e.target.value)}
+                  placeholder="e.g. Rahul Sharma"
+                  className="w-full rounded-xl border border-[#d4deeb] bg-[#f1f5fa] px-3.5 py-2.5 text-[13px] font-medium shadow-[inset_2px_2px_4px_#cfd8e5,inset_-2px_-2px_4px_#ffffff] outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-600 mb-1">Role / Specialization</label>
+                <input
+                  type="text"
+                  value={newMemberRole}
+                  onChange={(e) => setNewMemberRole(e.target.value)}
+                  placeholder="e.g. Senior Java / DevOps Lead"
+                  className="w-full rounded-xl border border-[#d4deeb] bg-[#f1f5fa] px-3.5 py-2.5 text-[13px] font-medium shadow-[inset_2px_2px_4px_#cfd8e5,inset_-2px_-2px_4px_#ffffff] outline-none"
+                />
+              </div>
+              <div className="flex gap-2 justify-end pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-xl"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 text-xs font-bold text-white bg-[#4f46e5] rounded-xl shadow-md hover:bg-indigo-700"
+                >
+                  Save Teammate
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

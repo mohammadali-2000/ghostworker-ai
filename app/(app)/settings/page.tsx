@@ -16,11 +16,13 @@ import {
   Github,
   MessageSquare,
   FileText,
+  Send,
+  Users,
 } from "lucide-react";
 
-type Provider = "slack" | "github" | "notion" | "google_drive" | "jira" | "email";
+type Provider = "teams" | "github" | "jira" | "slack" | "notion" | "google_drive" | "email";
 
-const SYNCABLE_PROVIDERS: Provider[] = ["slack", "github", "notion", "google_drive", "jira"];
+const SYNCABLE_PROVIDERS: Provider[] = ["github", "notion", "google_drive", "jira", "slack"];
 
 const syncRoutes: Partial<Record<Provider, string>> = {
   slack: "/api/slack/sync",
@@ -54,15 +56,25 @@ const providerMeta: Record<
   Provider,
   { label: string; description: string; icon: React.ReactNode }
 > = {
-  slack: {
-    label: "Teams & Slack",
-    description: "Sync delivery channels and messages into organizational memory.",
-    icon: <MessageSquare size={18} className="text-indigo-600" />,
+  teams: {
+    label: "Microsoft Teams (Personal & Work)",
+    description: "Connect your personal Microsoft account (Outlook / Gmail) or Workflows webhook for ambient twin answering.",
+    icon: <Users size={18} className="text-[#505ac9]" />,
   },
   github: {
-    label: "GitHub Enterprise",
-    description: "Sync repositories, commits, PRs, and commit diffs.",
+    label: "GitHub Repositories",
+    description: "Sync repositories, commits, PRs, and commit diffs for live code grounding.",
     icon: <Github size={18} className="text-slate-800" />,
+  },
+  jira: {
+    label: "Jira Sprint Board",
+    description: "Sync agile sprints, epics, bug tracking, and release boards.",
+    icon: <ExternalLink size={18} className="text-blue-600" />,
+  },
+  slack: {
+    label: "Slack Workspace",
+    description: "Sync delivery channels and messages into organizational memory.",
+    icon: <MessageSquare size={18} className="text-emerald-600" />,
   },
   notion: {
     label: "Notion & Confluence",
@@ -74,11 +86,6 @@ const providerMeta: Record<
     description: "Sync cloud architecture specs and shared presentations.",
     icon: null,
   },
-  jira: {
-    label: "Jira Enterprise",
-    description: "Sync agile sprints, epics, bug tracking, and release boards.",
-    icon: <ExternalLink size={18} className="text-blue-600" />,
-  },
   email: {
     label: "Corporate Mail (IMAP / Exchange)",
     description: "Sync relevant architecture threads into private twin context.",
@@ -87,29 +94,34 @@ const providerMeta: Record<
 };
 
 const providerFields: Record<Provider, ProviderField[]> = {
-  slack: [
-    { key: "bot_token", label: "Bot / Webhook Token", type: "password", placeholder: "xoxb-... or webhook URL" },
+  teams: [
+    { key: "email", label: "Personal Microsoft Email", placeholder: "syedmohammadali@example.com (or personal Outlook/Gmail)" },
+    { key: "channel", label: "Teams Channel / Chat Name", placeholder: "general or personal-delivery" },
+    { key: "webhook_url", label: "Teams Workflows Webhook URL (Power Automate)", type: "password", placeholder: "https://prod-XX.westus.logic.azure.com/workflows/..." },
   ],
   github: [
     { key: "username", label: "GitHub Username", placeholder: "mohammadali-2000" },
     { key: "token", label: "Personal Access Token", type: "password", placeholder: "ghp_..." },
   ],
+  jira: [
+    { key: "base_url", label: "Base URL", placeholder: "https://your-domain.atlassian.net" },
+    { key: "email", label: "Account Email", placeholder: "you@example.com" },
+    { key: "api_token", label: "API Token", type: "password" },
+  ],
+  slack: [
+    { key: "bot_token", label: "Bot / Webhook Token", type: "password", placeholder: "xoxb-... or webhook URL" },
+  ],
   notion: [
     { key: "api_key", label: "API Key", type: "password", placeholder: "ntn_..." },
   ],
   google_drive: [],
-  jira: [
-    { key: "base_url", label: "Base URL", placeholder: "https://accenture.atlassian.net" },
-    { key: "email", label: "Corporate Email", placeholder: "ali@accenture.com" },
-    { key: "api_token", label: "API Token", type: "password" },
-  ],
   email: [
-    { key: "address", label: "Email Address", placeholder: "ali@company.com" },
+    { key: "address", label: "Email Address", placeholder: "you@example.com" },
     { key: "app_password", label: "App Password", type: "password" },
   ],
 };
 
-const NON_GOOGLE_PROVIDERS: Provider[] = ["slack", "github", "notion", "jira", "email"];
+const NON_GOOGLE_PROVIDERS: Provider[] = ["teams", "github", "jira", "slack", "notion", "email"];
 
 function formatSyncResult(result: Record<string, unknown>): string {
   const parts: string[] = [];
@@ -137,13 +149,14 @@ function GoogleLogo({ size = 18 }: { size?: number }) {
 function SettingsContent() {
   const searchParams = useSearchParams();
   const [formState, setFormState] = useState<Record<Provider, Record<string, string>>>({
-    slack: {}, github: {}, notion: {}, google_drive: {}, jira: {}, email: {},
+    teams: {}, github: {}, jira: {}, slack: {}, notion: {}, google_drive: {}, email: {},
   });
   const [statuses, setStatuses] = useState<Record<Provider, IntegrationStatus | null>>({
-    slack: null, github: null, notion: null, google_drive: null, jira: null, email: null,
+    teams: null, github: null, jira: null, slack: null, notion: null, google_drive: null, email: null,
   });
   const [savingProvider, setSavingProvider] = useState<Provider | null>(null);
   const [syncingProvider, setSyncingProvider] = useState<Provider | null>(null);
+  const [testingTeams, setTestingTeams] = useState(false);
   const [syncFeedback, setSyncFeedback] = useState<Record<string, SyncFeedback>>({});
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" | "info" } | null>(null);
 
@@ -157,20 +170,33 @@ function SettingsContent() {
     return typeof s?.config_preview?.email === "string" ? s.config_preview.email : null;
   }, [statuses.google_drive]);
 
-  const googleStatus = statuses.google_drive;
-
   const fetchStatuses = useCallback(async () => {
     try {
       const res = await fetch("/api/integrations");
       if (res.ok) {
         const data = await res.json();
         const map: Record<Provider, IntegrationStatus | null> = {
-          slack: null, github: null, notion: null, google_drive: null, jira: null, email: null,
+          teams: null, github: null, jira: null, slack: null, notion: null, google_drive: null, email: null,
+        };
+        const initialForm: Record<Provider, Record<string, string>> = {
+          teams: {}, github: {}, jira: {}, slack: {}, notion: {}, google_drive: {}, email: {},
         };
         for (const item of data.integrations as IntegrationStatus[]) {
           map[item.provider] = item;
+          if (item.config_preview) {
+            const preview = item.config_preview as Record<string, string>;
+            for (const [k, v] of Object.entries(preview)) {
+              if (v && typeof v === "string" && !v.includes("***")) {
+                initialForm[item.provider][k] = v;
+              }
+            }
+          }
         }
         setStatuses(map);
+        setFormState((prev) => ({
+          ...initialForm,
+          ...prev,
+        }));
       }
     } catch {
       // ignore error
@@ -207,7 +233,7 @@ function SettingsContent() {
         body: JSON.stringify({ provider, config: formState[provider] }),
       });
       if (res.ok) {
-        setMessage({ text: `${providerMeta[provider].label} configuration saved.`, type: "success" });
+        setMessage({ text: `${providerMeta[provider].label} configuration saved to PostgreSQL.`, type: "success" });
         await fetchStatuses();
       } else {
         setMessage({ text: "Failed to save configuration.", type: "error" });
@@ -216,6 +242,45 @@ function SettingsContent() {
       setMessage({ text: "Failed to save configuration.", type: "error" });
     }
     setSavingProvider(null);
+  };
+
+  const handleTestTeams = async () => {
+    setTestingTeams(true);
+    try {
+      const webhookUrl = formState.teams.webhook_url;
+      const res = await fetch("/api/teams/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: "Hello from TwinOps! Your personal Microsoft Teams channel is connected to Sm Ali's Digital Twin.",
+          title: "TwinOps Digital Twin Connected",
+          subtitle: "Responding on behalf of Sm Ali",
+          webhookUrl: webhookUrl || undefined,
+          facts: [
+            { title: "Connected Account", value: formState.teams.email || "Personal Microsoft Account" },
+            { title: "Status", value: "Live & Active" },
+          ],
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSyncFeedback((prev) => ({
+          ...prev,
+          teams: { success: true, message: "Adaptive card delivered to your Teams channel successfully!" },
+        }));
+      } else {
+        setSyncFeedback((prev) => ({
+          ...prev,
+          teams: { success: false, message: data.error || "Failed to send message to Teams" },
+        }));
+      }
+    } catch {
+      setSyncFeedback((prev) => ({
+        ...prev,
+        teams: { success: false, message: "Network error sending test card to Teams" },
+      }));
+    }
+    setTestingTeams(false);
   };
 
   const handleSyncNow = async (provider: Provider, route?: string) => {
@@ -287,10 +352,10 @@ function SettingsContent() {
           {/* Header */}
           <div>
             <h1 className="text-[24px] font-extrabold tracking-tight text-slate-800">
-              Enterprise Integrations & Sync
+              Integrations & Real Database Connectors
             </h1>
             <p className="mt-1 text-[13.5px] font-medium text-slate-500">
-              Configure real repository tokens and webhooks to ground your team digital twins in live codebases.
+              Configure personal Microsoft Teams, GitHub, and Jira connectors. All credentials save to your real PostgreSQL database.
             </p>
           </div>
 
@@ -316,98 +381,91 @@ function SettingsContent() {
             </div>
           )}
 
-          {/* Google Account Card */}
-          <div className="rounded-3xl border border-[#e2eaf3] bg-[#f1f5fa] p-6 shadow-[6px_6px_14px_#cfd8e5,-6px_-6px_14px_#ffffff]">
+          {/* Microsoft Teams Card Highlight */}
+          <div className="rounded-3xl border border-[#d2dbfc] bg-gradient-to-br from-[#f6f8ff] to-[#eef2fc] p-6 shadow-[6px_6px_14px_#cfd8e5,-6px_-6px_14px_#ffffff]">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <GoogleLogo size={24} />
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#505ac9] text-white shadow-[3px_3px_8px_#505ac940]">
+                  <Users size={22} />
+                </div>
                 <div>
-                  <h2 className="text-[15px] font-bold text-slate-800">Google Workspace & M365</h2>
-                  <p className="text-[12px] font-medium text-slate-500">Architecture decks, Drive folders & Mail sync</p>
+                  <h2 className="text-[16px] font-extrabold text-slate-800">Microsoft Teams (Personal Account)</h2>
+                  <p className="text-[12px] font-medium text-slate-500">Auto-answer mentions and sync chat context with your personal account</p>
                 </div>
               </div>
               <span
                 className={`rounded-full px-3 py-1 text-[11px] font-bold border ${
-                  isGoogleOAuth
+                  statuses.teams?.has_config
                     ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                     : "bg-slate-100 text-slate-500 border-slate-200"
                 }`}
               >
-                {isGoogleOAuth ? "Connected" : "Not connected"}
+                {statuses.teams?.has_config ? "Connected" : "Not Configured"}
               </span>
             </div>
 
-            {isGoogleOAuth ? (
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-[13px] font-bold text-emerald-800">
-                  <Check size={15} />
-                  Authenticated as: <strong>{googleEmail || "Enterprise User"}</strong>
+            <div className="mb-4 space-y-3">
+              {providerFields.teams.map((field) => (
+                <div key={field.key}>
+                  <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                    {field.label}
+                  </label>
+                  <input
+                    type={field.type || "text"}
+                    value={formState.teams[field.key] || ""}
+                    placeholder={field.placeholder || ""}
+                    onChange={(e) => handleInputChange("teams", field.key, e.target.value)}
+                    className="w-full rounded-xl border border-[#d8e2ed] bg-white px-4 py-2.5 text-[13px] font-medium text-slate-800 placeholder:text-slate-400 shadow-[inset_2px_2px_4px_#cfd8e5,inset_-2px_-2px_4px_#ffffff] focus:border-indigo-400 focus:outline-none"
+                  />
                 </div>
+              ))}
+            </div>
 
-                {googleFeedback && (
-                  <div
-                    className={`rounded-xl border px-3.5 py-2.5 text-[12px] font-bold ${
-                      googleFeedback.success
-                        ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-                        : "border-rose-200 bg-rose-50 text-rose-800"
-                    }`}
-                  >
-                    {googleFeedback.message}
-                  </div>
-                )}
+            <div className="mb-4 rounded-2xl border border-indigo-100 bg-indigo-50/50 p-3.5 text-[12px] font-medium text-indigo-900 leading-relaxed">
+              <strong>💡 How to get your Teams Webhook:</strong> In your Teams channel, click <code className="bg-white px-1.5 py-0.5 rounded border border-indigo-200">···</code> &rarr; <strong>Workflows</strong> &rarr; Select <em>&ldquo;Post to a channel when a webhook request is received&rdquo;</em> &rarr; Copy the generated URL and paste it above.
+            </div>
 
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => handleSyncNow("google_drive", "/api/google-drive/sync")}
-                    disabled={isGoogleSyncing}
-                    className="flex items-center gap-2 rounded-xl border border-[#e2eaf3] bg-white px-4 py-2 text-[13px] font-bold text-slate-700 shadow-[3px_3px_7px_#cfd8e5] transition-all hover:bg-slate-50 disabled:opacity-50"
-                  >
-                    <HardDrive size={14} className={isGoogleSyncing ? "animate-spin" : ""} />
-                    {isGoogleSyncing ? "Syncing..." : "Sync Drive Specs"}
-                  </button>
-                  <button
-                    onClick={() => handleSyncNow("google_drive", "/api/gmail/sync")}
-                    disabled={isGoogleSyncing}
-                    className="flex items-center gap-2 rounded-xl border border-[#e2eaf3] bg-white px-4 py-2 text-[13px] font-bold text-slate-700 shadow-[3px_3px_7px_#cfd8e5] transition-all hover:bg-slate-50 disabled:opacity-50"
-                  >
-                    <Mail size={14} className={isGoogleSyncing ? "animate-spin" : ""} />
-                    {isGoogleSyncing ? "Syncing..." : "Sync Architecture Mail"}
-                  </button>
-                  <button
-                    onClick={handleDisconnectGoogle}
-                    className="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-[13px] font-bold text-rose-700 transition-all hover:bg-rose-100"
-                  >
-                    <LogOut size={14} />
-                    Disconnect
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <p className="text-[13px] font-medium leading-relaxed text-slate-600">
-                  Connect your corporate account to automatically ingest technical design documents and team emails into local semantic memory.
-                </p>
-                <a
-                  href="/api/auth/google"
-                  className="inline-flex items-center gap-2 rounded-xl bg-[#4f46e5] px-5 py-2.5 text-[13px] font-bold text-white shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] transition-all hover:bg-indigo-700"
-                >
-                  <LogIn size={15} />
-                  Connect Google Workspace
-                </a>
+            {syncFeedback.teams && (
+              <div
+                className={`mb-4 rounded-xl border px-3.5 py-2.5 text-[12px] font-bold ${
+                  syncFeedback.teams.success
+                    ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                    : "border-rose-200 bg-rose-50 text-rose-800"
+                }`}
+              >
+                {syncFeedback.teams.message}
               </div>
             )}
+
+            <div className="flex flex-wrap gap-2.5">
+              <button
+                onClick={() => handleSave("teams")}
+                disabled={savingProvider === "teams" || testingTeams}
+                className="flex items-center gap-2 rounded-xl bg-[#505ac9] px-5 py-2.5 text-[13px] font-bold text-white shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] transition-all hover:bg-[#434cb0] disabled:opacity-50"
+              >
+                {savingProvider === "teams" ? "Saving..." : "Save Teams Connector"}
+              </button>
+              <button
+                onClick={handleTestTeams}
+                disabled={savingProvider === "teams" || testingTeams}
+                className="flex items-center gap-2 rounded-xl border border-[#d8e2ed] bg-white px-4 py-2.5 text-[13px] font-bold text-slate-700 shadow-[3px_3px_7px_#cfd8e5] transition-all hover:bg-slate-50 disabled:opacity-50"
+              >
+                <Send size={14} className={testingTeams ? "animate-spin text-indigo-600" : "text-indigo-600"} />
+                {testingTeams ? "Delivering..." : "Send Test Card to Teams"}
+              </button>
+            </div>
           </div>
 
           {/* Other Integrations */}
           <div>
             <h2 className="text-[16px] font-bold text-slate-800">Pod Connectors & Dev Ecosystem</h2>
             <p className="mt-0.5 text-[12.5px] font-medium text-slate-500">
-              Configure credentials to ingest commit diffs, sprint boards, and Slack/Teams threads.
+              Configure credentials to ingest commit diffs, sprint boards, and Slack threads.
             </p>
           </div>
 
           <div className="space-y-4">
-            {NON_GOOGLE_PROVIDERS.map((provider) => {
+            {NON_GOOGLE_PROVIDERS.filter((p) => p !== "teams").map((provider) => {
               const meta = providerMeta[provider];
               const fields = providerFields[provider];
               const status = statuses[provider];

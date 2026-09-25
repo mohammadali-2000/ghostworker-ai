@@ -10,6 +10,7 @@ import {
   Zap,
   LogOut,
   Hash,
+  RefreshCw,
 } from "lucide-react";
 
 export type EmployeeView = "chat" | "slack" | "coworkers" | "knowledge";
@@ -125,8 +126,8 @@ export function EmployeeSidebar({
           onClick={onDemoMode}
           className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 py-2.5 text-[12.5px] font-bold text-white shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] hover:opacity-95 active:scale-[0.98] transition-all"
         >
-          <Zap size={14} className="fill-white" />
-          Trigger Demo Mode
+          <RefreshCw size={14} className="text-white" />
+          Sync Real Repositories
         </button>
         <a
           href="/"

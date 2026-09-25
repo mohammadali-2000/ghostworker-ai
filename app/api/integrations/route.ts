@@ -5,6 +5,7 @@ import { syncGitHubContextToSupabase } from "@/lib/integrations/github";
 import { syncNotionContextToSupabase } from "@/lib/integrations/notion";
 import { syncGoogleDriveContextToSupabase, syncGmailToSupabase } from "@/lib/integrations/google";
 import { syncSlackContextToSupabase } from "@/lib/integrations/slack";
+import { syncJiraContext } from "@/lib/integrations/jira";
 
 type IntegrationProvider =
   | "slack"
@@ -212,6 +213,10 @@ export async function POST(request: NextRequest) {
         } else {
           syncResult = driveResult;
         }
+      }
+    } else if (body.provider === "jira") {
+      if (body.config.base_url && body.config.email && body.config.api_token) {
+        syncResult = await syncJiraContext({ cloneId });
       }
     }
   } catch (error) {

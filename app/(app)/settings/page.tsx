@@ -20,13 +20,14 @@ import {
 
 type Provider = "slack" | "github" | "notion" | "google_drive" | "jira" | "email";
 
-const SYNCABLE_PROVIDERS: Provider[] = ["slack", "github", "notion", "google_drive"];
+const SYNCABLE_PROVIDERS: Provider[] = ["slack", "github", "notion", "google_drive", "jira"];
 
 const syncRoutes: Partial<Record<Provider, string>> = {
   slack: "/api/slack/sync",
   github: "/api/github/sync",
   notion: "/api/notion/sync",
   google_drive: "/api/google-drive/sync",
+  jira: "/api/jira/sync",
   email: "/api/gmail/sync",
 };
 

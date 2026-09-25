@@ -204,6 +204,31 @@ export async function getTeamsWebhookUrl(): Promise<string | null> {
   return null;
 }
 
+export interface JiraCredentials {
+  baseUrl: string;
+  email: string;
+  apiToken: string;
+}
+
+/** Resolve Jira Cloud credentials from Settings first, then environment. */
+export async function getJiraCredentials(): Promise<JiraCredentials> {
+  const config = await getIntegrationConfig("jira");
+  const baseUrl = typeof config?.base_url === "string" ? config.base_url : process.env.JIRA_BASE_URL;
+  const email = typeof config?.email === "string" ? config.email : process.env.JIRA_EMAIL;
+  const apiToken = typeof config?.api_token === "string" ? config.api_token : process.env.JIRA_API_TOKEN;
+
+  if (!baseUrl || !email || !apiToken) {
+    throw new Error("Jira is not configured. Add base URL, email, and API token in Settings or set JIRA_BASE_URL, JIRA_EMAIL, and JIRA_API_TOKEN.");
+  }
+
+  const url = new URL(baseUrl);
+  if (url.protocol !== "https:") {
+    throw new Error("Jira base URL must use HTTPS.");
+  }
+
+  return { baseUrl: url.origin, email: email.trim(), apiToken: apiToken.trim() };
+}
+
 export async function getActiveCloneId(): Promise<string> {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;

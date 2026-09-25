@@ -478,22 +478,17 @@ export async function syncGitHubContextToSupabase(opts: {
   }
 
   if (memoryRows.length > 0) {
-    // 1. Always persist to local file store (data/local_memories.json) for 100% local guarantee
-    try {
-      const { saveLocalMemories } = await import("@backend/memory/local-store");
-      saveLocalMemories(memoryRows as any);
-    } catch (localErr) {
-      console.warn("[github-sync] Local file save warning:", localErr);
-    }
-
-    // 2. Also persist to Supabase if reachable
-    try {
+    // Supabase is the source of truth when it is configured. Do not report a
+    // successful enterprise sync if the shared database write has failed.
+    if (supabaseUrl && supabaseKey) {
       const { error } = await supabase.from("memories").insert(memoryRows);
       if (error) {
-        console.warn("[github-sync] Supabase DB insert error:", error.message);
+        throw new Error(`GitHub context could not be saved to Supabase: ${error.message}`);
       }
-    } catch (supabaseErr) {
-      console.warn("[github-sync] Supabase unreachable, data safely stored in local-store:", supabaseErr);
+    } else {
+      // Offline/demo fallback only when no shared database was configured.
+      const { saveLocalMemories } = await import("@backend/memory/local-store");
+      saveLocalMemories(memoryRows as any);
     }
   }
 
@@ -504,4 +499,3 @@ export async function syncGitHubContextToSupabase(opts: {
     chunks_created: chunksCreated,
   };
 }
-

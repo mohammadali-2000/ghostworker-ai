@@ -75,28 +75,37 @@ export async function GET() {
     return NextResponse.json({ integrations });
   }
 
-  const supabase = createServerSupabaseClient();
-  const result = await supabase
-    .from("integrations")
-    .select("provider, config, updated_at")
-    .order("provider");
+    try {
+      const supabase = createServerSupabaseClient();
+      const result = await supabase
+        .from("integrations")
+        .select("provider, config, updated_at")
+        .order("provider");
 
-  if (result.error) {
-    return NextResponse.json(
-      { error: `Failed to load integrations: ${result.error.message}` },
-      { status: 500 }
-    );
+      if (!result.error && result.data) {
+        const integrations = (result.data as IntegrationRecord[]).map((row) => ({
+          provider: row.provider,
+          updated_at: row.updated_at,
+          has_config: Object.keys(row.config ?? {}).length > 0,
+          config_preview: maskConfig(row.config ?? {}),
+        }));
+        return NextResponse.json({ integrations });
+      }
+    } catch {
+      // Fall through to local fallback
+    }
+
+    const integrations = VALID_PROVIDERS.map((provider) => {
+      const entry = localIntegrationsMap.get(provider);
+      return {
+        provider,
+        updated_at: entry?.updated_at || new Date().toISOString(),
+        has_config: Boolean(entry && Object.keys(entry.config).length > 0),
+        config_preview: entry ? maskConfig(entry.config) : {},
+      };
+    });
+    return NextResponse.json({ integrations });
   }
-
-  const integrations = (result.data as IntegrationRecord[]).map((row) => ({
-    provider: row.provider,
-    updated_at: row.updated_at,
-    has_config: Object.keys(row.config ?? {}).length > 0,
-    config_preview: maskConfig(row.config ?? {}),
-  }));
-
-  return NextResponse.json({ integrations });
-}
 
 export async function POST(request: NextRequest) {
   const body = (await request.json()) as {

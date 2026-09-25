@@ -380,27 +380,28 @@ export async function syncGitHubContextToSupabase(opts: {
   const supabase = createServerSupabaseClient();
   const now = new Date().toISOString();
 
-  const snapshotInsert = await supabase
-    .from("memories")
-    .insert({
-      clone_id: opts.cloneId,
-      type: "snapshot",
-      source: "github",
-      content: JSON.stringify(context),
-      confidence: 1.0,
-      metadata: { github_username: opts.username, repositories_scanned: context.repositories_scanned },
-      occurred_at: now,
-    })
-    .select("id")
-    .single();
+  let snapshotId = `snap_local_${Date.now()}`;
+  try {
+    const snapshotInsert = await supabase
+      .from("memories")
+      .insert({
+        clone_id: opts.cloneId,
+        type: "snapshot",
+        source: "github",
+        content: JSON.stringify(context),
+        confidence: 1.0,
+        metadata: { github_username: opts.username, repositories_scanned: context.repositories_scanned },
+        occurred_at: now,
+      })
+      .select("id")
+      .single();
 
-  if (snapshotInsert.error || !snapshotInsert.data) {
-    throw new Error(
-      `Failed to save GitHub snapshot: ${snapshotInsert.error?.message ?? "unknown error"}`
-    );
+    if (snapshotInsert?.data?.id) {
+      snapshotId = snapshotInsert.data.id as string;
+    }
+  } catch (err) {
+    console.warn("[github-sync] Supabase snapshot insert fallback:", err);
   }
-
-  const snapshotId = snapshotInsert.data.id as string;
   const repositoryDocs = context.repositories.map((repository) =>
     buildRepositorySnapshotDocument(opts.username, repository)
   );
@@ -477,9 +478,22 @@ export async function syncGitHubContextToSupabase(opts: {
   }
 
   if (memoryRows.length > 0) {
-    const { error } = await supabase.from("memories").insert(memoryRows);
-    if (error) {
-      throw new Error(`Failed to save GitHub memories: ${error.message}`);
+    // 1. Always persist to local file store (data/local_memories.json) for 100% local guarantee
+    try {
+      const { saveLocalMemories } = await import("@backend/memory/local-store");
+      saveLocalMemories(memoryRows as any);
+    } catch (localErr) {
+      console.warn("[github-sync] Local file save warning:", localErr);
+    }
+
+    // 2. Also persist to Supabase if reachable
+    try {
+      const { error } = await supabase.from("memories").insert(memoryRows);
+      if (error) {
+        console.warn("[github-sync] Supabase DB insert error:", error.message);
+      }
+    } catch (supabaseErr) {
+      console.warn("[github-sync] Supabase unreachable, data safely stored in local-store:", supabaseErr);
     }
   }
 

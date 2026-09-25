@@ -157,10 +157,33 @@ export function searchKnowledgeBase(
   query: string,
   topK: number = 5
 ): Chunk[] {
-  const queryTerms = query.toLowerCase().split(/\s+/);
+  const queryTerms = query.toLowerCase().split(/\s+/).filter(Boolean);
+
+  // 1. Search real synced local memories from disk (GitHub, Teams, Docs)
+  let localChunks: Chunk[] = [];
+  try {
+    const { searchLocalMemories } = require("./local-store");
+    const localItems = searchLocalMemories(query, topK);
+    localChunks = localItems.map((item: any) => ({
+      id: item.id,
+      document_id: item.metadata?.snapshot_id || item.id,
+      clone_id: cloneId,
+      content: item.content,
+      metadata: {
+        title: item.metadata?.document_title || item.metadata?.title || "Real Workspace Memory",
+        doc_type: item.type || "github_sync",
+        ...item.metadata,
+      },
+      created_at: item.occurred_at,
+    }));
+  } catch {
+    // fallback gracefully
+  }
+
+  // 2. Search fallback mock documents
   const cloneDocs = mockDocuments.filter((d) => d.clone_id === cloneId);
 
-  const results = cloneDocs
+  const mockResults: Chunk[] = cloneDocs
     .map((doc) => ({
       id: doc.id,
       document_id: doc.id,
@@ -175,11 +198,12 @@ export function searchKnowledgeBase(
         doc.content.toLowerCase().includes(term)
       ).length,
     }))
-    .filter((r) => r.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, topK);
+    .filter((r) => (r as any).score > 0)
+    .sort((a, b) => (b as any).score - (a as any).score);
 
-  return results;
+  // Real local memories take precedence over mock documents!
+  const combined = [...localChunks, ...mockResults];
+  return combined.slice(0, topK);
 }
 
 export function getCloneMemories(cloneId: string) {

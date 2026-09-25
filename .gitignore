@@ -7,3 +7,7 @@ next-env.d.ts
 
 # Supabase temp
 supabase/.temp
+
+# Local memory storage
+data/*.json
+!data/.gitkeep

@@ -212,46 +212,50 @@ export async function getActiveCloneId(): Promise<string> {
     return "clone_self";
   }
 
-  const supabase = createServerSupabaseClient();
+  try {
+    const supabase = createServerSupabaseClient();
 
-  // Try active clones first
-  const active = await supabase
-    .from("clones")
-    .select("id")
-    .eq("status", "active")
-    .order("created_at", { ascending: true })
-    .limit(1)
-    .single();
+    // Try active clones first
+    const active = await supabase
+      .from("clones")
+      .select("id")
+      .eq("status", "active")
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .single();
 
-  if (active.data?.id) {
-    return active.data.id as string;
+    if (active.data?.id) {
+      return active.data.id as string;
+    }
+
+    // Fall back to any clone regardless of status
+    const anyClone = await supabase
+      .from("clones")
+      .select("id")
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .single();
+
+    if (anyClone.data?.id) {
+      return anyClone.data.id as string;
+    }
+
+    // No clones at all — auto-seed a default clone (no org/user FK needed)
+    console.log("[getActiveCloneId] No clones found, auto-seeding default clone...");
+
+    const { data: clone } = await supabase
+      .from("clones")
+      .insert({ name: "Default Clone", status: "active" })
+      .select("id")
+      .single();
+
+    if (clone?.id) {
+      console.log(`[getActiveCloneId] Seeded default clone: ${clone.id}`);
+      return clone.id as string;
+    }
+  } catch (err) {
+    console.warn("[getActiveCloneId] Supabase unreachable, fallback to clone_self:", err);
   }
 
-  // Fall back to any clone regardless of status
-  const anyClone = await supabase
-    .from("clones")
-    .select("id")
-    .order("created_at", { ascending: true })
-    .limit(1)
-    .single();
-
-  if (anyClone.data?.id) {
-    return anyClone.data.id as string;
-  }
-
-  // No clones at all — auto-seed a default clone (no org/user FK needed)
-  console.log("[getActiveCloneId] No clones found, auto-seeding default clone...");
-
-  const { data: clone, error: cloneErr } = await supabase
-    .from("clones")
-    .insert({ name: "Default Clone", status: "active" })
-    .select("id")
-    .single();
-
-  if (cloneErr || !clone) {
-    throw new Error(`Failed to create default clone: ${cloneErr?.message}`);
-  }
-
-  console.log(`[getActiveCloneId] Seeded default clone: ${clone.id}`);
-  return clone.id as string;
+  return "clone_self";
 }

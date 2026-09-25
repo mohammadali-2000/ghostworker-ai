@@ -41,12 +41,17 @@ export function CeoSidebar({ activeView, onViewChange, onDemoMode }: CeoSidebarP
     <aside className="flex h-full w-[240px] flex-col border-r border-[#1e1e22] bg-[#111114]">
       {/* Logo */}
       <div className="flex items-center gap-2 px-5 py-5">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#c4b5a0] text-[#0a0a0c]">
+        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">
           <Sparkles size={15} />
         </div>
-        <span className="text-[15px] font-semibold tracking-tight text-[#ededed]">
-          GhostWorker
-        </span>
+        <div className="flex flex-col">
+          <span className="text-[15px] font-bold tracking-tight text-[#ededed]">
+            TwinOps
+          </span>
+          <span className="text-[9px] uppercase tracking-wider text-indigo-400 font-semibold">
+            Manager Console
+          </span>
+        </div>
       </div>
 
       {/* Role badge */}

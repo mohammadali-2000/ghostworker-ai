@@ -9,9 +9,8 @@ import {
   Settings,
   Zap,
   LogOut,
+  Hash,
 } from "lucide-react";
-
-import { Hash } from "lucide-react";
 
 export type EmployeeView = "chat" | "slack" | "coworkers" | "knowledge";
 
@@ -24,23 +23,23 @@ interface EmployeeSidebarProps {
 const navItems: { id: EmployeeView; label: string; icon: React.ReactNode }[] = [
   {
     id: "slack",
-    label: "Teams & Slack Channels",
-    icon: <Hash size={18} />,
+    label: "Teams & Slack Hub",
+    icon: <Hash size={17} />,
   },
   {
     id: "chat",
-    label: "My Twin Clone",
-    icon: <MessageSquare size={18} />,
+    label: "My Twin Brain",
+    icon: <MessageSquare size={17} />,
   },
   {
     id: "coworkers",
-    label: "Coworker Twins",
-    icon: <Users size={18} />,
+    label: "Pod Teammates",
+    icon: <Users size={17} />,
   },
   {
     id: "knowledge",
-    label: "Knowledge Base",
-    icon: <BookOpen size={18} />,
+    label: "Episodic Knowledge",
+    icon: <BookOpen size={17} />,
   },
 ];
 
@@ -58,38 +57,39 @@ export function EmployeeSidebar({
   }, []);
 
   return (
-    <aside className="flex h-full w-[240px] flex-col border-r border-[#1e1e22] bg-[#111114]">
+    <aside className="flex h-full w-[250px] flex-col bg-[#eaf0f6] border-r border-[#d4deeb] select-none">
       {/* Logo */}
-      <div className="flex items-center gap-2 px-5 py-5">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">
-          <Sparkles size={15} />
+      <div className="flex items-center gap-3 px-5 py-6">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] border border-white/60">
+          <Sparkles size={18} className="animate-pulse" />
         </div>
         <div className="flex flex-col">
-          <span className="text-[15px] font-bold tracking-tight text-[#ededed]">
+          <span className="text-[16px] font-extrabold tracking-tight text-slate-800">
             TwinOps
           </span>
-          <span className="text-[9px] uppercase tracking-wider text-indigo-400 font-semibold">
-            Enterprise Pod
+          <span className="text-[10px] uppercase tracking-wider text-indigo-600 font-bold">
+            Accenture Pod
           </span>
         </div>
       </div>
 
-      {/* User info */}
-      {(cloneName || email) && (
-        <div className="mx-3 mb-3 rounded-lg bg-[#1a1a1e] px-3 py-2">
-          <p className="text-[12px] font-medium text-[#c4b5a0]">
-            {cloneName || email}
+      {/* User profile capsule */}
+      <div className="mx-3 mb-4 rounded-xl bg-[#f1f5fa] p-2.5 shadow-[inset_2px_2px_4px_#cfd8e5,inset_-2px_-2px_4px_#ffffff] border border-white/60">
+        <div className="flex items-center gap-2">
+          <div className="h-2.5 w-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
+          <p className="text-[12px] font-bold text-slate-700 truncate">
+            {cloneName || "Sm Ali (Architect)"}
           </p>
-          {cloneName && email && (
-            <p className="text-[10px] text-[#71717a]">{email}</p>
-          )}
         </div>
-      )}
+        <p className="text-[10px] text-slate-500 pl-4.5 truncate">
+          {email || "ali@accenture.com"}
+        </p>
+      </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 pt-2">
-        <p className="mb-2 px-2 text-[11px] font-medium uppercase tracking-wider text-[#52525b]">
-          Workspace
+      <nav className="flex-1 px-3 space-y-1.5">
+        <p className="px-3 text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-2">
+          Workflows
         </p>
         {navItems.map((item) => {
           const active = activeView === item.id;
@@ -97,13 +97,13 @@ export function EmployeeSidebar({
             <button
               key={item.id}
               onClick={() => onViewChange(item.id)}
-              className={`mb-0.5 flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-[13.5px] transition-colors ${
+              className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] font-medium transition-all ${
                 active
-                  ? "bg-[#1e1e22] font-medium text-[#ededed]"
-                  : "text-[#a1a1aa] hover:bg-[#19191d] hover:text-[#d4d4d8]"
+                  ? "bg-[#e5edf6] text-indigo-700 font-bold shadow-[inset_3px_3px_6px_#cfd8e5,inset_-3px_-3px_6px_#ffffff] border border-white/80"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-[#f1f5fa] hover:shadow-[3px_3px_7px_#cfd8e5,-3px_-3px_7px_#ffffff]"
               }`}
             >
-              <span className={active ? "text-[#c4b5a0]" : "text-[#52525b]"}>
+              <span className={active ? "text-indigo-600" : "text-slate-400"}>
                 {item.icon}
               </span>
               {item.label}
@@ -113,24 +113,24 @@ export function EmployeeSidebar({
       </nav>
 
       {/* Bottom actions */}
-      <div className="border-t border-[#1e1e22] px-3 py-3 space-y-2">
+      <div className="p-3 border-t border-[#d4deeb] space-y-2">
         <a
           href="/settings"
-          className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-[13.5px] text-[#a1a1aa] transition-colors hover:bg-[#19191d] hover:text-[#d4d4d8]"
+          className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-[12.5px] font-semibold text-slate-600 transition-all hover:bg-[#f1f5fa] hover:shadow-[3px_3px_7px_#cfd8e5,-3px_-3px_7px_#ffffff]"
         >
-          <span className="text-[#52525b]"><Settings size={18} /></span>
-          Integrations
+          <Settings size={16} className="text-slate-400" />
+          Settings & Keys
         </a>
         <button
           onClick={onDemoMode}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#c4b5a0] px-3 py-2 text-[13px] font-medium text-[#0a0a0c] shadow-sm transition-colors hover:bg-[#d4c5b0] active:bg-[#b4a590]"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 py-2.5 text-[12.5px] font-bold text-white shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] hover:opacity-95 active:scale-[0.98] transition-all"
         >
-          <Zap size={14} />
-          Demo Mode
+          <Zap size={14} className="fill-white" />
+          Trigger Demo Mode
         </button>
         <a
           href="/"
-          className="flex w-full items-center justify-center gap-2 rounded-md px-3 py-1.5 text-[12px] text-[#52525b] transition-colors hover:text-[#a1a1aa]"
+          className="flex w-full items-center justify-center gap-1.5 py-1 text-[11px] font-medium text-slate-400 hover:text-slate-600 transition-colors"
         >
           <LogOut size={12} />
           Switch Portal

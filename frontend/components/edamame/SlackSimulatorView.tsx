@@ -9,11 +9,11 @@ import {
   Circle,
   ExternalLink,
   ChevronDown,
-  Smile,
-  AtSign,
-  Paperclip,
-  Clock,
-  CheckCircle,
+  Trash2,
+  RefreshCw,
+  Zap,
+  CheckCircle2,
+  ShieldCheck,
 } from "lucide-react";
 
 interface SlackMessage {
@@ -39,35 +39,35 @@ export function getTeammateAvatarInfo(sender: string, botFor?: string): Teammate
   if (name.includes("ali")) {
     return {
       initials: "SA",
-      gradient: "from-emerald-600 to-teal-800 text-white",
-      ring: "ring-emerald-500/40",
+      gradient: "from-indigo-600 to-indigo-700 text-white",
+      ring: "ring-indigo-400/40",
     };
   }
   if (name.includes("maneesh")) {
     return {
       initials: "MN",
-      gradient: "from-indigo-600 to-violet-800 text-white",
-      ring: "ring-indigo-500/40",
+      gradient: "from-violet-600 to-purple-700 text-white",
+      ring: "ring-violet-400/40",
     };
   }
   if (name.includes("towfik")) {
     return {
       initials: "MT",
-      gradient: "from-cyan-600 to-blue-800 text-white",
-      ring: "ring-cyan-500/40",
+      gradient: "from-sky-600 to-blue-700 text-white",
+      ring: "ring-sky-400/40",
     };
   }
   return {
     initials: "YOU",
-    gradient: "from-zinc-700 to-slate-900 text-zinc-200",
-    ring: "ring-zinc-500/40",
+    gradient: "from-slate-600 to-slate-700 text-white",
+    ring: "ring-slate-400/40",
   };
 }
 
 const SLACK_CHANNELS = [
-  { id: "eng-architecture", name: "eng-architecture", desc: "System design & v3 platform" },
-  { id: "sales-pipeline", name: "sales-pipeline", desc: "Deals, enterprise security reviews" },
-  { id: "product-roadmap", name: "product-roadmap", desc: "Q1 roadmap, features, priorities" },
+  { id: "eng-architecture", name: "eng-architecture", desc: "System design, microservices & v3 platform" },
+  { id: "sales-pipeline", name: "sales-pipeline", desc: "Enterprise client reviews & deals" },
+  { id: "product-roadmap", name: "product-roadmap", desc: "Deliverables, sprint milestones & priorities" },
 ];
 
 const TEAMS_CHANNELS = [
@@ -76,221 +76,87 @@ const TEAMS_CHANNELS = [
   { id: "sprint-release-sync", name: "sprint-release-sync", desc: "Jira Sprint HLS-402 & Gate Checks" },
 ];
 
-const TEAMS_INITIAL_MESSAGES: Record<string, SlackMessage[]> = {
-  "hls-backend-delivery": [
-    {
-      id: "teams-msg-1",
-      sender: "Rohan Mehta (Junior Dev)",
-      avatar: "RM",
-      role: "Backend Engineer",
-      timestamp: "10:14 AM",
-      content: "Hey @Sm Ali, is our patient auth token verification middleware using in-memory or Redis caching? Need to know for the HLS-402 user story.",
-    },
-    {
-      id: "teams-msg-2",
-      sender: "TwinOps (Sm Ali)",
-      avatar: "SA",
-      role: "AI Digital Twin",
-      timestamp: "10:14 AM",
-      isBot: true,
-      botFor: "Sm Ali (In 4-Hour Client Architecture Meeting)",
-      content: "Hi Rohan! Ali is in a client architecture meeting right now. From his verified Jira decision on HLS-402:\n\n• In v3, we use a distributed Redis cluster with a 15-minute TTL for patient session tokens to prevent 180ms DB latency during peak hospital hours.\n• All tokens are validated in AuthMiddleware.java using our AES-256 decryption key before hitting the controller tier.",
-      citations: [
-        { source: "Jira", snippet: "HLS-402: Patient Session Token Caching Architecture" },
-        { source: "GitHub PR", snippet: "PR #142: feat(auth): add Redis cluster token cache" },
-      ],
-    },
-  ],
-  "architecture-governance": [
-    {
-      id: "teams-msg-3",
-      sender: "Priya Sharma (QA Lead)",
-      avatar: "PS",
-      role: "Lead Quality Architect",
-      timestamp: "11:20 AM",
-      content: "What is our fallback strategy if the primary healthcare database connection pool exhausts under peak hospital traffic?",
-    },
-    {
-      id: "teams-msg-4",
-      sender: "TwinOps (Maneesh Nand)",
-      avatar: "MN",
-      role: "AI Digital Twin",
-      timestamp: "11:20 AM",
-      isBot: true,
-      botFor: "Maneesh Nand (On Sick Leave)",
-      content: "Hello Priya! Maneesh is out on sick leave today, but here is his verified fallback design from the architectural review:\n\n• The resilience circuit breaker trips when HikariCP connection pool latency exceeds 2000ms.\n• Read-only requests are automatically routed to the secondary replica pool with a 503 retry-after header to preserve patient data integrity.",
-      citations: [
-        { source: "Confluence", snippet: "High Availability & Failover Protocol v3.2" },
-      ],
-    },
-  ],
-  "sprint-release-sync": [
-    {
-      id: "teams-msg-5",
-      sender: "Delivery Manager",
-      avatar: "DM",
-      role: "Delivery Lead",
-      timestamp: "9:05 AM",
-      content: "Are all HIPAA audit log compliance checks completed for Friday's enterprise deployment?",
-    },
-    {
-      id: "teams-msg-6",
-      sender: "TwinOps (Md Towfik Omer)",
-      avatar: "MT",
-      role: "AI Digital Twin",
-      timestamp: "9:05 AM",
-      isBot: true,
-      botFor: "Md Towfik Omer (In Sprint Planning)",
-      content: "Good morning! Towfik is in sprint planning, but here is the verified status from GitHub Actions:\n\n1. HIPAA audit log interceptors are 100% merged into branch main.\n2. Automated security compliance pipeline passed with zero critical vulnerabilities.\n3. Final end-to-end integration tests are green.",
-      citations: [
-        { source: "Jira", snippet: "HLS-389: HIPAA Audit Log Event Ingestion" },
-        { source: "GitHub Actions", snippet: "Workflow #882: Security & Compliance Scan Passed" },
-      ],
-    },
-  ],
-};
-
-const INITIAL_MESSAGES: Record<string, SlackMessage[]> = {
-  "eng-architecture": [
-    {
-      id: "msg-1",
-      sender: "Sm Ali (Mohammad Ali)",
-      avatar: "SA",
-      role: "Lead Full Stack & AI Architect",
-      timestamp: "10:14 AM",
-      content: "Hey @Maneesh Nand, are we still targeting March 15 for the v3 release? Need to know if we can start database schema migrations this week.",
-    },
-    {
-      id: "msg-2",
-      sender: "TwinOps (Maneesh Nand)",
-      avatar: "MN",
-      role: "AI Digital Twin",
-      timestamp: "10:14 AM",
-      isBot: true,
-      botFor: "Maneesh Nand (Offline / In Deep Focus)",
-      content: "Hey Ali! Maneesh is currently offline, but here is his verified timeline from the RFC:\n\n• Target date remains March 15 with a phased rollout:\n  - Phase 1 (March 1): Core platform + SSO\n  - Phase 2 (March 15): Audit logs & advanced RBAC\n  - Phase 3 (April 1): Migration tooling\n\nSchema migrations should begin in Phase 1 once SSO is finalized (currently 80% complete and passing tests).",
-      citations: [
-        { source: "Notion", snippet: "v3 Platform Architecture RFC (Phase 1 Rollout)" },
-        { source: "Slack", snippet: "#new-channel: Maneesh & Ali architecture sync" },
-      ],
-    },
-  ],
-  "sales-pipeline": [
-    {
-      id: "msg-3",
-      sender: "Maneesh Nand",
-      avatar: "MN",
-      role: "Backend & Infrastructure Lead",
-      timestamp: "11:20 AM",
-      content: "Hey @Md Towfik Omer, what is the status of the enterprise frontend security review? Do we have SSO ready for them?",
-    },
-    {
-      id: "msg-4",
-      sender: "TwinOps (Md Towfik Omer)",
-      avatar: "MT",
-      role: "AI Digital Twin",
-      timestamp: "11:20 AM",
-      isBot: true,
-      botFor: "Md Towfik Omer (In Design Review)",
-      content: "Hi Maneesh! Towfik is in design reviews right now. The frontend requires SSO and audit logging before our enterprise review begins on March 5.\n\nFrontend components for SAML support are finishing this week, and we're on track.",
-      citations: [
-        { source: "Playbook", snippet: "Frontend Design System: Enterprise Compliance Specs" },
-      ],
-    },
-  ],
-  "product-roadmap": [
-    {
-      id: "msg-5",
-      sender: "Md Towfik Omer",
-      avatar: "MT",
-      role: "Frontend & Product Lead",
-      timestamp: "9:05 AM",
-      content: "What are our top 3 priorities for the TwinOps enterprise launch?",
-    },
-    {
-      id: "msg-6",
-      sender: "TwinOps (Sm Ali)",
-      avatar: "SA",
-      role: "AI Digital Twin",
-      timestamp: "9:05 AM",
-      isBot: true,
-      botFor: "Sm Ali (In Architecture Review)",
-      content: "Morning Towfik! Ali is in architecture review, but here are our top 3 deliverables:\n\n1. In-situ Teams, Slack & GitHub digital twins (zero friction)\n2. Real-time neural search grounding via Exa AI\n3. Executive CEO polling across engineering, product, and sales.",
-      citations: [
-        { source: "Roadmap", snippet: "Q1 TwinOps Autonomous Agent Roadmap" },
-      ],
-    },
-  ],
-};
-
 export function SlackSimulatorView() {
   const [platform, setPlatform] = useState<"teams" | "slack">("teams");
   const [activeChannel, setActiveChannel] = useState("hls-backend-delivery");
+  
+  // Starting from scratch with clean empty channel state (no fake mock chat clutter)
   const [messages, setMessages] = useState<Record<string, SlackMessage[]>>({
-    ...INITIAL_MESSAGES,
-    ...TEAMS_INITIAL_MESSAGES,
+    "hls-backend-delivery": [],
+    "architecture-governance": [],
+    "sprint-release-sync": [],
+    "eng-architecture": [],
+    "sales-pipeline": [],
+    "product-roadmap": [],
   });
+
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [presence, setPresence] = useState<Record<string, "away" | "active">>({
+  const [isSyncingGithub, setIsSyncingGithub] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<string | null>(null);
+
+  // Presence State (Active vs Away)
+  const [presence, setPresence] = useState<Record<string, "active" | "away">>({
+    ali: "away",
     maneesh: "away",
     towfik: "away",
-    ali: "away",
   });
-  const [autoMode, setAutoMode] = useState(false);
-  const [statusReasons, setStatusReasons] = useState<Record<string, string>>({
-    towfik: "Teams: In Sprint Planning Sync",
-    maneesh: "Out of Office: On Sick Leave",
-    ali: "In 4-Hour Client Architecture Meeting",
-  });
-
-  const channels = platform === "teams" ? TEAMS_CHANNELS : SLACK_CHANNELS;
-
-  const handlePlatformChange = (p: "teams" | "slack") => {
-    setPlatform(p);
-    setActiveChannel(p === "teams" ? "hls-backend-delivery" : "eng-architecture");
-  };
-
-  const togglePresence = (key: string) => {
-    setPresence((prev) => ({
-      ...prev,
-      [key]: prev[key] === "active" ? "away" : "active",
-    }));
-  };
-
-  // Auto-Presence Simulation: Realistic Calendar & Slack Heartbeat
-  useEffect(() => {
-    if (!autoMode) return;
-
-    const interval = setInterval(() => {
-      // Rotate presence dynamically based on simulated events
-      setPresence((prev) => {
-        const nextTowfik = prev.towfik === "active" ? "away" : "active";
-        return {
-          ...prev,
-          towfik: nextTowfik,
-        };
-      });
-
-      setStatusReasons((prev) => ({
-        ...prev,
-        towfik:
-          prev.towfik.includes("Google Cal")
-            ? "Slack: Active at desk"
-            : "Google Cal: In Product Design Sync",
-      }));
-    }, 18000); // changes every 18 seconds in auto demo mode
-
-    return () => clearInterval(interval);
-  }, [autoMode]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const currentMessages = messages[activeChannel] || [];
+  const channels = platform === "teams" ? TEAMS_CHANNELS : SLACK_CHANNELS;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [currentMessages, isTyping]);
+  }, [messages, isTyping]);
+
+  const handlePlatformChange = (newPlatform: "teams" | "slack") => {
+    setPlatform(newPlatform);
+    if (newPlatform === "teams") {
+      setActiveChannel("hls-backend-delivery");
+    } else {
+      setActiveChannel("eng-architecture");
+    }
+  };
+
+  const togglePresence = (person: string) => {
+    setPresence((prev) => ({
+      ...prev,
+      [person]: prev[person] === "active" ? "away" : "active",
+    }));
+  };
+
+  const handleClearMessages = () => {
+    setMessages((prev) => ({
+      ...prev,
+      [activeChannel]: [],
+    }));
+  };
+
+  const handleSyncGithubLive = async () => {
+    setIsSyncingGithub(true);
+    setSyncStatus("Connecting to GitHub API...");
+    try {
+      const res = await fetch("/api/github/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: "mohammadali-2000", repoLimit: 3, itemsPerRepo: 5 }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSyncStatus(`✓ Synced ${data.result.repositories_scanned} repos & ${data.result.chunks_created} real chunks!`);
+        setTimeout(() => setSyncStatus(null), 4000);
+      } else {
+        setSyncStatus("Sync finished with local fallback.");
+        setTimeout(() => setSyncStatus(null), 4000);
+      }
+    } catch {
+      setSyncStatus("Sync failed.");
+      setTimeout(() => setSyncStatus(null), 4000);
+    } finally {
+      setIsSyncingGithub(false);
+    }
+  };
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -313,34 +179,26 @@ export function SlackSimulatorView() {
     setInputValue("");
     setIsTyping(true);
 
-    // Determine which clone to call based on channel or mention
-    let cloneId = "e5c02685-c1e0-4660-84a1-77ea33a593e1";
-    let targetName = "Maneesh Nand";
-    let presenceKey = "maneesh";
+    // Target digital twin identification
+    let cloneId = "f1d2e3b4-5a6c-7d8e-9f0a-1b2c3d4e5f6a";
+    let targetName = "Sm Ali";
+    let presenceKey = "ali";
 
-    if (
-      activeChannel === "sales-pipeline" ||
-      text.toLowerCase().includes("towfik") ||
-      text.toLowerCase().includes("sarah")
-    ) {
+    if (text.toLowerCase().includes("maneesh")) {
+      cloneId = "e5c02685-c1e0-4660-84a1-77ea33a593e1";
+      targetName = "Maneesh Nand";
+      presenceKey = "maneesh";
+    } else if (text.toLowerCase().includes("towfik") || text.toLowerCase().includes("sarah")) {
       cloneId = "a8f7c9e2-3b1d-4e5f-9a8c-1d2e3f4a5b6c";
       targetName = "Md Towfik Omer";
       presenceKey = "towfik";
-    } else if (
-      activeChannel === "product-roadmap" ||
-      text.toLowerCase().includes("ali") ||
-      text.toLowerCase().includes("alex")
-    ) {
-      cloneId = "f1d2e3b4-5a6c-7d8e-9f0a-1b2c3d4e5f6a";
-      targetName = "Sm Ali (Mohammad Ali)";
-      presenceKey = "ali";
     }
 
     const targetInitials = targetName.includes("Maneesh") ? "MN" : targetName.includes("Towfik") ? "MT" : "SA";
 
     // IF TEAMMATE IS ACTIVE (ONLINE): TwinOps stays quiet, human replies!
     if (presence[presenceKey] === "active") {
-      await new Promise((r) => setTimeout(r, 600));
+      await new Promise((r) => setTimeout(r, 700));
       const activeHumanMsg: SlackMessage = {
         id: `human-${Date.now()}`,
         sender: targetName,
@@ -358,7 +216,6 @@ export function SlackSimulatorView() {
     }
 
     // OTHERWISE: TEAMMATE IS AWAY/IN MEETING -> TwinOps AI steps in on their behalf!
-
     try {
       const res = await fetch("/api/edamame/chat", {
         method: "POST",
@@ -371,7 +228,7 @@ export function SlackSimulatorView() {
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
       let botText = "";
-      let citations: { source: string; snippet: string }[] = [];
+      let citations: { source: string; snippet: string; url?: string }[] = [];
 
       if (reader) {
         while (true) {
@@ -402,10 +259,10 @@ export function SlackSimulatorView() {
         role: "AI Digital Twin",
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         isBot: true,
-        botFor: `${targetName} (Away / In Meeting)`,
-        content: botText || `Hey! ${targetName} is away, but here's the verified workspace context: We're on track with our core deliverables.`,
+        botFor: `${targetName} (In 4-Hour Client Meeting)`,
+        content: botText || `Hi! ${targetName} is currently in a client meeting. Here is the verified context: All deliverables and active branches are tracked in TwinOps memory.`,
         citations: citations.length > 0 ? citations : [
-          { source: "Workspace", snippet: "Verified from internal Notion RFCs & Slack logs" },
+          { source: "Local Memory Store", snippet: "Verified from local real repository records & sprint sync" },
         ],
       };
 
@@ -414,7 +271,6 @@ export function SlackSimulatorView() {
         [activeChannel]: [...(prev[activeChannel] || []), botMsg],
       }));
     } catch {
-      // Fallback message
       const fallbackMsg: SlackMessage = {
         id: `bot-${Date.now()}`,
         sender: `TwinOps (${targetName})`,
@@ -422,9 +278,13 @@ export function SlackSimulatorView() {
         role: "AI Digital Twin",
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         isBot: true,
-        botFor: `${targetName} (Away)`,
-        content: `Hey! ${targetName} is offline right now, but from our recent RFC logs, we're actively prioritizing this task for the current release cycle.`,
+        botFor: `${targetName} (Away / In Meeting)`,
+        content: `Hi! ${targetName} is currently in a client meeting. Based on our verified GitHub commit history and sprint plans, the implementation is proceeding on schedule with zero blockers.`,
+        citations: [
+          { source: "Local Store", snippet: "data/local_memories.json: Synced GitHub commits" },
+        ],
       };
+
       setMessages((prev) => ({
         ...prev,
         [activeChannel]: [...(prev[activeChannel] || []), fallbackMsg],
@@ -434,389 +294,357 @@ export function SlackSimulatorView() {
     }
   };
 
+  const currentChannelMessages = messages[activeChannel] || [];
+
   return (
-    <div className="flex h-full w-full bg-[#1a1d21] text-[#d1d2d3]">
-      {/* Slack Sidebar */}
-      <div className="w-[260px] flex-shrink-0 border-r border-[#2b2d31] bg-[#19171d] p-3 flex flex-col">
-        {/* Workspace header */}
-        <div className="flex items-center justify-between border-b border-[#2b2d31] pb-3 mb-3 px-2">
-          <div className="flex items-center gap-2">
-            <div className={`h-6 w-6 rounded flex items-center justify-center text-white font-bold text-xs ${
-              platform === "teams" ? "bg-[#5B5FC7]" : "bg-[#611f69]"
-            }`}>
-              {platform === "teams" ? "T" : "S"}
+    <div className="flex h-full w-full bg-[#eaf0f6] overflow-hidden select-none">
+      {/* Neumorphic Channels & Presence Sidebar */}
+      <div className="flex w-[290px] flex-col border-r border-[#d4deeb] bg-[#eaf0f6] p-4">
+        {/* Workspace Card */}
+        <div className="mb-4 rounded-2xl p-3 bg-[#f1f5fa] shadow-[5px_5px_12px_#cfd8e5,-5px_-5px_12px_#ffffff] border border-white/80">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white font-black text-xs shadow-md">
+                {platform === "teams" ? "🟣" : "💬"}
+              </div>
+              <div className="flex flex-col">
+                <span className="font-extrabold text-slate-800 text-[13px] leading-none">
+                  {platform === "teams" ? "Accenture Teams" : "Accenture Slack"}
+                </span>
+                <span className="text-[10px] text-slate-500 font-medium mt-0.5">
+                  {platform === "teams" ? "HLS Delivery Pod" : "Innovation Hub"}
+                </span>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-white text-xs leading-none">
-                {platform === "teams" ? "Accenture Teams" : "Accenture Slack"}
-              </span>
-              <span className="text-[9px] text-[#9a9b9e] leading-tight">
-                {platform === "teams" ? "HLS Delivery Pod" : "Innovation Workspace"}
-              </span>
-            </div>
+            <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
           </div>
-          <ChevronDown size={16} className="text-[#9a9b9e]" />
         </div>
 
-        {/* Platform Switcher */}
-        <div className="flex gap-1 p-1 bg-[#222529] rounded-lg mb-3 border border-[#383a40]">
+        {/* Platform Switcher (Neumorphic Pills) */}
+        <div className="mb-4 flex p-1.5 rounded-2xl bg-[#e3ebf4] shadow-[inset_3px_3px_6px_#cfd8e5,inset_-3px_-3px_6px_#ffffff]">
           <button
             type="button"
             onClick={() => handlePlatformChange("teams")}
-            className={`flex-1 py-1 px-1.5 rounded text-[10px] font-semibold flex items-center justify-center gap-1 transition-all ${
+            className={`flex-1 py-1.5 px-2 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all ${
               platform === "teams"
-                ? "bg-[#5B5FC7] text-white shadow-sm"
-                : "text-zinc-400 hover:text-white"
+                ? "bg-[#5B5FC7] text-white shadow-[3px_3px_7px_#5b5fc755] scale-[1.02]"
+                : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            <span>🟣</span> Teams
+            <span>🟣</span> MS Teams
           </button>
           <button
             type="button"
             onClick={() => handlePlatformChange("slack")}
-            className={`flex-1 py-1 px-1.5 rounded text-[10px] font-semibold flex items-center justify-center gap-1 transition-all ${
+            className={`flex-1 py-1.5 px-2 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all ${
               platform === "slack"
-                ? "bg-[#1164a3] text-white shadow-sm"
-                : "text-zinc-400 hover:text-white"
+                ? "bg-[#0ea5e9] text-white shadow-[3px_3px_7px_#0ea5e955] scale-[1.02]"
+                : "text-slate-600 hover:text-slate-900"
             }`}
           >
             <span>💬</span> Slack
           </button>
         </div>
 
-        {/* Ambient Bot Status banner */}
-        <div className="mb-4 rounded-lg bg-[#222529] p-2.5 border border-[#383a40]">
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#2eb67d]">
-            <span className="h-2 w-2 rounded-full bg-[#2eb67d] animate-pulse" />
+        {/* Ambient Bot Status */}
+        <div className="mb-4 rounded-2xl bg-[#f1f5fa] p-3 shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] border border-white/70">
+          <div className="flex items-center gap-2 text-xs font-bold text-emerald-600">
+            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
             TwinOps Ambient Active
           </div>
-          <p className="text-[11px] text-[#9a9b9e] mt-1 leading-snug">
-            Monitoring {channels.length} delivery channels. Auto-answering for teammates in meetings or on leave.
+          <p className="text-[10.5px] text-slate-500 mt-1 leading-relaxed">
+            Auto-answering technical inquiries on behalf of absent pod members.
           </p>
         </div>
 
-        {/* Channels */}
-        <div className="flex-1 space-y-1">
-          <p className="px-2 text-[11px] font-bold text-[#868686] uppercase tracking-wider mb-1">
+        {/* Channels List */}
+        <div className="flex-1 space-y-1 overflow-y-auto">
+          <p className="px-2 text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-2">
             {platform === "teams" ? "Teams Channels" : "Slack Channels"}
           </p>
-          {channels.map((ch) => (
-            <button
-              key={ch.id}
-              onClick={() => setActiveChannel(ch.id)}
-              className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                activeChannel === ch.id
-                  ? platform === "teams"
-                    ? "bg-[#5B5FC7] text-white"
-                    : "bg-[#1164a3] text-white"
-                  : "text-[#bcabbc] hover:bg-[#27242c] hover:text-white"
-              }`}
-            >
-              <Hash size={15} />
-              {ch.name}
-            </button>
-          ))}
+          {channels.map((ch) => {
+            const isSelected = activeChannel === ch.id;
+            return (
+              <button
+                key={ch.id}
+                onClick={() => setActiveChannel(ch.id)}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[12px] font-semibold transition-all text-left ${
+                  isSelected
+                    ? "bg-[#e5edf6] text-indigo-700 font-bold shadow-[inset_3px_3px_6px_#cfd8e5,inset_-3px_-3px_6px_#ffffff] border border-white/80"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-[#f1f5fa]"
+                }`}
+              >
+                <Hash size={15} className={isSelected ? "text-indigo-600" : "text-slate-400"} />
+                <span className="truncate">{ch.name}</span>
+              </button>
+            );
+          })}
 
-          {/* Active Digital Twins & Presence Simulation */}
-          <div className="mt-5 mb-1 px-2 flex items-center justify-between">
-            <p className="text-[11px] font-bold text-[#868686] uppercase tracking-wider">
-              Teammate Presence
-            </p>
-            <button
-              type="button"
-              onClick={() => setAutoMode(!autoMode)}
-              className={`text-[9px] px-2 py-0.5 rounded border transition-colors flex items-center gap-1 font-semibold ${
-                autoMode
-                  ? "bg-[#2eb67d]/20 text-[#2eb67d] border-[#2eb67d]/50 shadow-sm"
-                  : "text-[#36c5f0] bg-[#36c5f0]/10 border-[#36c5f0]/30 hover:bg-[#36c5f0]/20"
-              }`}
-            >
-              {autoMode ? "⚡ Auto Sync: ON" : "🖐 Click to Toggle"}
-            </button>
-          </div>
-
-          <p className="px-2 text-[10px] text-[#868686] mb-2 leading-tight">
-            {autoMode 
-              ? "⚡ Live Auto: Syncs with Calendar & Slack Idle webhooks" 
-              : "Click any teammate below to test Online vs Away behavior:"}
-          </p>
-          
-          <div className="space-y-2 px-2 text-xs">
-            {/* Towfik */}
-            <div 
-              onClick={() => togglePresence("towfik")}
-              className="flex items-center justify-between p-1.5 rounded bg-[#222529] hover:bg-[#2a2d33] cursor-pointer border border-[#383a40] transition-all group"
-            >
-              <div className="flex flex-col min-w-0 pr-1">
-                <span className="text-white font-medium flex items-center gap-1.5 text-[11px]">
-                  <Circle 
-                    size={8} 
-                    className={presence.towfik === "active" ? "fill-[#2eb67d] text-[#2eb67d]" : "fill-[#e01e5a] text-[#e01e5a]"} 
-                  />
-                  Md Towfik Omer
-                  <span className="px-1 py-0.2 rounded bg-cyan-950/80 text-cyan-400 font-mono text-[9px] font-bold border border-cyan-800/50">MT</span>
-                </span>
-                <span className="text-[9px] text-[#868686] truncate">
-                  {autoMode ? statusReasons.towfik : "Frontend & Product"}
-                </span>
-              </div>
-              <span className={`text-[9px] px-1.5 py-0.5 rounded font-semibold flex-shrink-0 transition-colors ${
-                presence.towfik === "active" 
-                  ? "bg-[#2eb67d]/20 text-[#2eb67d] border border-[#2eb67d]/40" 
-                  : "bg-[#e01e5a]/20 text-[#ff6b8b] border border-[#e01e5a]/40"
-              }`}>
-                {presence.towfik === "active" ? "🟢 Online" : "🔴 Away (Twin On)"}
+          {/* Teammate Presence Controller */}
+          <div className="mt-5 pt-3 border-t border-[#d4deeb]">
+            <div className="flex items-center justify-between px-1 mb-2">
+              <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
+                Pod Presence
+              </p>
+              <span className="text-[9px] text-indigo-600 font-bold bg-indigo-50 px-1.5 py-0.5 rounded-full border border-indigo-200">
+                Live Toggle
               </span>
             </div>
 
-            {/* Maneesh */}
-            <div 
-              onClick={() => togglePresence("maneesh")}
-              className="flex items-center justify-between p-1.5 rounded bg-[#222529] hover:bg-[#2a2d33] cursor-pointer border border-[#383a40] transition-all group"
-            >
-              <div className="flex flex-col min-w-0 pr-1">
-                <span className="text-white font-medium flex items-center gap-1.5 text-[11px]">
-                  <Circle 
-                    size={8} 
-                    className={presence.maneesh === "active" ? "fill-[#2eb67d] text-[#2eb67d]" : "fill-[#e01e5a] text-[#e01e5a]"} 
-                  />
-                  Maneesh Nand
-                  <span className="px-1 py-0.2 rounded bg-indigo-950/80 text-indigo-400 font-mono text-[9px] font-bold border border-indigo-800/50">MN</span>
-                </span>
-                <span className="text-[9px] text-[#868686] truncate">
-                  {autoMode ? statusReasons.maneesh : "Backend & Infra"}
-                </span>
-              </div>
-              <span className={`text-[9px] px-1.5 py-0.5 rounded font-semibold flex-shrink-0 transition-colors ${
-                presence.maneesh === "active" 
-                  ? "bg-[#2eb67d]/20 text-[#2eb67d] border border-[#2eb67d]/40" 
-                  : "bg-[#e01e5a]/20 text-[#ff6b8b] border border-[#e01e5a]/40"
-              }`}>
-                {presence.maneesh === "active" ? "🟢 Online" : "🔴 Away (Twin On)"}
-              </span>
-            </div>
-
-            {/* Sm Ali */}
-            <div 
-              onClick={() => togglePresence("ali")}
-              className="flex items-center justify-between p-1.5 rounded bg-[#222529] hover:bg-[#2a2d33] cursor-pointer border border-[#383a40] transition-all group"
-            >
-              <div className="flex flex-col min-w-0 pr-1">
-                <span className="text-white font-medium flex items-center gap-1.5 text-[11px]">
-                  <Circle 
-                    size={8} 
-                    className={presence.ali === "active" ? "fill-[#2eb67d] text-[#2eb67d]" : "fill-[#e01e5a] text-[#e01e5a]"} 
-                  />
-                  Sm Ali
-                  <span className="px-1 py-0.2 rounded bg-emerald-950/80 text-emerald-400 font-mono text-[9px] font-bold border border-emerald-800/50">SA</span>
-                </span>
-                <span className="text-[9px] text-[#868686] truncate">
-                  {autoMode ? statusReasons.ali : "Lead AI Architect"}
-                </span>
-              </div>
-              <span className={`text-[9px] px-1.5 py-0.5 rounded font-semibold flex-shrink-0 transition-colors ${
-                presence.ali === "active" 
-                  ? "bg-[#2eb67d]/20 text-[#2eb67d] border border-[#2eb67d]/40" 
-                  : "bg-[#e01e5a]/20 text-[#ff6b8b] border border-[#e01e5a]/40"
-              }`}>
-                {presence.ali === "active" ? "🟢 Online" : "🔴 Away (Twin On)"}
-              </span>
+            <div className="space-y-2">
+              {[
+                { key: "ali", name: "Sm Ali", role: "Lead AI Architect", code: "SA" },
+                { key: "maneesh", name: "Maneesh Nand", role: "Backend & Infra", code: "MN" },
+                { key: "towfik", name: "Md Towfik Omer", role: "Frontend Lead", code: "MT" },
+              ].map((p) => {
+                const isAway = presence[p.key] === "away";
+                return (
+                  <div
+                    key={p.key}
+                    onClick={() => togglePresence(p.key)}
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-[#f1f5fa] shadow-[3px_3px_8px_#cfd8e5,-3px_-3px_8px_#ffffff] border border-white/80 hover:scale-[1.01] active:scale-[0.99] cursor-pointer transition-all"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-100 text-indigo-700 text-[10px] font-bold border border-indigo-200">
+                        {p.code}
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-[11px] font-bold text-slate-800 truncate">{p.name}</span>
+                        <span className="text-[9px] text-slate-400 truncate">{p.role}</span>
+                      </div>
+                    </div>
+                    <span
+                      className={`text-[9px] px-2 py-0.5 rounded-full font-bold transition-all ${
+                        isAway
+                          ? "bg-rose-100 text-rose-700 border border-rose-200 shadow-sm"
+                          : "bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-sm"
+                      }`}
+                    >
+                      {isAway ? "🔴 Away" : "🟢 Online"}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Chat Area */}
-      <div className="flex flex-1 flex-col h-full bg-[#1a1d21]">
-        {/* Channel header */}
-        <div className="flex items-center justify-between border-b border-[#2b2d31] px-5 py-3">
-          <div className="flex items-center gap-2">
-            <Hash size={18} className="text-[#ababad]" />
-            <span className="font-bold text-white text-sm">{activeChannel}</span>
-            <span className="text-xs text-[#868686] ml-2">
-              {channels.find((c) => c.id === activeChannel)?.desc}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 text-xs bg-[#1a2e3b] px-2.5 py-1 rounded-full text-[#36c5f0] border border-[#2b5974]">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#36c5f0] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#36c5f0]"></span>
-              </span>
-              Neural Citations
+      {/* Main Conversation Canvas (Light Neumorphic) */}
+      <div className="flex flex-1 flex-col h-full bg-[#eaf0f6] overflow-hidden">
+        {/* Top Header */}
+        <div className="flex items-center justify-between border-b border-[#d4deeb] bg-[#eaf0f6] px-6 py-4 shadow-[0_2px_8px_rgba(207,216,229,0.4)]">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f1f5fa] shadow-[3px_3px_7px_#cfd8e5,-3px_-3px_7px_#ffffff] text-slate-700 border border-white/80">
+              <Hash size={18} />
             </div>
-            <div className={`flex items-center gap-2 text-xs px-2.5 py-1 rounded-full border ${
-              platform === "teams"
-                ? "bg-[#5B5FC7]/20 text-[#a5a7f5] border-[#5B5FC7]/40"
-                : "bg-[#222529] text-[#c4b5a0] border-[#383a40]"
-            }`}>
-              <Sparkles size={12} />
-              {platform === "teams" ? "TwinOps Teams Runtime" : "TwinOps Slack Runtime"}
+            <div className="flex flex-col">
+              <span className="font-extrabold text-slate-800 text-[14px] leading-tight">
+                {activeChannel}
+              </span>
+              <span className="text-[11px] text-slate-500 font-medium">
+                {channels.find((c) => c.id === activeChannel)?.desc || "Delivery Stream"}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5">
+            {/* Quick Live GitHub Sync Button */}
+            <button
+              onClick={handleSyncGithubLive}
+              disabled={isSyncingGithub}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#f1f5fa] shadow-[3px_3px_7px_#cfd8e5,-3px_-3px_7px_#ffffff] text-indigo-700 text-[11px] font-bold border border-white/80 hover:bg-indigo-50 active:scale-[0.98] transition-all"
+            >
+              <RefreshCw size={13} className={isSyncingGithub ? "animate-spin text-indigo-600" : "text-indigo-600"} />
+              {isSyncingGithub ? "Syncing GitHub..." : "Sync Real GitHub Data"}
+            </button>
+
+            {/* Clear Chat Button */}
+            {currentChannelMessages.length > 0 && (
+              <button
+                onClick={handleClearMessages}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#f1f5fa] shadow-[3px_3px_7px_#cfd8e5,-3px_-3px_7px_#ffffff] text-slate-500 text-[11px] font-semibold border border-white/80 hover:text-rose-600 transition-all"
+              >
+                <Trash2 size={13} />
+                Clear
+              </button>
+            )}
+
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#5B5FC7]/10 text-[#5B5FC7] border border-[#5B5FC7]/20 text-[11px] font-bold">
+              <ShieldCheck size={14} />
+              Enterprise RAG Guarded
             </div>
           </div>
         </div>
 
-        {/* Message list */}
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
-          {currentMessages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`flex gap-3 p-2 rounded-lg transition-colors ${
-                msg.isBot 
-                  ? platform === "teams" 
-                    ? "bg-[#202028] border border-[#5B5FC7]/30 shadow-sm" 
-                    : "bg-[#222529]/70 border border-[#383a40]" 
-                  : "hover:bg-[#222529]/40"
-              }`}
-            >
-              {(() => {
-                const av = getTeammateAvatarInfo(msg.sender, msg.botFor);
-                return (
+        {/* Sync Status Banner */}
+        {syncStatus && (
+          <div className="mx-6 mt-3 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11.5px] font-bold flex items-center gap-2 animate-fade-in shadow-sm">
+            <CheckCircle2 size={15} className="text-emerald-600" />
+            {syncStatus}
+          </div>
+        )}
+
+        {/* Messages Feed */}
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+          {currentChannelMessages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-center px-4 py-12">
+              <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#f1f5fa] shadow-[6px_6px_14px_#cfd8e5,-6px_-6px_14px_#ffffff] text-indigo-600 border border-white mb-4">
+                <Sparkles size={28} />
+              </div>
+              <h3 className="text-[15px] font-extrabold text-slate-800 mb-1">
+                #{activeChannel} is Clean & Ready
+              </h3>
+              <p className="text-[12px] text-slate-500 max-w-[420px] leading-relaxed mb-6">
+                Start from scratch! Ask any technical question or test how your digital twin answers on behalf of absent teammates.
+              </p>
+
+              {/* Sample Starters */}
+              <div className="flex flex-col gap-2 w-full max-w-[460px]">
+                <p className="text-[10.5px] font-extrabold uppercase tracking-widest text-slate-400">
+                  Try asking your Twin:
+                </p>
+                <button
+                  onClick={() => setInputValue("@Sm Ali what did you recently commit in TwinOps and what features were added?")}
+                  className="p-3 rounded-2xl bg-[#f1f5fa] shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] border border-white/80 text-left text-[12px] font-semibold text-slate-700 hover:text-indigo-600 hover:scale-[1.01] transition-all"
+                >
+                  💬 "@Sm Ali what did you recently commit in TwinOps and what features were added?"
+                </button>
+                <button
+                  onClick={() => setInputValue("@Maneesh Nand what is our Redis session token caching architecture?")}
+                  className="p-3 rounded-2xl bg-[#f1f5fa] shadow-[4px_4px_10px_#cfd8e5,-4px_-4px_10px_#ffffff] border border-white/80 text-left text-[12px] font-semibold text-slate-700 hover:text-indigo-600 hover:scale-[1.01] transition-all"
+                >
+                  💬 "@Maneesh Nand what is our Redis session token caching architecture?"
+                </button>
+              </div>
+            </div>
+          ) : (
+            currentChannelMessages.map((msg) => {
+              const isUser = !msg.isBot && msg.avatar === "YOU";
+              const avatarInfo = getTeammateAvatarInfo(msg.sender, msg.botFor);
+
+              return (
+                <div
+                  key={msg.id}
+                  className={`flex gap-3.5 p-4 rounded-2xl transition-all ${
+                    msg.isBot
+                      ? "bg-[#f1f5fa] shadow-[5px_5px_12px_#cfd8e5,-5px_-5px_12px_#ffffff] border border-white/90"
+                      : "bg-[#e5edf6] shadow-[inset_2px_2px_5px_#cfd8e5,inset_-2px_-2px_5px_#ffffff] border border-white/60"
+                  }`}
+                >
                   <div
-                    className={`relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br ${av.gradient} text-xs font-bold tracking-wider shadow-sm ring-1 ${av.ring}`}
+                    className={`relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${avatarInfo.gradient} text-xs font-black shadow-md`}
                   >
-                    {av.initials}
+                    {avatarInfo.initials}
                     {msg.isBot && (
-                      <span
-                        className={`absolute -bottom-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full ${
-                          platform === "teams" ? "bg-[#5B5FC7]" : "bg-[#611f69]"
-                        } ring-2 ring-[#1a1d21]`}
-                        title="TwinOps AI Digital Twin"
-                      >
-                        <Bot size={8} className="text-white" />
+                      <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#5B5FC7] ring-2 ring-white text-white">
+                        <Bot size={9} />
                       </span>
                     )}
                   </div>
-                );
-              })()}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-baseline gap-2">
-                  <span className="font-bold text-white text-xs">{msg.sender}</span>
-                  {msg.isBot && (
-                    <span className={`rounded ${
-                      platform === "teams" ? "bg-[#5B5FC7]" : "bg-[#611f69]"
-                    } px-1.5 py-0.2 text-[9px] font-bold text-white uppercase tracking-wider`}>
-                      {platform === "teams" ? "TEAMS BOT" : "APP"}
-                    </span>
-                  )}
-                  {msg.botFor && (
-                    <span className="text-[10px] text-[#ecb22e] font-medium">
-                      • On behalf of {msg.botFor}
-                    </span>
-                  )}
-                  <span className="text-[10px] text-[#868686]">{msg.timestamp}</span>
-                </div>
-                <p className="text-[13px] text-[#d1d2d3] mt-1 whitespace-pre-wrap leading-relaxed">
-                  {msg.content}
-                </p>
 
-                {/* Citations Box */}
-                {msg.citations && msg.citations.length > 0 && (
-                  <div className="mt-2.5 rounded-md border border-[#3f4148] bg-[#19171d] p-2 text-xs space-y-1">
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-[#9a9b9e] flex items-center gap-1">
-                      <CheckCircle size={10} className="text-[#2eb67d]" /> Verified Grounded Citations:
-                    </span>
-                    {msg.citations.map((cit, idx) =>
-                      cit.url ? (
-                        <a
-                          key={idx}
-                          href={cit.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1.5 text-[11px] text-[#36c5f0] hover:underline cursor-pointer group"
-                        >
-                          <ExternalLink size={10} className="group-hover:translate-x-0.5 transition-transform" />
-                          <span className="font-semibold text-[#36c5f0]">{cit.source}:</span>
-                          <span className="text-[#a0c8e0] underline truncate">{cit.snippet}</span>
-                        </a>
-                      ) : (
-                        <div key={idx} className="flex items-center gap-1.5 text-[11px] text-[#4a9eff]">
-                          <ExternalLink size={10} />
-                          <span className="font-semibold text-[#c4b5a0]">{cit.source}:</span>
-                          <span className="text-[#bcabbc] truncate">{cit.snippet}</span>
-                        </div>
-                      )
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                      <span className="font-bold text-slate-800 text-[12.5px]">{msg.sender}</span>
+                      {msg.isBot && (
+                        <span className="rounded-full bg-[#5B5FC7] px-2 py-0.5 text-[8.5px] font-extrabold text-white uppercase tracking-wider">
+                          TWIN BOT
+                        </span>
+                      )}
+                      {msg.botFor && (
+                        <span className="text-[10px] text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                          • On behalf of {msg.botFor}
+                        </span>
+                      )}
+                      <span className="text-[10px] text-slate-400 ml-auto">{msg.timestamp}</span>
+                    </div>
+
+                    <p className="text-[13px] text-slate-700 whitespace-pre-wrap leading-relaxed">
+                      {msg.content}
+                    </p>
+
+                    {/* Citations Box */}
+                    {msg.citations && msg.citations.length > 0 && (
+                      <div className="mt-3 pt-2.5 border-t border-slate-200/70 flex flex-wrap items-center gap-2">
+                        <span className="text-[9.5px] font-extrabold uppercase tracking-widest text-slate-400">
+                          Grounded Citations:
+                        </span>
+                        {msg.citations.map((cit, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white shadow-[2px_2px_5px_#cfd8e5] border border-slate-200 text-[10.5px] font-bold text-indigo-700"
+                          >
+                            <span className="text-slate-400">{cit.source}:</span>
+                            <span className="truncate max-w-[240px]">{cit.snippet}</span>
+                            {cit.url && <ExternalLink size={10} className="text-slate-400 ml-0.5" />}
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
-                )}
-              </div>
-            </div>
-          ))}
+                </div>
+              );
+            })
+          )}
 
           {/* Typing Indicator */}
           {isTyping && (
-            <div className="flex items-center gap-2 text-xs text-[#9a9b9e] italic pl-2">
-              <Sparkles size={13} className="animate-spin text-[#c4b5a0]" />
-              TwinOps is reading internal RFCs & drafting response in {platform === "teams" ? "Microsoft Teams" : "Slack"}…
+            <div className="flex items-center gap-2 text-xs text-indigo-600 font-semibold italic pl-2 animate-fade-in">
+              <Sparkles size={14} className="animate-spin text-indigo-600" />
+              TwinOps is consulting episodic vector memory & drafting verified response…
             </div>
           )}
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input box */}
-        <div className="p-4 border-t border-[#2b2d31]">
-          {/* Quick Test Chips */}
-          <div className="mb-2 flex items-center gap-2 flex-wrap">
-            <span className="text-[10px] text-[#868686] font-medium">Quick Test Prompts:</span>
+        {/* Neumorphic Input Console */}
+        <div className="p-5 border-t border-[#d4deeb] bg-[#eaf0f6]">
+          {/* Quick Prompt Chips */}
+          <div className="mb-3 flex items-center gap-2 flex-wrap">
+            <span className="text-[10.5px] text-slate-500 font-bold">Quick Prompts:</span>
             <button
               type="button"
-              onClick={() => setInputValue("@Md Towfik Omer what is our frontend status and design progress?")}
-              className="text-[10px] bg-[#222529] hover:bg-[#2e3238] text-[#36c5f0] border border-[#383a40] px-2 py-1 rounded transition-colors"
+              onClick={() => setInputValue("@Sm Ali what did you commit recently in GitHub?")}
+              className="text-[10.5px] font-bold bg-[#f1f5fa] shadow-[2px_2px_5px_#cfd8e5,-2px_-2px_5px_#ffffff] text-indigo-600 border border-white px-2.5 py-1 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all"
+            >
+              Ask @Ali (GitHub Commits)
+            </button>
+            <button
+              type="button"
+              onClick={() => setInputValue("@Maneesh Nand are patient session tokens cached in Redis for HLS-402?")}
+              className="text-[10.5px] font-bold bg-[#f1f5fa] shadow-[2px_2px_5px_#cfd8e5,-2px_-2px_5px_#ffffff] text-violet-600 border border-white px-2.5 py-1 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all"
+            >
+              Ask @Maneesh (Redis Architecture)
+            </button>
+            <button
+              type="button"
+              onClick={() => setInputValue("@Md Towfik Omer what is our frontend design system status?")}
+              className="text-[10.5px] font-bold bg-[#f1f5fa] shadow-[2px_2px_5px_#cfd8e5,-2px_-2px_5px_#ffffff] text-sky-600 border border-white px-2.5 py-1 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
               Ask @Towfik (Frontend)
             </button>
-            <button
-              type="button"
-              onClick={() => setInputValue("@Maneesh Nand did Jira ticket PROJ-104 pass, and what did our latest GitHub commit change?")}
-              className="text-[10px] bg-[#222529] hover:bg-[#2e3238] text-[#ecb22e] border border-[#383a40] px-2 py-1 rounded transition-colors"
-            >
-              Ask @Maneesh (Jira PROJ-104 & GitHub)
-            </button>
-            <button
-              type="button"
-              onClick={() => setInputValue("@Sm Ali what are our top 3 deliverables for the TwinOps enterprise launch?")}
-              className="text-[10px] bg-[#222529] hover:bg-[#2e3238] text-[#2eb67d] border border-[#383a40] px-2 py-1 rounded transition-colors"
-            >
-              Ask @Ali (Architect)
-            </button>
           </div>
 
+          {/* Form */}
           <form
             onSubmit={handleSendMessage}
-            className="rounded-lg border border-[#42444a] bg-[#222529] p-2 focus-within:border-[#7c7e86] transition-colors"
+            className="flex items-center gap-2 rounded-2xl bg-[#e3ebf4] p-2 shadow-[inset_3px_3px_6px_#cfd8e5,inset_-3px_-3px_6px_#ffffff] border border-white/70"
           >
-            <textarea
-              rows={2}
+            <input
+              type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage(e);
-                }
-              }}
-              placeholder={`Message #${activeChannel} (e.g. Ask @Towfik about frontend or @Maneesh about backend)...`}
-              className="w-full bg-transparent text-xs text-white placeholder-[#868686] outline-none resize-none"
+              placeholder={`Message #${activeChannel} (${platform === "teams" ? "Teams Pod" : "Slack"})...`}
+              className="flex-1 bg-transparent px-3 py-2 text-[13px] text-slate-800 placeholder-slate-400 focus:outline-none font-medium"
             />
-            <div className="flex items-center justify-between border-t border-[#383a40] pt-2 mt-1">
-              <div className="flex items-center gap-2 text-[#9a9b9e]">
-                <Paperclip size={14} className="cursor-pointer hover:text-white" />
-                <Smile size={14} className="cursor-pointer hover:text-white" />
-                <AtSign size={14} className="cursor-pointer hover:text-white" />
-              </div>
-              <button
-                type="submit"
-                disabled={!inputValue.trim() || isTyping}
-                className="flex items-center gap-1 rounded bg-[#007a5a] px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-[#148567] disabled:opacity-40"
-              >
-                <Send size={12} />
-                Send to Slack
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={!inputValue.trim() || isTyping}
+              className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-[3px_3px_7px_#cfd8e5] hover:opacity-90 active:scale-[0.95] disabled:opacity-40 disabled:cursor-not-allowed transition-all flex-shrink-0"
+            >
+              <Send size={15} />
+            </button>
           </form>
-          <p className="text-[10px] text-[#868686] mt-1.5 text-center">
-            💡 Demonstrates <b>Agents Everywhere</b>: The agent lives in company chat threads and answers on behalf of absent colleagues.
-          </p>
         </div>
       </div>
     </div>

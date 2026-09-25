@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GhostWorker — Autonomous Workplace Digital Twins",
+  title: "TwinOps Enterprise — Autonomous Workplace Digital Twins",
   description:
-    "Ambient AI digital twins that live directly in Slack, GitHub, and team docs to answer technical questions and unblock teams 24/7.",
+    "Ambient AI digital twins that live directly in Microsoft Teams, Slack, GitHub, and enterprise episodic memory.",
 };
 
 export default function RootLayout({
@@ -26,7 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} bg-[#eaf0f6] text-slate-800 antialiased selection:bg-indigo-500/20`}
       >
         {children}
       </body>
